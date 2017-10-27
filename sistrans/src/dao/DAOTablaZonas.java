@@ -173,69 +173,69 @@ public class DAOTablaZonas
 	 * @throws SQLException
 	 * @throws Exception
 	 */
-	public List<Zona> getZonasSinParametros()throws SQLException, Exception
-	{
-		String sqlZonasMain = "SELECT * FROM ZONAS";
-		
-		PreparedStatement prepStmtZonasMain= conn.prepareStatement(sqlZonasMain);
-		recursos.add(prepStmtZonasMain);
-		ResultSet rsMain = prepStmtZonasMain.executeQuery();
-		
-		List<Zona> zonas = new ArrayList<Zona>();
-		
-		while(rsMain.next())
-		{
-			Long id = rsMain.getLong("ID");
-			String nombre = rsMain.getString("NAME");
-			Boolean esEspacioAbierto = rsMain.getBoolean("ESPACIO_ABIERTO");
-			Integer capacidad = rsMain.getInt("CAPACIDAD");
-			Boolean esIncluyente = rsMain.getBoolean("INCLUYENTE");
-			
-			String sqlCondiciones = "SELECT * FROM CONDICIONESTECNICAS , CONDICIONZONA  WHERE ID_ZONA = " + id + "AND ID_CONDICION = ID ORDER BY ID ASC";
-			System.out.println(sqlCondiciones);
-			PreparedStatement prepStmtCondiciones= conn.prepareStatement(sqlCondiciones);
-			recursos.add(prepStmtCondiciones);
-			ResultSet rsCondiciones = prepStmtCondiciones.executeQuery();
-			
-			List<String> condiciones = new ArrayList<String>();
-			while(rsCondiciones.next())
-			{
-				String condicion = rsCondiciones.getString("NAME");
-				condiciones.add(condicion);
-			}
-			Zona newZona = new Zona(id, nombre, esEspacioAbierto, capacidad, esIncluyente, condiciones, null);
-			
-			
-//			String sqlRestaurantes = "SELECT * FROM RESTAURANTES WHERE ID_ZONA = " + id + " ";
-//			PreparedStatement prepStmtRestaurantes= conn.prepareStatement(sqlRestaurantes);
-//			recursos.add(prepStmtRestaurantes);
-//			ResultSet rsRestaurantes = prepStmtRestaurantes.executeQuery();
+//	public List<Zona> getZonasSinParametros()throws SQLException, Exception
+//	{
+//		String sqlZonasMain = "SELECT * FROM ZONAS";
+//		
+//		PreparedStatement prepStmtZonasMain= conn.prepareStatement(sqlZonasMain);
+//		recursos.add(prepStmtZonasMain);
+//		ResultSet rsMain = prepStmtZonasMain.executeQuery();
+//		
+//		List<Zona> zonas = new ArrayList<Zona>();
+//		
+//		while(rsMain.next())
+//		{
+//			Long id = rsMain.getLong("ID");
+//			String nombre = rsMain.getString("NAME");
+//			Boolean esEspacioAbierto = rsMain.getBoolean("ESPACIO_ABIERTO");
+//			Integer capacidad = rsMain.getInt("CAPACIDAD");
+//			Boolean esIncluyente = rsMain.getBoolean("INCLUYENTE");
 //			
-//			List<Restaurante> restuarantes = new ArrayList<Restaurante>();
-//			while(rsRestaurantes.next())
+//			String sqlCondiciones = "SELECT * FROM CONDICIONESTECNICAS , CONDICIONZONA  WHERE ID_ZONA = " + id + "AND ID_CONDICION = ID ORDER BY ID ASC";
+//			System.out.println(sqlCondiciones);
+//			PreparedStatement prepStmtCondiciones= conn.prepareStatement(sqlCondiciones);
+//			recursos.add(prepStmtCondiciones);
+//			ResultSet rsCondiciones = prepStmtCondiciones.executeQuery();
+//			
+//			List<String> condiciones = new ArrayList<String>();
+//			while(rsCondiciones.next())
 //			{
-//				Long idRestaurante = rsRestaurantes.getLong("ID");
-//				String nameRestaurante = rsRestaurantes.getString("NAME");
-//				String paginaRestaurante = rsRestaurantes.getString("PAGINA_WEB");
-//				
-//				String sqlTipoRestaurantes = "SELECT T.NAME FROM RESTAURANTES R, TIPOS T WHERE R.ID_TIPO = T.ID AND R.ID =" + idRestaurante + " ";
-//				PreparedStatement prepStmtTipoRestaurantes= conn.prepareStatement(sqlTipoRestaurantes);
-//				recursos.add(prepStmtTipoRestaurantes);
-//				ResultSet rsTipoRestaurantes = prepStmtTipoRestaurantes.executeQuery();
-//				
-//				String tipoRestaurante = rsTipoRestaurantes.getString("NAME");
-//				
-//				//TODO INICIO PARTE DE PROCESAR LOS PRODUCTOS DEL RESTAURANTE.
-//				List<Producto> productosRestaurantes = null;
-//				
-//				
-//				//FIN PARTE DE PROCESAR LOS PRODUCTOS DEL RESTAURANTE.
-//				Restaurante newRestaurante = new Restaurante(idRestaurante, nameRestaurante, paginaRestaurante, productosRestaurantes, tipoRestaurante);
-//				restuarantes.add(newRestaurante);
+//				String condicion = rsCondiciones.getString("NAME");
+//				condiciones.add(condicion);
 //			}
-			zonas.add(newZona);
-		}
-		return zonas;
-	}	
+//			Zona newZona = new Zona(id, nombre, esEspacioAbierto, capacidad, esIncluyente, condiciones, null);
+//			
+//			
+////			String sqlRestaurantes = "SELECT * FROM RESTAURANTES WHERE ID_ZONA = " + id + " ";
+////			PreparedStatement prepStmtRestaurantes= conn.prepareStatement(sqlRestaurantes);
+////			recursos.add(prepStmtRestaurantes);
+////			ResultSet rsRestaurantes = prepStmtRestaurantes.executeQuery();
+////			
+////			List<Restaurante> restuarantes = new ArrayList<Restaurante>();
+////			while(rsRestaurantes.next())
+////			{
+////				Long idRestaurante = rsRestaurantes.getLong("ID");
+////				String nameRestaurante = rsRestaurantes.getString("NAME");
+////				String paginaRestaurante = rsRestaurantes.getString("PAGINA_WEB");
+////				
+////				String sqlTipoRestaurantes = "SELECT T.NAME FROM RESTAURANTES R, TIPOS T WHERE R.ID_TIPO = T.ID AND R.ID =" + idRestaurante + " ";
+////				PreparedStatement prepStmtTipoRestaurantes= conn.prepareStatement(sqlTipoRestaurantes);
+////				recursos.add(prepStmtTipoRestaurantes);
+////				ResultSet rsTipoRestaurantes = prepStmtTipoRestaurantes.executeQuery();
+////				
+////				String tipoRestaurante = rsTipoRestaurantes.getString("NAME");
+////				
+////				//TODO INICIO PARTE DE PROCESAR LOS PRODUCTOS DEL RESTAURANTE.
+////				List<Producto> productosRestaurantes = null;
+////				
+////				
+////				//FIN PARTE DE PROCESAR LOS PRODUCTOS DEL RESTAURANTE.
+////				Restaurante newRestaurante = new Restaurante(idRestaurante, nameRestaurante, paginaRestaurante, productosRestaurantes, tipoRestaurante);
+////				restuarantes.add(newRestaurante);
+////			}
+//			zonas.add(newZona);
+//		}
+//		return zonas;
+//	}	
 
 }

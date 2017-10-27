@@ -1,43 +1,30 @@
 package rest;
 
 import java.util.List;
+
 import javax.servlet.ServletContext;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.codehaus.jackson.map.ObjectMapper;
-
-import rest.ClienteResorce.RequestBody;
 import tm.RotondAndesTM;
-import vos.Zona;
-import vos.Pedido;
-import vos.Producto;
+import vos.EstadisticasPedidos;
 
-/**
- * Clase que administra el Rest de la clase Zona.
- * @author ASUS
- *
- */
-@Path("zonas")
+@Path("pedidos")
 @Produces("application/json")
 @Consumes("application/json")
-public class ZonasResource
+public class PedidosResource
 {
 	/**
 	 * Clase que contiene la información del cuerpo de entrada.
-	 * @author ASUS
+	 * @author Juan Carlos Corrales
 	 *
 	 */
 	@XmlRootElement
@@ -72,42 +59,22 @@ public class ZonasResource
 	}
 	
 	/**
-	 * Método que obtiene una Zona.
-	 * @param idZona Long, ID de la zona a obtener.
+	 * Método que obtiene las estadísticas de los Pedidos de un restaurante mediante el identificador de su Representante.
+	 * @param id Long, ID del Representante del restaurante
 	 * @return Response, toda la información de la Zona.
 	 */
 	@GET
 	@Path("{idZona: \\d+}")
 	@Produces( { MediaType.APPLICATION_JSON } )
-	public Response getZona(@PathParam("idZona") Long idZona) {
+	public Response getZona(@PathParam("idZona") Long id) {
 		RotondAndesTM tm = new RotondAndesTM(getPath());
 		try {
-			Zona zona = tm.darZona(idZona);
-			return Response.status( 200 ).entity( zona ).build( );		
+			System.out.println("ENTRO A METODO RESOURCE");
+			List<EstadisticasPedidos> respuesta = tm.darEstadisticasPedidos(id);
+			return Response.status( 200 ).entity( respuesta ).build( );		
 		}catch( Exception e )
 		{
 			return Response.status( 500 ).entity( doErrorMessage( e ) ).build( );
 		}
 	}
-	
-	/**
-	 * Método que registra una nueva Zona.
-	 * @param zona Zona, datos de la Zona.
-	 * @return Response, Zona con toda la información proporcionada.
-	 */
-	@POST
-	@Consumes({ MediaType.APPLICATION_JSON })
-	public Response agregarZona(Zona zona) {
-		RotondAndesTM tm = new RotondAndesTM(getPath());
-		try {
-			
-			Zona res = tm.agregarZona(zona);
-			return Response.status( 200 ).entity( res ).build();	
-		}catch( Exception e )
-		{
-			return Response.status( 500 ).entity( doErrorMessage( e ) ).build( );
-		}
-	}
-	
-	
 }

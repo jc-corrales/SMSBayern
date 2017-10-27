@@ -26,6 +26,7 @@ import dao.DAOTablaRestaurantes;
 import dao.DAOTablaZonas;
 import vos.Cliente;
 import vos.ClienteFrecuente;
+import vos.EstadisticasPedidos;
 import vos.Ingrediente;
 import vos.IngredienteBase;
 import vos.Pedido;
@@ -519,6 +520,55 @@ public class RotondAndesTM {
 		}
 		return zona;
 	}
+	/**
+	 * Método que obtiene las estadísticas de los Pedidos de un Restaurante.
+	 * @param id Long, ID del Representante del Restaurante cuyas estadísticas se van a pedir.
+	 * @return List<EstadisticasPedidos>
+	 * @throws SQLException
+	 * @throws Exception
+	 */
+	public List<EstadisticasPedidos> darEstadisticasPedidos(Long id)throws SQLException, Exception {
 
+//		Zona zona = null;
+//
+//		DAOTablaZonas daoZona = new DAOTablaZonas();
+//		DAOTablaRestaurantes daoRes = new DAOTablaRestaurantes();
+//		DAOTablaProductos daoProd = new DAOTablaProductos();
+		System.out.println("ENTRO A METODO TM");
+		DAOTablaPedidos daoPedidos = new DAOTablaPedidos();
+		System.out.println("CREO DAOPEDIDOS");
+		List<EstadisticasPedidos> respuesta;
+		try {
+			System.out.println("ENTRO A TRY");
+			this.conn = darConexion();
+			daoPedidos.setConn(conn);
+			respuesta = daoPedidos.darEstadisticasPedidos();
+//			System.out.println("after dao ------> " + zona.getId() + " || " + zona.getNombre());
+			if(respuesta.size() == 0) {
+				throw new Exception("NO EXISTE LA ZONA");
+			}		
+		}catch (SQLException e) {
+			System.err.println("SQLException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		} catch (Exception e) {
+			System.err.println("GeneralException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		}finally {
+			try {
+
+				daoPedidos.cerrarRecursos();
+//				daoRes.cerrarRecursos();
+				if(this.conn!=null)
+					this.conn.close();
+			} catch (SQLException exception) {
+				System.err.println("SQLException closing resources:" + exception.getMessage());
+				exception.printStackTrace();
+				throw exception;
+			}
+		}
+		return respuesta;
+	}
 
 }

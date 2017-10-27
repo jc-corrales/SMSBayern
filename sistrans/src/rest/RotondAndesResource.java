@@ -17,8 +17,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import tm.RotondAndesTM;
 import vos.Cliente;
+import vos.EstadisticasPedidos;
 import vos.Producto;
-import vos.ProductoBase;
+//import vos.ProductoBase;
 
 @Path("admin")
 public class RotondAndesResource {
@@ -72,6 +73,26 @@ public class RotondAndesResource {
 		try {
 			Cliente cliente = tm.darCliente(id);
 			return Response.status( 200 ).entity( cliente ).build( );		
+		}catch( Exception e )
+		{
+			return Response.status( 500 ).entity( doErrorMessage( e ) ).build( );
+		}
+	}
+	
+	/**
+	 * Método que obtiene las estadísticas de los Pedidos de un restaurante mediante el identificador de su Representante.
+	 * @param id Long, ID del Representante del restaurante
+	 * @return Response, toda la información de la Zona.
+	 */
+	@GET
+	@Path("pedidos")
+	@Produces( { MediaType.APPLICATION_JSON } )
+	public Response getZona() {
+		RotondAndesTM tm = new RotondAndesTM(getPath());
+		try {
+			System.out.println("ENTRO A METODO RESOURCE");
+			List<EstadisticasPedidos> respuesta = tm.darEstadisticasPedidos(null);
+			return Response.status( 200 ).entity( respuesta ).build( );		
 		}catch( Exception e )
 		{
 			return Response.status( 500 ).entity( doErrorMessage( e ) ).build( );
