@@ -26,8 +26,12 @@ import dao.DAOTablaRestaurantes;
 import dao.DAOTablaZonas;
 import vos.Cliente;
 import vos.ClienteFrecuente;
+import vos.Ingrediente;
+import vos.IngredienteBase;
 import vos.Pedido;
 import vos.Producto;
+import vos.ProductoBase;
+import vos.Restaurante;
 import vos.Zona;
 
 /**
@@ -190,7 +194,7 @@ public class RotondAndesTM {
 			this.conn = darConexion();
 			daoProd.setConn(conn);
 			res = daoProd.darProducto(id, idRest);
-			
+
 			//INICIO DE LA SEGUNDA PARTE DE LA TRANSACCION
 			daoIng.setConn(conn);
 			res.setIngredientes(daoIng.darIngredientesProducto(id));
@@ -232,7 +236,7 @@ public class RotondAndesTM {
 			if(!dao.verficarCliente(id, password)) 
 				throw new Exception("Clave invalida");
 			//fin Verificacion		
-			
+
 			dao.borrarPreferencia(id, idProd);
 		}catch (SQLException e) {
 			System.err.println("SQLException:" + e.getMessage());
@@ -262,19 +266,19 @@ public class RotondAndesTM {
 		try {
 			this.conn = darConexion();
 			dao.setConn(conn);
-			
+
 			//Verificar Cliente
 			if(!dao.verficarCliente(id, password)) 
 				throw new Exception("Clave invalida");
 			//fin Verificacion		
-			
+
 			dao.registrarPreferencia(id, idProd);
-			
+
 			//INICIO AGREGAR PREFERENCIAS A ENIDAD CLIENTEFRECUENTE
 			cliente = dao.darClienteFrecuente(id);
 			daoPref.setConn(conn);
 			cliente.setPreferencias(daoPref.darPreferencias(id));
-			
+
 		}catch (SQLException e) {
 			System.err.println("SQLException:" + e.getMessage());
 			e.printStackTrace();
@@ -388,14 +392,24 @@ public class RotondAndesTM {
 		return productos; 
 	}
 
-	public List<Producto> darProductosPor(Integer filtro, Object parametro)  throws SQLException, Exception {
+	public List<Producto> darProductosPor(Integer filtro, String parametro)  throws SQLException, Exception {
 		List<Producto> productos; 
 		DAOTablaProductos dao = new DAOTablaProductos();
-
+		DAOTablaIngredientes daoIng = new DAOTablaIngredientes();
 		try {
 			this.conn = darConexion();
 			dao.setConn(conn);
 			productos = dao.darProductosPor(filtro, parametro);
+
+			daoIng.setConn(conn);
+			int a = 0;
+			for(Producto prod : productos) {
+				List<Ingrediente> ingredientes = daoIng.darIngredientesProducto(prod.getId());
+				prod.setIngredientes(ingredientes);
+				productos.set(a, prod);
+				a++;
+			}
+
 		}catch (SQLException e) {
 			System.err.println("SQLException:" + e.getMessage());
 			e.printStackTrace();
@@ -406,6 +420,7 @@ public class RotondAndesTM {
 			throw e;
 		} finally {
 			try {
+				daoIng.cerrarRecursos();
 				dao.cerrarRecursos();
 				if(this.conn!=null)
 					this.conn.close();
@@ -417,19 +432,16 @@ public class RotondAndesTM {
 		}
 		return productos; 
 	}
-	
-	public Zona agregarZona(Long id, String nombre, Boolean esEspacioAbierto, Integer capacidad, Boolean esIncluyente, List<String> condiciones, List<String> restaurantes)throws SQLException, Exception
-	{
-		Zona nuevaZona = new Zona(id, nombre, esEspacioAbierto, capacidad, esIncluyente, condiciones, null);
+
+	public Zona agregarZona(Zona zona)throws SQLException, Exception{
+
 		DAOTablaZonas dao = new DAOTablaZonas();
 		try {
 			this.conn = darConexion();
 			dao.setConn(conn);	
-			
-			dao.addZona(nuevaZona);
-			
-			//INICIO AGREGAR PREFERENCIAS A ENIDAD CLIENTEFRECUENTE
-			
+
+			dao.addZona(zona);
+
 		}catch (SQLException e) {
 			System.err.println("SQLException:" + e.getMessage());
 			e.printStackTrace();
@@ -449,18 +461,41 @@ public class RotondAndesTM {
 				throw exception;
 			}
 		}
-		return nuevaZona;
+		return zona;
 	}
-	
-	
-	public List<Zona> darZonasSinParametro() throws SQLException, Exception {
-		List<Zona> zonas; 
-		DAOTablaZonas dao = new DAOTablaZonas();
+
+	public Zona darZona(Long id) throws SQLException, Exception {
+
+		Zona zona = null;
+
+		DAOTablaZonas daoZona = new DAOTablaZonas();
+		DAOTablaRestaurantes daoRes = new DAOTablaRestaurantes();
+		DAOTablaProductos daoProd = new DAOTablaProductos();
 
 		try {
 			this.conn = darConexion();
-			dao.setConn(conn);
-			zonas = dao.getZonasSinParametros();
+			daoZona.setConn(conn);
+			zona = daoZona.darZona(id);
+			System.out.println("after dao ------> " + zona.getId() + " || " + zona.getNombre());
+			if(zona == null) {
+				throw new Exception("NO EXISTE LA ZONA");
+			}
+			//AGREGACIÓN DE RESTAURANTES A ZONA
+
+			daoRes.setConn(conn);
+			List<Restaurante> restaurantes = daoRes.darRestaurantesDeZona(id);
+
+			//AGREGACIÓN DE PRODUCTOS A RESTAURANTES
+			if(restaurantes != null && !restaurantes.isEmpty())
+			{
+				daoProd.setConn(conn);
+				for(Restaurante rest : restaurantes) {
+					rest.setProductos(daoProd.darProductosPor(DAOTablaProductos.RESTAURANTE, rest.getId().toString()));
+				}
+				zona.setRestaurantes(restaurantes);
+			}
+			
+
 		}catch (SQLException e) {
 			System.err.println("SQLException:" + e.getMessage());
 			e.printStackTrace();
@@ -469,9 +504,11 @@ public class RotondAndesTM {
 			System.err.println("GeneralException:" + e.getMessage());
 			e.printStackTrace();
 			throw e;
-		} finally {
+		}finally {
 			try {
-				dao.cerrarRecursos();
+
+				daoZona.cerrarRecursos();
+				daoRes.cerrarRecursos();
 				if(this.conn!=null)
 					this.conn.close();
 			} catch (SQLException exception) {
@@ -480,6 +517,8 @@ public class RotondAndesTM {
 				throw exception;
 			}
 		}
-		return zonas; 
+		return zona;
 	}
+
+
 }

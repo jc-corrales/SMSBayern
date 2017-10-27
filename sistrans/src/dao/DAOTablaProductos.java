@@ -7,6 +7,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.codehaus.jackson.map.ObjectMapper;
+
 import vos.Ingrediente;
 import vos.Producto;
 import vos.ProductoBase;
@@ -16,7 +18,6 @@ public class DAOTablaProductos {
 	private ArrayList<Object> recursos;
 	private Connection conn;
 
-	private static final int RANGO_FECHA = 0;
 	public static final int RESTAURANTE = 1;
 	public static final int CATEGORIA = 2;
 	public static final int RANGO_PRECIOS= 3;
@@ -114,20 +115,25 @@ public class DAOTablaProductos {
 
 
 
-	public List<Producto> darProductosPor(Integer filtro, Object parametro) throws SQLException, Exception{
+	public List<Producto> darProductosPor(Integer filtro, String parametro) throws SQLException, Exception{
+		ObjectMapper om = new ObjectMapper();
 		ArrayList<Producto> productos = new ArrayList<Producto>();
-		String sentencia = "SELECT * FROM PRODUCTOS";
+		String sentencia = "SELECT * FROM PRODUCTOS, PRODUCTO_RESTAURANTE WHERE ID = ID_PROD ";
 
 		switch(filtro) {
 
 		case RESTAURANTE:
-			sentencia +=  "WHERE ID_RESTAURANTE = " + parametro ;
+			sentencia +=  "AND ID_REST = " + Integer.parseInt(parametro);
 			break;
 
 		case CATEGORIA: 
-			sentencia = "SELECT * FROM PRODUCTOS, " + parametro + "WHERE ID = ID_PRODUCTO";
-
-		case RANGO_PRECIOS: 
+			sentencia += "AND CATEGORIA = '" + ((String) parametro) + "'";
+			System.out.println("sentencia -> " + sentencia);
+			break;
+			
+		case RANGO_PRECIOS:
+			String[] precios = parametro.split(",");
+			sentencia += "AND PRECIO >= " + Integer.parseInt(precios[0]) + " AND  PRECIO <= " + Integer.parseInt(precios[1]);
 		default:
 			break;
 		}
@@ -135,16 +141,17 @@ public class DAOTablaProductos {
 		PreparedStatement stamnt = conn.prepareStatement(sentencia);
 		recursos.add(stamnt);
 		ResultSet rs = stamnt.executeQuery();
-		int a = 1;
 		while(rs.next()) {
 			Producto producto = new Producto();
 			producto.setId(rs.getLong("ID"));
-			producto.setNombre("Producto" + a);
-			producto.setCostoDeProduccion(rs.getDouble("COSTO_PRODUCCION"));
+			producto.setNombre(rs.getString("NAME"));
 			producto.setDescripcionEspaniol(rs.getString("DESCRIPCION"));
 			producto.setDescripcionIngles(rs.getString("DESCRIPTION"));
+			producto.setCategoria(rs.getString("CATEGORIA"));
+			producto.setPrecio(rs.getDouble("PRECIO"));
+			producto.setCostoDeProduccion(rs.getDouble("COSTO_PRODUCCION"));
+			producto.setProductosEquivalentes(darProductosEquivalentes(producto.getId(), rs.getLong("ID_REST")));
 			productos.add(producto);
-			a++;
 		}
 		return productos;
 	}
@@ -171,6 +178,9 @@ public class DAOTablaProductos {
 			preferencias.add(prod);
 		}
 		return preferencias;
-	} 
+	}
+
+
+
 
 }

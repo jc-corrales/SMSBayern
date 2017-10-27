@@ -25,26 +25,7 @@ public class Restaurante {
 	 */
 	@JsonProperty(value="paginaWeb")
 	private String pagina;
-//	/**
-//	 * Atributo que contiene las Entradas que este Restaurante ofrece.
-//	 */
-//	@JsonProperty(value="entradas")
-//	private Collection<Entrada> entradas;
-//	/**
-//	 * Atributo que contiene los Platos Fuertes que este Restaurante ofrece.
-//	 */
-//	@JsonProperty(value="platosFuertes")
-//	private Collection<PlatoFuerte> platosFuertes;
-//	/**
-//	 * Atributo que contiene los Postres que este Restaurante ofrece.
-//	 */
-//	@JsonProperty(value="postres")
-//	private Collection<Postre> postres;
-//	/**
-//	 * Atributo que contiene las Bebidas que este Restaurante ofrece.
-//	 */
-//	@JsonProperty(value="bebidas")
-//	private Collection<Bebida> bebidas;
+
 	/**
 	 * Productos del restaurante.
 	 */
@@ -54,7 +35,7 @@ public class Restaurante {
 	 * Atributo que contiene el tipo de Restaurante.
 	 */
 	@JsonProperty(value = "tipo")
-	private String tipo;
+	private TipoComida tipo;
 	/**
 	 * Método constructor de la clase Restaurante.
 	 * @param id Long
@@ -68,13 +49,8 @@ public class Restaurante {
 	public Restaurante(@JsonProperty(value="id") Long id, 
 			@JsonProperty(value="name") String name, 
 			@JsonProperty(value="paginaWeb") String pagina,
-//			@JsonProperty(value="entradas") Collection<Entrada> entradas,
-//			@JsonProperty(value="platosFuertes") Collection<PlatoFuerte> platosFuertes,
-//			@JsonProperty(value="postres") Collection<Postre> postres,
-//			@JsonProperty(value="bebidas") Collection<Bebida> bebidas
 			@JsonProperty(value = "productos")List<Producto> productos,
-//			@JsonProperty(value = "zona")Zona zona,
-			@JsonProperty(value = "tipo")String tipo
+			@JsonProperty(value = "tipo")TipoComida tipo
 			)
 			{
 		
@@ -206,7 +182,7 @@ public class Restaurante {
 	 * Método que obtiene el tipo del restaurante.
 	 * @return String tipo del Restaurante.
 	 */
-	public String getTipoRestaurante()
+	public TipoComida getTipoRestaurante()
 	{
 		return tipo;
 	}
@@ -214,7 +190,7 @@ public class Restaurante {
 	 * Método que establece el tipo del restaurante.
 	 * @param tipo String, nuevo tipo del restaurante.
 	 */
-	public void setTipoRestaurante(String tipo)
+	public void setTipoRestaurante(TipoComida tipo)
 	{
 		this.tipo = tipo;
 	}

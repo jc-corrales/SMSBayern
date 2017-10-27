@@ -41,12 +41,16 @@ public class Zona
 	 * Lista que contiene las condiciones de la zona.
 	 */
 	@JsonProperty(value = "condiciones")
-	private List<String> condiciones;
+	private List<Condicion> condiciones;
 	/**
 	 * Atributo que contiene los restaurantes de esta zona.
 	 */
 	@JsonProperty(value = "restaurantes")
 	private List<Restaurante> restaurantes;
+	
+	public Zona(){
+		
+	}
 	/**
 	 * Método constructor de la zona.
 	 * @param id Long, id de la zona.
@@ -61,7 +65,7 @@ public class Zona
 			@JsonProperty(value = "esEspacioAbierto")Boolean esEspacioAbierto,
 			@JsonProperty(value = "capacidad")Integer capacidad,
 			@JsonProperty(value = "esIncluyente")Boolean esIncluyente,
-			@JsonProperty(value = "condiciones")List<String> condiciones,
+			@JsonProperty(value = "condiciones")List<Condicion> condiciones,
 			@JsonProperty(value = "restaurantes") List<Restaurante> restaurantes)
 			
 	{
@@ -151,7 +155,7 @@ public class Zona
 	 * Método que establece si la zona es incluyente o no.
 	 * @param esIncluyente boolean, si es incluyente o no.
 	 */
-	public void esIncluyente(boolean esIncluyente)
+	public void setEsIncluyente(boolean esIncluyente)
 	{
 		this.esIncluyente = esIncluyente;
 	}
@@ -159,7 +163,7 @@ public class Zona
 	 * Método que obtiene las condiciones de una zona.
 	 * @return List<String>, condiciones de la zona.
 	 */
-	public List<String> getCondiciones()
+	public List<Condicion> getCondiciones()
 	{
 		return condiciones;
 	}
@@ -167,7 +171,7 @@ public class Zona
 	 * Método que establece las condiciones de la zona.
 	 * @param condiciones List<String>, nuevas condiciones de la zona.
 	 */
-	public void setCondiciones(List<String> condiciones)
+	public void setCondiciones(List<Condicion> condiciones)
 	{
 		this.condiciones = condiciones;
 	}
@@ -187,4 +191,6 @@ public class Zona
 	{
 		this.restaurantes = restaurantes;
 	}
+	
+	
 }

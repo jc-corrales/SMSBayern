@@ -54,15 +54,13 @@ public class ZonasResource
 	
 	
 	@GET
-//	@Path("{idRest: \\d+}/productos/{idProd: \\d+}")
+	@Path("{idZona: \\d+}")
 	@Produces( { MediaType.APPLICATION_JSON } )
-	public Response getProducto() {
+	public Response getZona(@PathParam("idZona") Long idZona) {
 		RotondAndesTM tm = new RotondAndesTM(getPath());
 		try {
-			System.out.println("ENTRO A METODO.");
-			List<Zona> zonas = tm.darZonasSinParametro();
-			//System.out.println("FINAL ingredientes: " + producto.getIngredientes().size());
-			return Response.status( 200 ).entity( zonas ).build( );		
+			Zona zona = tm.darZona(idZona);
+			return Response.status( 200 ).entity( zona ).build( );		
 		}catch( Exception e )
 		{
 			return Response.status( 500 ).entity( doErrorMessage( e ) ).build( );
@@ -71,14 +69,13 @@ public class ZonasResource
 	
 	
 	@POST
-//	@Path("")
 	@Consumes({ MediaType.APPLICATION_JSON })
-	public Response agregarZona(RequestBody request) {
+	public Response agregarZona(Zona zona) {
 		RotondAndesTM tm = new RotondAndesTM(getPath());
 		try {
 			
-			Zona zona = tm.agregarZona(request.id, request.nombre, request.esEspacioAbierto, request.capacidad, request.esIncluyente, request.condiciones, null);
-			return Response.status( 200 ).entity( zona ).build();	
+			Zona res = tm.agregarZona(zona);
+			return Response.status( 200 ).entity( res ).build();	
 		}catch( Exception e )
 		{
 			return Response.status( 500 ).entity( doErrorMessage( e ) ).build( );
