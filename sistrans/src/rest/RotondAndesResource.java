@@ -91,7 +91,7 @@ public class RotondAndesResource {
 		RotondAndesTM tm = new RotondAndesTM(getPath());
 		try {
 			System.out.println("ENTRO A METODO RESOURCE");
-			List<EstadisticasPedidos> respuesta = tm.darEstadisticasPedidos(null);
+			List<EstadisticasPedidos> respuesta = tm.darEstadisticasPedidos();
 			return Response.status( 200 ).entity( respuesta ).build( );		
 		}catch( Exception e )
 		{

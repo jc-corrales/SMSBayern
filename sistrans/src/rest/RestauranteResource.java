@@ -20,12 +20,33 @@ import javax.xml.bind.annotation.XmlRootElement;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import tm.RotondAndesTM;
+import vos.Ingrediente;
 import vos.Pedido;
 import vos.Producto;
+import vos.ProductoBase;
 
 @Path("restaurantes")
 public class RestauranteResource {
 
+	/**
+	 * Clase que contiene la información del cuerpo de entrada.
+	 * @author ASUS
+	 *
+	 */
+	@XmlRootElement
+	public static class RequestBodyProducto {
+	    @XmlElement Long id;
+	    @XmlElement String nombre;
+	    @XmlElement String descripcionEspaniol;
+	    @XmlElement String descripcionIngles;
+	    @XmlElement String Categoria;
+	    @XmlElement List<Ingrediente> ingredientes;
+	    @XmlElement Double costoDeProduccion;
+	    @XmlElement List<ProductoBase> productosEquivalentes;
+	    @XmlElement Double precio;
+	    @XmlElement List<String> tiposComida;
+	    @XmlElement Integer cantidad;
+	}
 	@Context
 	private ServletContext context;
 
@@ -69,6 +90,45 @@ public class RestauranteResource {
 			return Response.status( 500 ).entity( doErrorMessage( e ) ).build( );
 		}
 	}
-
-
+	/**
+	 * Método que registra las equivalencias entre dos productos para un restaurante.
+	 * @param idRestaurante Long, ID del Restaurante dueño de los dos productos.
+	 * @param idProducto1 Long, ID del primer producto a relacionar.
+	 * @param idProducto2 Long, ID del segundo producto a relacionar.
+	 * @return
+	 */
+	@POST
+	@Path("{idRestaurante: \\d+}/producto1/{idProducto1: \\d+}/producto2/{idProducto2: \\d+}")
+	public Response registrarProductosEquivalentes(@PathParam("idRestaurante")Long idRestaurante, @PathParam("idProducto1")Long idProducto1, @PathParam("idProducto2")Long idProducto2)
+	{
+		RotondAndesTM tm = new RotondAndesTM(getPath());
+		try {	 
+			tm.registrarProductosEquivalentes(idRestaurante, idProducto1, idProducto2);
+			return Response.status( 200 ).entity( "{ \"RESPUESTA\": \" Equivalencia Registrada \"}" ).build();	
+		}catch( Exception e )
+		{
+			return Response.status( 500 ).entity( doErrorMessage( e ) ).build( );
+		}
+	}
+	
+	
+	/**
+	 * Método que registra una nueva Zona.
+	 * @param zona Zona, datos de la Zona.
+	 * @return Response, Zona con toda la información proporcionada.
+	 */
+	@POST
+	@Path("{idRestaurante: \\d+}")
+	@Consumes({ MediaType.APPLICATION_JSON })
+	@Produces({ MediaType.APPLICATION_JSON })
+	public Response agregarProducto(@PathParam("idRestaurante") Long idRestaurante, Producto producto) {
+		RotondAndesTM tm = new RotondAndesTM(getPath());
+		try {
+			Producto res = tm.agregarProducto(idRestaurante, producto);;
+			return Response.status( 200 ).entity( res ).build();	
+		}catch( Exception e )
+		{
+			return Response.status( 500 ).entity( doErrorMessage( e ) ).build( );
+		}
+	}
 }

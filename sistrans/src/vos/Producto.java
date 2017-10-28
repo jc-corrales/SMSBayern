@@ -40,7 +40,11 @@ public class Producto extends ProductoBase
 	 */
 	@JsonProperty(value = "tiposComida")
 	private List<TipoComida> tiposComida;
-	
+	/**
+	 * Atributo que contiene la cantidad de producto disponible.
+	 */
+	@JsonProperty(value = "cantidad")
+	private Integer cantidad;
 	/**
 	 * Método constructor de la clase Producto.
 	 * @param id
@@ -66,14 +70,15 @@ public class Producto extends ProductoBase
 			@JsonProperty(value = "precio") Double precio, 
 			@JsonProperty(value = "tipos") List<TipoComida> tiposComida,
 			@JsonProperty(value = "categoria") String categoria,
-			@JsonProperty(value = "ingredientes") List<Ingrediente> ingredientes){
+			@JsonProperty(value = "ingredientes") List<Ingrediente> ingredientes,
+			@JsonProperty(value = "cantidad")Integer cantidad){
 		
 		super(id, nombre, descripcionEspaniol, descripcionIngles, categoria, ingredientes);
 		this.costoDeProduccion = costoDeProduccion;
 		this.productosEquivalentes = productosEquivalentes;
 		this.precio = precio;
 		this.tiposComida = tiposComida;
-		
+		this.cantidad = cantidad;
 	}
 	
 	/**
@@ -140,6 +145,20 @@ public class Producto extends ProductoBase
 	{
 		this.tiposComida = tiposComida;
 	}
-	
-
+	/**
+	 * Método que obtiene la cantidad de este Producto disponible.
+	 * @return Integer, Cantidad de producto disponible.
+	 */
+	public Integer getCantidad()
+	{
+		return cantidad;
+	}
+	/**
+	 * Método que establece la cantidad de producto disponible.
+	 * @param cantidad Integer, nueva cantidad de Producto disponible.
+	 */
+	public void setCantidad(Integer cantidad)
+	{
+		this.cantidad = cantidad;
+	}
 }

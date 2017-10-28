@@ -465,7 +465,8 @@ public class RotondAndesTM {
 		return zona;
 	}
 
-	public Zona darZona(Long id) throws SQLException, Exception {
+	public Zona darZona(Long id) throws SQLException, Exception
+	{
 
 		Zona zona = null;
 
@@ -527,25 +528,22 @@ public class RotondAndesTM {
 	 * @throws SQLException
 	 * @throws Exception
 	 */
-	public List<EstadisticasPedidos> darEstadisticasPedidos(Long id)throws SQLException, Exception {
-
+	public List<EstadisticasPedidos> darEstadisticasPedidos()throws SQLException, Exception
+	{
 //		Zona zona = null;
 //
 //		DAOTablaZonas daoZona = new DAOTablaZonas();
 //		DAOTablaRestaurantes daoRes = new DAOTablaRestaurantes();
 //		DAOTablaProductos daoProd = new DAOTablaProductos();
-		System.out.println("ENTRO A METODO TM");
 		DAOTablaPedidos daoPedidos = new DAOTablaPedidos();
-		System.out.println("CREO DAOPEDIDOS");
 		List<EstadisticasPedidos> respuesta;
 		try {
-			System.out.println("ENTRO A TRY");
 			this.conn = darConexion();
 			daoPedidos.setConn(conn);
 			respuesta = daoPedidos.darEstadisticasPedidos();
 //			System.out.println("after dao ------> " + zona.getId() + " || " + zona.getNombre());
 			if(respuesta.size() == 0) {
-				throw new Exception("NO EXISTE LA ZONA");
+				throw new Exception("No existe el Restaurante.");
 			}		
 		}catch (SQLException e) {
 			System.err.println("SQLException:" + e.getMessage());
@@ -570,5 +568,208 @@ public class RotondAndesTM {
 		}
 		return respuesta;
 	}
+	
+//	/**
+//	 * Método que obtiene las estadísticas de todos los pedidos del restaurante asociado al Representante, cuyos datos entran por parámetro.
+//	 * Sólo el Representante tiene autorización para ver los datos de su Restaurante.
+//	 * @param idRepresentante Long, ID del representante.
+//	 * @param password String, contraseña del Representante.
+//	 * @return List<EstadisticasPedidos> lista con las estadísticas del restaurante.
+//	 * @throws SQLException
+//	 * @throws Exception
+//	 */
+//	public List<EstadisticasPedidos> darEstadisticasPedidosPorRestaurante(Long idRepresentante, String password)throws SQLException, Exception {
+//
+////		Zona zona = null;
+////
+////		DAOTablaZonas daoZona = new DAOTablaZonas();
+////		DAOTablaRestaurantes daoRes = new DAOTablaRestaurantes();
+////		DAOTablaProductos daoProd = new DAOTablaProductos();
+//		System.out.println("ENTRO A METODO TM");
+//		DAOTablaPedidos daoPedidos = new DAOTablaPedidos();
+//		System.out.println("CREO DAOPEDIDOS");
+//		List<EstadisticasPedidos> respuesta;
+//		try {
+//			System.out.println("ENTRO A TRY");
+//			this.conn = darConexion();
+//			daoPedidos.setConn(conn);
+//			respuesta = daoPedidos.darEstadisticasPedidosPorRestaurante(idRepresentante, password);
+////			System.out.println("after dao ------> " + zona.getId() + " || " + zona.getNombre());
+//			if(respuesta.size() == 0) {
+//				throw new Exception("NO EXISTE LA ZONA");
+//			}		
+//		}catch (SQLException e) {
+//			System.err.println("SQLException:" + e.getMessage());
+//			e.printStackTrace();
+//			throw e;
+//		} catch (Exception e) {
+//			System.err.println("GeneralException:" + e.getMessage());
+//			e.printStackTrace();
+//			throw e;
+//		}finally {
+//			try {
+//
+//				daoPedidos.cerrarRecursos();
+////				daoRes.cerrarRecursos();
+//				if(this.conn!=null)
+//					this.conn.close();
+//			} catch (SQLException exception) {
+//				System.err.println("SQLException closing resources:" + exception.getMessage());
+//				exception.printStackTrace();
+//				throw exception;
+//			}
+//		}
+//		return respuesta;
+//	}
+	
+	/**
+	 * Método que obtiene las estadísticas de todos los pedidos del restaurante asociado al Representante, cuyos datos entran por parámetro.
+	 * Sólo el Representante tiene autorización para ver los datos de su Restaurante.
+	 * @param idRepresentante Long, ID del restaurante.
+	 * @return List<EstadisticasPedidos> lista con las estadísticas del restaurante.
+	 * @throws SQLException
+	 * @throws Exception
+	 */
+	public List<EstadisticasPedidos> darEstadisticasPedidosPorRestaurante(Long idRepresentante)throws SQLException, Exception
+	{
 
+//		Zona zona = null;
+//
+//		DAOTablaZonas daoZona = new DAOTablaZonas();
+//		DAOTablaRestaurantes daoRes = new DAOTablaRestaurantes();
+//		DAOTablaProductos daoProd = new DAOTablaProductos();
+		DAOTablaPedidos daoPedidos = new DAOTablaPedidos();
+		List<EstadisticasPedidos> respuesta;
+		try {
+			this.conn = darConexion();
+			daoPedidos.setConn(conn);
+			respuesta = daoPedidos.darEstadisticasPedidosPorRestaurante(idRepresentante);
+//			System.out.println("after dao ------> " + zona.getId() + " || " + zona.getNombre());
+			if(respuesta.size() == 0) {
+				throw new Exception("No existe el Restaurante.");
+			}		
+		}catch (SQLException e) {
+			System.err.println("SQLException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		} catch (Exception e) {
+			System.err.println("GeneralException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		}finally {
+			try {
+
+				daoPedidos.cerrarRecursos();
+//				daoRes.cerrarRecursos();
+				if(this.conn!=null)
+					this.conn.close();
+			} catch (SQLException exception) {
+				System.err.println("SQLException closing resources:" + exception.getMessage());
+				exception.printStackTrace();
+				throw exception;
+			}
+		}
+		return respuesta;
+	}
+	/**
+	 * Método que cancela un Pedido ordenado. El Pedido debe no estar servido para que sea válido.
+	 * @param idPedido ID del pedido a cancelar.
+	 * @throws SQLException
+	 * @throws Exception
+	 */
+	public void cancelarPedido(Long idPedido) throws SQLException, Exception
+	{
+		DAOTablaPedidos daoPedidos = new DAOTablaPedidos();
+		try {
+			this.conn = darConexion();
+			daoPedidos.setConn(conn);
+			daoPedidos.cancelarPedido(idPedido);
+			
+		}catch (SQLException e) {
+			System.err.println("SQLException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		} catch (Exception e) {
+			System.err.println("GeneralException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		}finally {
+			try {
+
+				daoPedidos.cerrarRecursos();
+				if(this.conn!=null)
+					this.conn.close();
+			} catch (SQLException exception) {
+				System.err.println("SQLException closing resources:" + exception.getMessage());
+				exception.printStackTrace();
+				throw exception;
+			}
+		}
+	}
+	/**
+	 * Método para agregar un nuevo producto sin sus equivalencias.
+	 * @param idRestaurante Long, ID del restaurante dueño de este producto.
+	 * @param producto 
+	 * @throws SQLException
+	 * @throws Exception
+	 */
+	public Producto agregarProducto(Long idRestaurante, Producto producto) throws SQLException, Exception
+	{
+		Producto respuesta;
+		DAOTablaProductos daoProductos = new DAOTablaProductos();
+		try {
+			this.conn = darConexion();
+			daoProductos.setConn(conn);
+			respuesta = daoProductos.agregarProductoSinEquivalencias(idRestaurante, producto);
+			
+		}catch (SQLException e) {
+			System.err.println("SQLException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		} catch (Exception e) {
+			System.err.println("GeneralException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		}finally {
+			try {
+				daoProductos.cerrarRecursos();
+				if(this.conn!=null)
+					this.conn.close();
+			} catch (SQLException exception) {
+				System.err.println("SQLException closing resources:" + exception.getMessage());
+				exception.printStackTrace();
+				throw exception;
+			}
+		}
+		return respuesta;
+	}
+	
+	public void registrarProductosEquivalentes(Long idRestaurante, Long idProducto1, Long idProducto2)throws SQLException, Exception
+	{
+		DAOTablaProductos daoProductos = new DAOTablaProductos();
+		try {
+			this.conn = darConexion();
+			daoProductos.setConn(conn);
+			daoProductos.registrarEquivalenciaDeProductos(idRestaurante, idProducto1, idProducto2);
+			
+		}catch (SQLException e) {
+			System.err.println("SQLException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		} catch (Exception e) {
+			System.err.println("GeneralException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		}finally {
+			try {
+				daoProductos.cerrarRecursos();
+				if(this.conn!=null)
+					this.conn.close();
+			} catch (SQLException exception) {
+				System.err.println("SQLException closing resources:" + exception.getMessage());
+				exception.printStackTrace();
+				throw exception;
+			}
+		}
+	}
 }

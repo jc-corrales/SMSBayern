@@ -114,6 +114,7 @@ public class DAOTablaPedidos {
 	public void despacharPedido(Long idPed) throws SQLException, Exception{
 		String sql = "UPDATE PEDIDOS SET SERVIDO = 1 WHERE ID = " + idPed;
 		
+		
 		PreparedStatement prepStmt = conn.prepareStatement(sql);
 		recursos.add(prepStmt);
 		prepStmt.executeQuery();
@@ -134,6 +135,7 @@ public class DAOTablaPedidos {
 				"    FROM PEDIDOS PEDIDO, PRODUCTO_RESTAURANTE PRODUCTO, RESTAURANTES REST, PRODUCTOS PROD\r\n" + 
 				"    WHERE Producto.Id_Prod = Pedido.Id_Producto AND Producto.Id_Rest = Pedido.Id_Restaurante AND REST.ID = PEDIDO.ID_RESTAURANTE AND PROD.ID = PEDIDO.ID_PRODUCTO\r\n" + 
 				"    GROUP BY REST.NAME, PROD.NAME, PEDIDO.SERVIDO\r\n" + 
+	
 				"    ORDER BY RESTAURANTE";
 		
 		PreparedStatement prepStmt = conn.prepareStatement(sql);
@@ -156,5 +158,100 @@ public class DAOTablaPedidos {
 		}
 		
 		return respuesta;
+	}
+	
+	/**
+	 * Método que obtiene una lista de pedidos.
+	 * @param idRestaurante ID del Restaurante cuyas estadísticas de Pedidos se van a pedir.
+	 * @return
+	 * @throws SQLException
+	 * @throws Exception
+	 */
+	public List<EstadisticasPedidos> darEstadisticasPedidosPorRestaurante(Long idRestaurante)throws SQLException, Exception
+	{
+		System.out.println("ENTRO A METODO DAO");
+		List<EstadisticasPedidos> respuesta = new ArrayList<EstadisticasPedidos>();
+		
+//		String sqlRepresentante = "";		
+//		PreparedStatement prepStmtRepresentante = conn.prepareStatement(sqlRepresentante);
+//		recursos.add(prepStmtRepresentante);
+//		ResultSet datosRepresentante = prepStmtRepresentante.executeQuery();
+//		
+//		Long idRestaurante =
+		
+		String sql = "SELECT REST.NAME AS RESTAURANTE, PROD.NAME AS PRODUCTO, PEDIDO.SERVIDO AS SERVIDO, COUNT(PEDIDO.ID) AS ORDENADOS, SUM(PRODUCTO.PRECIO) AS GANANCIAS\r\n" + 
+				"    FROM PEDIDOS PEDIDO, PRODUCTO_RESTAURANTE PRODUCTO, RESTAURANTES REST, PRODUCTOS PROD\r\n" + 
+				"    WHERE Producto.Id_Prod = Pedido.Id_Producto AND Producto.Id_Rest = Pedido.Id_Restaurante AND REST.ID = PEDIDO.ID_RESTAURANTE AND PROD.ID = PEDIDO.ID_PRODUCTO AND REST.ID = "+ idRestaurante + "\r\n" + 
+				"    GROUP BY REST.NAME, PROD.NAME, PEDIDO.SERVIDO\r\n" + 
+	
+				"    ORDER BY RESTAURANTE";
+		
+		PreparedStatement prepStmt = conn.prepareStatement(sql);
+		recursos.add(prepStmt);
+		ResultSet datosPedidos = prepStmt.executeQuery();
+		while(datosPedidos.next())
+		{
+			String restaurante = datosPedidos.getString("RESTAURANTE");
+			String producto = datosPedidos.getString("PRODUCTO");
+			Boolean servido = true;
+			if(datosPedidos.getInt("SERVIDO") == 0)
+			{
+				servido = false;
+			}
+			Integer numOrdenados = datosPedidos.getInt("ORDENADOS");
+			Double ganancias = datosPedidos.getDouble("GANANCIAS");
+			
+			EstadisticasPedidos temp = new EstadisticasPedidos(restaurante, producto, servido, numOrdenados, ganancias);
+			respuesta.add(temp);
+		}
+		
+		return respuesta;
+	}
+	
+	/**
+	 * Método que cancela un Pedido. El Pedido debe no haber sido servido para que la transacción sea válida.
+	 * @param id Long, ID del Pedido.
+	 * @throws SQLException
+	 * @throws Exception
+	 */
+	public void cancelarPedido(Long id)throws SQLException, Exception
+	{
+		
+		String sql = "SELECT *\r\n" + 
+				"    FROM PEDIDOS\r\n" + 
+				"    WHERE ID = " + id;
+		System.out.println(sql);
+		PreparedStatement prepStmt = conn.prepareStatement(sql);
+		recursos.add(prepStmt);
+		ResultSet rs = prepStmt.executeQuery();
+		
+		
+		conn.setAutoCommit(false);
+//		System.out.println();
+//		System.out.println("ID:" + rs.getLong("ID"));
+		if(!rs.next())
+		{
+			throw new Exception("No existe el Pedido con ID: " + id);
+		}
+		if(rs.getInt("SERVIDO") == 1)
+		{
+			throw new Exception("No se puede cancelar el Pedido con ID: " + id + " debido a que ya ha sido entregado.");
+		}		
+		
+		String sqlEliminador = "DELETE \r\n" + 
+				"    FROM PEDIDOS \r\n" + 
+				"    WHERE ID = " + id;
+		PreparedStatement prepStmtDeleter = conn.prepareStatement(sqlEliminador);
+		recursos.add(prepStmtDeleter);
+		prepStmtDeleter.executeQuery();
+		
+		conn.setSavepoint();
+		String sqlUpdater = "UPDATE PRODUCTO_RESTAURANTE\r\n" + 
+				"    SET CANTIDAD = (CANTIDAD + 1)\r\n" + 
+				"    WHERE ID_PROD = " + rs.getLong("ID_PRODUCTO") + " AND ID_REST = " + rs.getLong("ID_RESTAURANTE");
+		PreparedStatement prepStmtUpdater= conn.prepareStatement(sqlUpdater);
+		recursos.add(prepStmtUpdater);
+		prepStmtUpdater.executeQuery();
+		conn.setAutoCommit(true);
 	}
 }

@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.servlet.ServletContext;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -58,23 +59,58 @@ public class PedidosResource
 		return "{ \"ERROR\": \""+ e.getMessage() + "\"}" ;
 	}
 	
+//	/**
+//	 * Método que obtiene las estadísticas de los Pedidos de un restaurante mediante el identificador de su Representante.
+//	 * @param id Long, ID del Representante del restaurante
+//	 * @return Response, toda la información de la Zona.
+//	 */
+//	@GET
+//	@Path("\"{representanteId:\\\\d+}/{password:\\\\d+}\"")
+//	@Produces( { MediaType.APPLICATION_JSON } )
+//	public Response getZona(@PathParam("representanteId") Long id, @PathParam("password") String contrasenia) {
+//		RotondAndesTM tm = new RotondAndesTM(getPath());
+//		try {
+//			System.out.println("ENTRO A METODO RESOURCE");
+//			List<EstadisticasPedidos> respuesta = tm.darEstadisticasPedidosPorRestaurante(id, contrasenia);
+//			return Response.status( 200 ).entity( respuesta ).build( );		
+//		}catch( Exception e )
+//		{
+//			return Response.status( 500 ).entity( doErrorMessage( e ) ).build( );
+//		}
+//	}
+	
 	/**
 	 * Método que obtiene las estadísticas de los Pedidos de un restaurante mediante el identificador de su Representante.
 	 * @param id Long, ID del Representante del restaurante
 	 * @return Response, toda la información de la Zona.
 	 */
 	@GET
-	@Path("{idZona: \\d+}")
+	@Path("{restauranteId: \\d+}")
 	@Produces( { MediaType.APPLICATION_JSON } )
-	public Response getZona(@PathParam("idZona") Long id) {
+	public Response getEstadisticasPedidosPorRestaurante(@PathParam("restauranteId") Long id) {
 		RotondAndesTM tm = new RotondAndesTM(getPath());
 		try {
-			System.out.println("ENTRO A METODO RESOURCE");
-			List<EstadisticasPedidos> respuesta = tm.darEstadisticasPedidos(id);
+			List<EstadisticasPedidos> respuesta = tm.darEstadisticasPedidosPorRestaurante(id);
 			return Response.status( 200 ).entity( respuesta ).build( );		
 		}catch( Exception e )
 		{
 			return Response.status( 500 ).entity( doErrorMessage( e ) ).build( );
+		}
+	}
+	
+	@DELETE
+	@Path("{pedidoId: \\d+}")
+	@Produces( { MediaType.APPLICATION_JSON } )
+	public Response cancelarPedido(@PathParam("pedidoId") Long idPedido)
+	{
+		RotondAndesTM tm = new RotondAndesTM(getPath());
+		try {
+			tm.cancelarPedido(idPedido);
+//			List<EstadisticasPedidos> respuesta = tm.darEstadisticasPedidosPorRestaurante(id);
+			return Response.status( 200 ).entity( null ).build( );		
+		}catch( Exception e )
+		{
+			return Response.status( 412 ).entity( doErrorMessage( e ) ).build( );
 		}
 	}
 }
