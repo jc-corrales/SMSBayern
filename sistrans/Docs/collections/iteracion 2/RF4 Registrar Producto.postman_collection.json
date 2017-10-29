@@ -1,0 +1,104 @@
+{
+	"variables": [],
+	"info": {
+		"name": "RF 4 Registrar Producto",
+		"_postman_id": "4d28110f-8455-4ab4-637d-8cd635f876a6",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Registrar producto con ID: 5 para Restaurante 4 (error)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 500\"] = responseCode.code === 500;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "http://localhost:8080/RotondAndes/rest/restaurantes/4",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"id\": 5, \"nombre\":\"NuevoProducto1\",\"descripcionEspaniol\" : \"lol1\", \"descripcionIngles\" : \"lol2\", \"categoria\" : \"ENTRADA\", \"ingredientes\" : [{\"name\" : \"Suckling Clover\"}], \"costoDeProduccion\" : 500, \"productosEquivalentes\" : null, \"precio\" : 700, \"tiposComida\": [{\"id\" : 1, \"name\" : \"Red\"}, {\"id\" : 2, \"name\" : \"Goldenrod\"}], \"cantidad\" : 40}"
+				},
+				"description": "Debido a que este Restaurante ya tiene su propia versión de este producto, el sistema arrojará error, indicando que no se puede volver a hacer."
+			},
+			"response": []
+		},
+		{
+			"name": "Registrar producto con ID: 100 para el Restaurante 4. (El base ya existe).",
+			"request": {
+				"url": "http://localhost:8080/RotondAndes/rest/restaurantes/4",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"id\": 100, \"nombre\":\"NuevoProducto1\",\"descripcionEspaniol\" : \"lol1\", \"descripcionIngles\" : \"lol2\", \"categoria\" : \"ENTRADA\", \"ingredientes\" : [{\"name\" : \"Suckling Clover\"}], \"costoDeProduccion\" : 500, \"productosEquivalentes\" : null, \"precio\" : 700, \"tiposComida\": [{\"id\" : 1, \"name\" : \"Red\"}, {\"id\" : 2, \"name\" : \"Goldenrod\"}], \"cantidad\" : 40}"
+				},
+				"description": "Cuando se registra un producto cuya base ya existe, se ignora la información adicional y simplemente se asocia la base original en la Base de Datos con los nuevos datos del Restaurante. (hacer su propia versión de ese producto.)"
+			},
+			"response": []
+		},
+		{
+			"name": "Registrar producto con ID: 101, totalmente nuevo, para el Restaurante con ID: 4",
+			"request": {
+				"url": "http://localhost:8080/RotondAndes/rest/restaurantes/4",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"id\": 101, \"nombre\":\"NuevoProducto1\",\"descripcionEspaniol\" : \"lol1\", \"descripcionIngles\" : \"lol2\", \"categoria\" : \"ENTRADA\", \"ingredientes\" : [{\"name\" : \"Suckling Clover\"}], \"costoDeProduccion\" : 500, \"productosEquivalentes\" : null, \"precio\" : 700, \"tiposComida\": [{\"id\" : 1, \"name\" : \"Red\"}, {\"id\" : 2, \"name\" : \"Goldenrod\"}], \"cantidad\" : 40}"
+				},
+				"description": "Este Post agrega un producto que previamente no existe en la Base de Datos. Por lo que agrega su información básica para que otros restaurantes puedan hacer sus respectivas variantes."
+			},
+			"response": []
+		},
+		{
+			"name": "Obtener producto agregado.",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "http://localhost:8080/RotondAndes/rest/restaurantes/4/productos/101",
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		}
+	]
+}

@@ -1,0 +1,33 @@
+{
+	"variables": [],
+	"info": {
+		"name": "RFC2 Consultar una Zona.",
+		"_postman_id": "ffb82a28-845b-975a-a595-388dec48196b",
+		"description": "El resultado incluye toda la información relevante sobre el sitio, incluyendo los productos servidos con su respectiva fecha\r\ny hora de servicio. Los resultados deben ser clasificados según un criterio deseado por quien realiza la consulta. Debe\r\nofrecerse la posibilidad de agrupamiento y ordenamiento de las respuestas según los intereses del usuario que consulta.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Get zona con ID: 1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "http://localhost:8080/RotondAndes/rest/zonas/1",
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		}
+	]
+}

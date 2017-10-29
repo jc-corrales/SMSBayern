@@ -5,6 +5,7 @@ import java.util.List;
 import javax.servlet.ServletContext;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -17,10 +18,13 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import tm.RotondAndesTM;
 import vos.Cliente;
+import vos.ClienteFrecuente;
 import vos.ConsumoCliente;
 import vos.EstadisticasPedidos;
 import vos.Producto;
 //import vos.ProductoBase;
+import vos.Representante;
+import vos.Restaurante;
 
 @Path("admin")
 public class RotondAndesResource {
@@ -143,6 +147,44 @@ public class RotondAndesResource {
 	}
 	
 	
-	
-	
+	/**
+	 * Método que agrega un nuevo Restaurante.
+	 * @param restaurante Restaurante, Información del nuevo Restaurante.
+	 * @param representante Representante, Información del nuevo Restaurante.
+	 * @param idZona Long, ID de la Zona asignada al Restaurante.
+	 * @return Restaurante, toda la información del restaurante.
+	 */
+	@POST
+	@Path("restaurantes/idZona/{idZona: \\d+}")
+	@Consumes({ MediaType.APPLICATION_JSON })
+	@Produces({ MediaType.APPLICATION_JSON })
+	public Response agregarRestaurante(Representante representante,@PathParam("idZona") Long idZona) {
+		RotondAndesTM tm = new RotondAndesTM(getPath());
+		try {
+			Restaurante res = tm.registrarRestaurante(representante.getRestaurante(), representante, idZona);
+			return Response.status( 200 ).entity( res ).build();	
+		}catch( Exception e )
+		{
+			return Response.status( 500 ).entity( doErrorMessage( e ) ).build( );
+		}
+	}
+	/**
+	 * Método que agrega un Cliente Frecuente a RotondAndes.
+	 * @param cliente ClienteFrecuente, información del Cliente Frecuente.
+	 * @return Respone.
+	 */
+	@POST
+	@Path("clientesFrecuentes")
+	@Consumes({ MediaType.APPLICATION_JSON })
+	@Produces({ MediaType.APPLICATION_JSON })
+	public Response agregarClienteFrecuente(ClienteFrecuente cliente) {
+		RotondAndesTM tm = new RotondAndesTM(getPath());
+		try {
+			ClienteFrecuente res = tm.registrarClienteFrecuente(cliente);
+			return Response.status( 200 ).entity( res ).build();	
+		}catch( Exception e )
+		{
+			return Response.status( 500 ).entity( doErrorMessage( e ) ).build( );
+		}
+	}
 }

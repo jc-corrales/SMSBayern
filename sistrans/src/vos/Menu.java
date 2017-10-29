@@ -38,16 +38,16 @@ public class Menu{
 	 */
 	@JsonProperty(value="costoProduccion")
 	private Double costoProduccion;
-	/**
-	 * Atributo que contiene la descripción en español de este Menú.
-	 */
-	@JsonProperty(value="descripcion")
-	private String descripcion;
-	/**
-	 * Atributo que contiene la descripción en inglés de este Menú.
-	 */
-	@JsonProperty(value="description")
-	private String description;
+//	/**
+//	 * Atributo que contiene la descripción en español de este Menú.
+//	 */
+//	@JsonProperty(value="descripcion")
+//	private String descripcion;
+//	/**
+//	 * Atributo que contiene la descripción en inglés de este Menú.
+//	 */
+//	@JsonProperty(value="description")
+//	private String description;
 	/**
 	 * Atributo que contiene el precio de este Menú.
 	 */
@@ -73,7 +73,11 @@ public class Menu{
 	 */
 	@JsonProperty(value="bebida")
 	private Producto bebida;
-
+	/**
+	 * Atributo que contiene el acompañamiento de este menú.
+	 */
+	@JsonProperty(value = "acompaniamiento")
+	private Producto acompaniamiento;
 
 	/**
 	 * Método constructor de la clase menu
@@ -85,24 +89,26 @@ public class Menu{
 	public Menu(@JsonProperty(value="id") Long id, 
 			@JsonProperty(value="name") String name, 
 			@JsonProperty(value = "costoProduccion") Double costoProduccion, 
-			@JsonProperty(value="descripcion") String descripcion, 
-			@JsonProperty(value = "description") String description, 
+//			@JsonProperty(value="descripcion") String descripcion, 
+//			@JsonProperty(value = "description") String description, 
 			@JsonProperty(value = "precio") Double precio,
 			@JsonProperty(value="entrada") Producto entrada,
 			@JsonProperty(value="platoFuerte") Producto platoFuerte,
 			@JsonProperty(value="bebida") Producto bebida,
-			@JsonProperty(value="postre") Producto postre){
+			@JsonProperty(value="postre") Producto postre,
+			@JsonProperty(value = "acompaniamiento")Producto acompaniamiento){
 		super();
 		this.id = id;
 		this.name = name;
-		this.descripcion = descripcion;
-		this.description = description;
+//		this.descripcion = descripcion;
+//		this.description = description;
 		this.precio = precio;
 		this.costoProduccion = costoProduccion;
 		this.entrada = entrada;
 		this.platoFuerte = platoFuerte;
 		this.bebida = bebida;
 		this.postre = postre;
+		this.acompaniamiento = acompaniamiento;
 	}
 
 
@@ -141,39 +147,39 @@ public class Menu{
 	}
 
 
-	/**
-	 * Método getter del atributo sabores
-	 * @return colección de sabores del menu 
-	 */
-	public  String getDescripcion() {
-		return descripcion;
-	}
+//	/**
+//	 * Método getter del atributo sabores
+//	 * @return colección de sabores del menu 
+//	 */
+//	public  String getDescripcion() {
+//		return descripcion;
+//	}
 
-	/**
-	 * Método setter del atributo esCaliente <b> post: </b> El valor condicional de la bebida ha sido cambiado
-	 * por el valor que entra como parámetro.
-	 */
-	public void setDescripcion(String descripcion) {
-		this.descripcion= descripcion;
-	}
+//	/**
+//	 * Método setter del atributo esCaliente <b> post: </b> El valor condicional de la bebida ha sido cambiado
+//	 * por el valor que entra como parámetro.
+//	 */
+//	public void setDescripcion(String descripcion) {
+//		this.descripcion= descripcion;
+//	}
 
 
 
-	/**
-	 * Método getter del atributo sabores
-	 * @return colección de sabores del menu 
-	 */
-	public  String getdescription() {
-		return description;
-	}
+//	/**
+//	 * Método getter del atributo sabores
+//	 * @return colección de sabores del menu 
+//	 */
+//	public  String getdescription() {
+//		return description;
+//	}
 
-	/**
-	 * Método setter del atributo esCaliente <b> post: </b> El valor condicional de la bebida ha sido cambiado
-	 * por el valor que entra como parámetro.
-	 */
-	public void setdescription(String description) {
-		this.description= description;
-	}
+//	/**
+//	 * Método setter del atributo esCaliente <b> post: </b> El valor condicional de la bebida ha sido cambiado
+//	 * por el valor que entra como parámetro.
+//	 */
+//	public void setdescription(String description) {
+//		this.description= description;
+//	}
 	/**
 	 * Método que obtiene el Precio de este Menú.
 	 * @return Double, Precio de este Menú.
@@ -257,5 +263,21 @@ public class Menu{
 	 */
 	public void setBebida(Producto bebida) {
 		this.bebida = bebida;
+	}
+	/**
+	 * Método que obtiene el acompañamiento de este Menú.
+	 * @return Producto, acompañamiento del Menú.
+	 */
+	public Producto getAcompaniamiento()
+	{
+		return acompaniamiento;
+	}
+	/**
+	 * Método que establece el acompaniamiento de este Menú.
+	 * @param acompaniamiento Producto, nuevo acompañamiento.
+	 */
+	public void setAcompaniamiento(Producto acompaniamiento)
+	{
+		this.acompaniamiento = acompaniamiento;
 	}
 }

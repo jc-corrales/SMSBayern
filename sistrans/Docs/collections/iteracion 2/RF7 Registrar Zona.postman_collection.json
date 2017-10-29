@@ -1,0 +1,31 @@
+{
+	"variables": [],
+	"info": {
+		"name": "RF7 Registrar Zona",
+		"_postman_id": "730776f7-37cb-bf61-25bb-9406688a2276",
+		"description": "Registra la información básica de una zona de servicio, de acuerdo con el enunciado. Esta operación es realizada por un\r\nusuario administrador de RotondAndes.\r\n",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Agregar Zona",
+			"request": {
+				"url": "http://localhost:8080/RotondAndes/rest/zonas/",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"id\":41, \"nombre\" : \"norte\", \"esEspacioAbierto\" : true, \"capacidad\" : 40, \"esIncluyente\" : true, \"condiciones\" : [{\"id\" : 1 , \"name\" : \"pellentesque\"}]}"
+				},
+				"description": ""
+			},
+			"response": []
+		}
+	]
+}

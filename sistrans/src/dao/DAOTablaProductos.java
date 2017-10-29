@@ -125,9 +125,14 @@ public class DAOTablaProductos {
 		}
 		return prods;
 	}
-
-
-
+	/**
+	 * Método dinámico, obtiene una lista de Productos según unos parámetros de búsqueda.
+	 * @param filtro Integer, tipo de filtro.
+	 * @param parametro String, parámetro según el cual realizar la búsqueda.
+	 * @return List<Producto>, lista de Productos.
+	 * @throws SQLException
+	 * @throws Exception
+	 */
 	public List<Producto> darProductosPor(Integer filtro, String parametro) throws SQLException, Exception{
 		ObjectMapper om = new ObjectMapper();
 		ArrayList<Producto> productos = new ArrayList<Producto>();
@@ -170,7 +175,7 @@ public class DAOTablaProductos {
 		return productos;
 	}
 	/**
-	 * M�todo que da los productos preferidos de un Cliente Frecuente. 
+	 * Método que da los productos preferidos de un Cliente Frecuente. 
 	 * @param id Long, ID del cliente Frecuente.
 	 * @return List<ProductoBase>, Lista de Productos preferidos del Cliente Frecuente.
 	 * @throws SQLException
@@ -198,7 +203,7 @@ public class DAOTablaProductos {
 		return preferencias;
 	}
 	/**
-	 * M�todo que crea un Producto general en la Base de Datos.
+	 * Método que crea un Producto general en la Base de Datos.
 	 * @param producto
 	 * @return
 	 * @throws SQLException
@@ -207,7 +212,7 @@ public class DAOTablaProductos {
 	public Producto agregarProductoSinEquivalencias(Long idRestaurante, Producto producto)throws SQLException, Exception
 	{
 		conn.setAutoCommit(false);
-		//Agregar informaci�n para el Producto base.
+		//Agregar información para el Producto base.
 		String sqlComprobar = "SELECT * FROM PRODUCTOS WHERE ID = " + producto.getId();
 		
 		PreparedStatement prepComprobar = conn.prepareStatement(sqlComprobar);
@@ -225,7 +230,7 @@ public class DAOTablaProductos {
 			prepStmt.executeQuery();
 		}
 
-		//Agregar informaci�n para Restaurante_Producto (Lo espec�fico para el Restaurante)
+		//Agregar información para Restaurante_Producto (Lo específico para el Restaurante)
 		String sql2 = "INSERT INTO PRODUCTO_RESTAURANTE (ID_PROD, ID_REST, PRECIO, COSTO_PRODUCCION, CANTIDAD)\r\n" + 
 				"    VALUES (" + producto.getId()+", "+ idRestaurante +", "+ producto.getPrecio()+", "+producto.getCostoDeProduccion()+", "+producto.getCantidad()+")\r\n";
 		
@@ -260,8 +265,8 @@ public class DAOTablaProductos {
 	}
 
 	/**
-	 * M�todo que registra la equivalencia entre dos productos.
-	 * @param idRestaurante Long, ID del restaurante due�o de los dos productos.
+	 * Método que registra la equivalencia entre dos productos.
+	 * @param idRestaurante Long, ID del restaurante dueño de los dos productos.
 	 * @param idProducto1 Long, ID del producto 1.
 	 * @param idProducto2 Long, ID del producto 2.
 	 * @throws SQLException
@@ -304,10 +309,9 @@ public class DAOTablaProductos {
 		conn.commit();
 		conn.setAutoCommit(true);
 	}
-	
-	/**
+  	/**
 	 * RF 14
-	 * Registrar Pedido de un producto (generalmente un men�) con equivalencias.
+	 * Registrar Pedido de un producto (generalmente un menú) con equivalencias.
 	 * 
 	 */
 	public Menu registrarPedidoProductoEquivalencias(long pidp1, long pidp2, long pidr)
@@ -322,7 +326,7 @@ public class DAOTablaProductos {
 		{
 		long idNuevoMenu = 0;
 		
-			System.out.println("Si est� el otro men� disponible");
+			System.out.println("Si está el otro menú disponible");
 			{
 				idNuevoMenu = rs.getLong("ID_PROD2");
 				
@@ -384,5 +388,50 @@ public class DAOTablaProductos {
 			
 			return resp;
 		}
-
+	/**
+	 * Método que obtiene los productos más ofrecidos por Restaurantes en RotondAndes.
+	 * @return List<Producto>, lista de Productos.
+	 * @throws SQLException
+	 * @throws Exception
+	 */
+	public List<Producto> darProductosMasOfrecidos()throws SQLException, Exception
+	{
+		List<Producto> productos = new ArrayList<Producto>();
+		String sql = "SELECT PRODUCTO.ID, PRODUCTO.NAME, PRODUCTO.DESCRIPCION, PRODUCTO.DESCRIPTION, PRODUCTO.CATEGORIA, COUNT(COMPL.ID_REST) AS NUMVECESOFRECIDOS\r\n" + 
+				"    FROM PRODUCTOS PRODUCTO, PRODUCTO_RESTAURANTE COMPL\r\n" + 
+				"    WHERE PRODUCTO.ID = COMPL.ID_PROD\r\n" + 
+				"    GROUP BY PRODUCTO.ID, PRODUCTO.DESCRIPCION, PRODUCTO.DESCRIPTION, PRODUCTO.CATEGORIA, PRODUCTO.NAME\r\n" + 
+				"    ORDER BY NUMVECESOFRECIDOS DESC";
+		
+		PreparedStatement prepStmt= conn.prepareStatement(sql);
+		recursos.add(prepStmt);
+		ResultSet rs1 = prepStmt.executeQuery();
+		Integer numMax = 0;
+		if(rs1.next())
+		{
+			Long id =rs1.getLong("ID");
+			String nombre = rs1.getString("NAME");
+			String descripcionEspaniol = rs1.getString("DESCRIPCION");
+			String descripcionIngles = rs1.getString("DESCRIPTION");
+			String categoria = rs1.getString("CATEGORIA");
+			numMax = rs1.getInt("CANTIDAD");
+		
+			Producto temp = new Producto(id, nombre, descripcionEspaniol, descripcionIngles, null, null, null, null, categoria, null, numMax);
+			productos.add(temp);
+		}
+		while(rs1.next())
+		{
+			if(rs1.getInt("CANTIDAD") == numMax)
+			{
+				Long id =rs1.getLong("ID");
+				String nombre = rs1.getString("NAME");
+				String descripcionEspaniol = rs1.getString("DESCRIPCION");
+				String descripcionIngles = rs1.getString("DESCRIPTION");
+				String categoria = rs1.getString("CATEGORIA");
+				Producto temp = new Producto(id, nombre, descripcionEspaniol, descripcionIngles, null, null, null, null, categoria, null, numMax);
+				productos.add(temp);
+			}
+		}
+		return productos;
+	}
 }

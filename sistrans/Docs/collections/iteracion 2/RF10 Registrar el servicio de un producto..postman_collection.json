@@ -1,0 +1,22 @@
+{
+	"variables": [],
+	"info": {
+		"name": "RF10 Registrar el servicio de un producto.",
+		"_postman_id": "1434c842-8206-dbba-c581-fd6f5f639272",
+		"description": "Registra en el sistema que un producto de un restaurante fue efectivamente servido a un comensal, actualizando el número\r\nde unidades disponibles de ese producto en el restaurante. Asegure que este requerimiento maneja correctamente el\r\nservicio de un menú Esta operación es realizada por un usuario restaurante de RotondAndes.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "http://localhost:8080/RotondAndes/rest/restaurantes/1/pedidos/17",
+			"request": {
+				"url": "http://localhost:8080/RotondAndes/rest/restaurantes/1/pedidos/17",
+				"method": "POST",
+				"header": [],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		}
+	]
+}

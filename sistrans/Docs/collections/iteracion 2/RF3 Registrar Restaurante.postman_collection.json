@@ -1,0 +1,31 @@
+{
+	"variables": [],
+	"info": {
+		"name": "RF3 Registrar Restaurante",
+		"_postman_id": "3570ffe8-6f7b-e4d8-cbd9-8fb578a21537",
+		"description": "Registra la información básica de un restaurante, de acuerdo con el enunciado. Esta operación es realizada por un usuario\r\nadministrador de RotondAndes.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Agregar Restaurante",
+			"request": {
+				"url": "http://localhost:8080/RotondAndes/rest/admin/restaurantes/idZona/25",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"name\" : \"Guillermo\", \"contrasenia\" : \"oweijfhpwe\", \"restaurante\" : {\"name\" : \"nuevoRestaurante\", \"pagina\" : \"www.lol.com.co\", \"tipo\" : {\"id\": 4}, \"precio\" : 10000.0}}"
+				},
+				"description": ""
+			},
+			"response": []
+		}
+	]
+}

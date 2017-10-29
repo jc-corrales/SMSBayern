@@ -3,6 +3,7 @@ package rest;
 import java.util.List;
 
 import javax.servlet.ServletContext;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -16,6 +17,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 
 import tm.RotondAndesTM;
+import vos.Cliente;
+import vos.ClienteFrecuente;
 import vos.ConsumoCliente;
 import vos.Orden;
 
@@ -80,5 +83,22 @@ public class ClienteResorce {
 			return Response.status( 500 ).entity( doErrorMessage( e ) ).build( );
 		}
 	}
-	
+	/**
+	 * Método que agrega un Cliente a RotondAndes.
+	 * @param cliente ClienteFrecuente, información del Cliente.
+	 * @return Respone.
+	 */
+	@POST
+	@Consumes({ MediaType.APPLICATION_JSON })
+	@Produces({ MediaType.APPLICATION_JSON })
+	public Response agregarCliente(Cliente cliente) {
+		RotondAndesTM tm = new RotondAndesTM(getPath());
+		try {
+			Cliente res = tm.registrarCliente(cliente);
+			return Response.status( 200 ).entity( res ).build();	
+		}catch( Exception e )
+		{
+			return Response.status( 500 ).entity( doErrorMessage( e ) ).build( );
+		}
+	}
 }

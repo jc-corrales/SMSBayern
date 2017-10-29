@@ -1,7 +1,7 @@
 /**-------------------------------------------------------------------
  * $Id$
- * Universidad de los Andes (Bogot√° - Colombia)
- * Departamento de Ingenier√≠a de Sistemas y Computaci√≥n
+ * Universidad de los Andes (Bogot√É¬° - Colombia)
+ * Departamento de Ingenier√É¬≠a de Sistemas y Computaci√É¬≥n
  *
  * Materia: Sistemas Transaccionales
  * Ejercicio: RotondAndes 
@@ -31,10 +31,13 @@ import vos.ClienteFrecuente;
 import vos.ConsumoCliente;
 import vos.EstadisticasPedidos;
 import vos.Ingrediente;
+
 import vos.IngredientesSimilares;
+import vos.Menu;
 import vos.Orden;
 import vos.Pedido;
 import vos.Producto;
+import vos.Representante;
 import vos.Restaurante;
 import vos.Zona;
 
@@ -127,9 +130,9 @@ public class RotondAndesTM {
 
 
 
-	////////////////////////////////////////
-	///////Transacciones////////////////////
-	////////////////////////////////////////
+	//--------------------------------------------------
+	//Transacciones-------------------------------------
+	//--------------------------------------------------
 
 	public List<Cliente> darClientes() throws Exception {
 		List<Cliente> clientes; 
@@ -393,7 +396,9 @@ public class RotondAndesTM {
 		try {
 			this.conn = darConexion();
 			dao.setConn(conn);
-
+			System.out.println(id);
+			System.out.println(idProd);
+			System.out.println(password);
 			//Verificar Cliente
 			if(!dao.verficarCliente(id, password)) 
 				throw new Exception("Clave invalida");
@@ -428,11 +433,11 @@ public class RotondAndesTM {
 		return cliente;
 	}
 	/**
-	 * MÈtodo que emite una Orden con un sÛlo Pedido.
+	 * M√©todo que emite una Orden con un s√≥lo Pedido.
 	 * @param id Long, ID del cliente que hace el pedido.
 	 * @param idProd Long, ID del producto que se pide.
-	 * @param idRestProd Long, ID del restaurante dueÒo del producto que se pide.
-	 * @return Orden, Orden con toda la informaciÛn del Pedido.
+	 * @param idRestProd Long, ID del restaurante due√±o del producto que se pide.
+	 * @return Orden, Orden con toda la informaci√≥n del Pedido.
 	 * @throws SQLException
 	 * @throws Exception
 	 */
@@ -567,7 +572,13 @@ public class RotondAndesTM {
 		}
 		return productos; 
 	}
-
+	/**
+	 * M√©todo para agregar una Zona a RotondAndes
+	 * @param zona Zona, toda la informaci√≥n de la zona a agregar.
+	 * @return Zona.
+	 * @throws SQLException
+	 * @throws Exception
+	 */
 	public Zona agregarZona(Zona zona)throws SQLException, Exception{
 
 		DAOTablaZonas dao = new DAOTablaZonas();
@@ -613,15 +624,16 @@ public class RotondAndesTM {
 			daoZona.setConn(conn);
 			zona = daoZona.darZona(id);
 			System.out.println("after dao ------> " + zona.getId() + " || " + zona.getNombre());
-			if(zona == null) {
+			if(zona == null)
+			{
 				throw new Exception("NO EXISTE LA ZONA");
 			}
-			//AGREGACI”N DE RESTAURANTES A ZONA
+			//AGREGACI√ìN DE RESTAURANTES A ZONA
 
 			daoRes.setConn(conn);
 			List<Restaurante> restaurantes = daoRes.darRestaurantesDeZona(id);
 
-			//AGREGACI”N DE PRODUCTOS A RESTAURANTES
+			//AGREGACI√ìN DE PRODUCTOS A RESTAURANTES
 			if(restaurantes != null && !restaurantes.isEmpty())
 			{
 				daoProd.setConn(conn);
@@ -656,8 +668,8 @@ public class RotondAndesTM {
 		return zona;
 	}
 	/**
-	 * MÈtodo que obtiene las estadÌsticas de los Pedidos de un Restaurante.
-	 * @param id Long, ID del Representante del Restaurante cuyas estadÌsticas se van a pedir.
+	 * M√©todo que obtiene las estad√≠sticas de los Pedidos de un Restaurante.
+	 * @param id Long, ID del Representante del Restaurante cuyas estad√≠sticas se van a pedir.
 	 * @return List<EstadisticasPedidos>
 	 * @throws SQLException
 	 * @throws Exception
@@ -704,11 +716,11 @@ public class RotondAndesTM {
 	}
 	
 //	/**
-//	 * MÈtodo que obtiene las estadÌsticas de todos los pedidos del restaurante asociado al Representante, cuyos datos entran por par·metro.
-//	 * SÛlo el Representante tiene autorizaciÛn para ver los datos de su Restaurante.
+//	 * M√©todo que obtiene las estad√≠sticas de todos los pedidos del restaurante asociado al Representante, cuyos datos entran por par√°metro.
+//	 * S√≥lo el Representante tiene autorizaci√≥n para ver los datos de su Restaurante.
 //	 * @param idRepresentante Long, ID del representante.
-//	 * @param password String, contraseÒa del Representante.
-//	 * @return List<EstadisticasPedidos> lista con las estadÌsticas del restaurante.
+//	 * @param password String, contrase√±a del Representante.
+//	 * @return List<EstadisticasPedidos> lista con las estad√≠sticas del restaurante.
 //	 * @throws SQLException
 //	 * @throws Exception
 //	 */
@@ -757,10 +769,10 @@ public class RotondAndesTM {
 //	}
 	
 	/**
-	 * MÈtodo que obtiene las estadÌsticas de todos los pedidos del restaurante asociado al Representante, cuyos datos entran por par·metro.
-	 * SÛlo el Representante tiene autorizaciÛn para ver los datos de su Restaurante.
+	 * M√©todo que obtiene las estad√≠sticas de todos los pedidos del restaurante asociado al Representante, cuyos datos entran por par√°metro.
+	 * S√≥lo el Representante tiene autorizaci√≥n para ver los datos de su Restaurante.
 	 * @param idRepresentante Long, ID del restaurante.
-	 * @return List<EstadisticasPedidos> lista con las estadÌsticas del restaurante.
+	 * @return List<EstadisticasPedidos> lista con las estad√≠sticas del restaurante.
 	 * @throws SQLException
 	 * @throws Exception
 	 */
@@ -806,7 +818,7 @@ public class RotondAndesTM {
 		return respuesta;
 	}
 	/**
-	 * MÈtodo que cancela un Pedido ordenado. El Pedido debe no estar servido para que sea v·lido.
+	 * M√©todo que cancela un Pedido ordenado. El Pedido debe no estar servido para que sea v√°lido.
 	 * @param idPedido ID del pedido a cancelar.
 	 * @throws SQLException
 	 * @throws Exception
@@ -841,8 +853,8 @@ public class RotondAndesTM {
 		}
 	}
 	/**
-	 * MÈtodo para agregar un nuevo producto sin sus equivalencias.
-	 * @param idRestaurante Long, ID del restaurante dueÒo de este producto.
+	 * M√©todo para agregar un nuevo producto sin sus equivalencias.
+	 * @param idRestaurante Long, ID del restaurante due√±o de este producto.
 	 * @param producto 
 	 * @throws SQLException
 	 * @throws Exception
@@ -878,8 +890,8 @@ public class RotondAndesTM {
 		return respuesta;
 	}
 	/**
-	 * MÈtodo que registra que dos Productos son equivalentes entre sÌ.
-	 * @param idRestaurante Long, ID del Restaurante dueÒo de los dos Productos.
+	 * M√©todo que registra que dos Productos son equivalentes entre s√≠.
+	 * @param idRestaurante Long, ID del Restaurante due√±o de los dos Productos.
 	 * @param idProducto1 Long, ID del Producto 1 a relacionar.
 	 * @param idProducto2 Long, ID del producto 2 a relacionar.
 	 * @throws SQLException
@@ -915,8 +927,8 @@ public class RotondAndesTM {
 	}
 	
 	/**
-	 * MÈtodo que agrega un nuevo Ingrediente a RotondAndes. Los ingredientes se comparten entre los restaurantes.
-	 * @param ingrediente Ingrediente, toda la informaciÛn respecto al Ingrediente.
+	 * M√©todo que agrega un nuevo Ingrediente a RotondAndes. Los ingredientes se comparten entre los restaurantes.
+	 * @param ingrediente Ingrediente, toda la informaci√≥n respecto al Ingrediente.
 	 * @return Ingrediente, Ingrediente que se ha agregado.
 	 * @throws SQLException
 	 * @throws Exception
@@ -953,7 +965,7 @@ public class RotondAndesTM {
 	}
 	
 	/**
-	 * MÈtodo que obtiene toda la informaciÛn de consulta de todos los clientes.
+	 * M√©todo que obtiene toda la informaci√≥n de consulta de todos los clientes.
 	 * @return List<ConsumoCliente>, Lista de consumos de los clientes.
 	 * @throws SQLException
 	 * @throws Exception
@@ -999,7 +1011,7 @@ public class RotondAndesTM {
 		return respuesta;
 	}
 	/**
-	 * MÈtodo que obtiene el consumo de un cliente especÌfico.
+	 * M√©todo que obtiene el consumo de un cliente espec√≠fico.
 	 * @param idCliente Long, ID del cliente a consultar.
 	 * @return List<ConsumoCliente>, Lista de consumos del cliente consultado.
 	 * @throws SQLException
@@ -1043,11 +1055,193 @@ public class RotondAndesTM {
 			}
 		}
 		return respuesta;
-	}
-	
+	}  	
 	/**
 	 * RF14
 	 */
 	
 	public 
+  /**
+	 * M√©todo que agregar un Men√∫ para un Restaurante.
+	 * Al menos uno de los par√°metros debe ser no nulo y el restaurante debe ofrecer los productos
+	 * cuyos IDs est√° introduciendo por par√°metro.
+	 * @param idRestaurante Long, ID del Restaurante.
+	 * @param idEntrada Long, ID de la Entrada.
+	 * @param idPlatoFuerte Long, ID del Plato Fuerte.
+	 * @param idPostre Long, ID del Postre.
+	 * @param idBebida Long, ID de la Bebida.
+	 * @param idAcompaniamiento Long, ID del Acompa√±amiento.
+	 * @return Boolean, booleano que indica si el procedimiento fue exitoso.
+	 * @throws SQLException
+	 * @throws Exception
+	 */
+	public Menu registrarMenu (Long idRestaurante, Menu menu) throws SQLException, Exception
+	{
+		Menu respuesta;
+		DAOTablaRestaurantes daoRestaurantes = new DAOTablaRestaurantes();
+		try {
+			this.conn = darConexion();
+			daoRestaurantes.setConn(conn);
+			
+			if(menu.getEntrada() != null)
+			{
+				menu.setEntrada(darProducto(menu.getEntrada().getId(), idRestaurante));
+			}
+			if(menu.getPlatoFuerte() != null)
+			{
+				menu.setPlatoFuerte(darProducto(menu.getPlatoFuerte().getId(), idRestaurante));
+			}
+			if(menu.getPostre()!= null)
+			{
+				menu.setPostre(darProducto(menu.getPostre().getId(), idRestaurante));
+			}
+			if(menu.getBebida() != null)
+			{
+				menu.setBebida(darProducto(menu.getBebida().getId(), idRestaurante));
+			}
+			if(menu.getAcompaniamiento() != null)
+			{
+				menu.setAcompaniamiento(darProducto(menu.getAcompaniamiento().getId(), idRestaurante));
+			}
+			respuesta = daoRestaurantes.registrarMenu(idRestaurante, menu);
+		}catch (SQLException e) {
+			System.err.println("SQLException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		} catch (Exception e) {
+			System.err.println("GeneralException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		}finally {
+			try {
+				daoRestaurantes.cerrarRecursos();
+				if(this.conn!=null)
+					this.conn.close();
+			} catch (SQLException exception) {
+				System.err.println("SQLException closing resources:" + exception.getMessage());
+				exception.printStackTrace();
+				throw exception;
+			}
+		}
+		return respuesta;
+	}
+	
+	/**
+	 * M√©todo que regitra un Restaurante en la base de datos.
+	 * @param restaurante Restaurante, informaci√≥n del Restaurante.
+	 * @param representante Representante, informaci√≥n del Representante.
+	 * @param precio
+	 * @param idZona
+	 * @return
+	 * @throws SQLException
+	 * @throws Exception
+	 */
+	public Restaurante registrarRestaurante(Restaurante restaurante, Representante representante, Long idZona) throws SQLException, Exception
+	{
+		Restaurante respuesta;
+		DAOTablaRestaurantes daoRestaurantes = new DAOTablaRestaurantes();
+		try {
+			this.conn = darConexion();
+			daoRestaurantes.setConn(conn);
+			Zona zona = darZona(idZona);
+			if(zona == null)
+			{
+				throw new Exception("Zona no existe");
+			}
+			respuesta = daoRestaurantes.registrarRestaurante(restaurante, representante, zona.getId());
+			
+		}catch (SQLException e) {
+			System.err.println("SQLException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		} catch (Exception e) {
+			System.err.println("GeneralException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		}finally {
+			try {
+				daoRestaurantes.cerrarRecursos();
+				if(this.conn!=null)
+					this.conn.close();
+			} catch (SQLException exception) {
+				System.err.println("SQLException closing resources:" + exception.getMessage());
+				exception.printStackTrace();
+				throw exception;
+			}
+		}
+		return respuesta;
+	}
+	/**
+	 * M√©todo que agrega un Cliente Frecuente.
+	 * @param cliente ClienteFrecuente, informaci√≥n del cliente a agregar.
+	 * @return ClienteFrecuente, informaci√≥n del cliente agregado.
+	 * @throws SQLException
+	 * @throws Exception
+	 */
+	public ClienteFrecuente registrarClienteFrecuente(ClienteFrecuente cliente) throws SQLException, Exception
+	{
+		DAOTablaClientesFrecuentes daoClientesFrecuentes = new DAOTablaClientesFrecuentes();
+		try {
+			this.conn = darConexion();
+			daoClientesFrecuentes.setConn(conn);
+			cliente = daoClientesFrecuentes.agregarClienteFrecuente(cliente);
+			
+		}catch (SQLException e) {
+			System.err.println("SQLException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		} catch (Exception e) {
+			System.err.println("GeneralException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		}finally {
+			try {
+				daoClientesFrecuentes.cerrarRecursos();
+				if(this.conn!=null)
+					this.conn.close();
+			} catch (SQLException exception) {
+				System.err.println("SQLException closing resources:" + exception.getMessage());
+				exception.printStackTrace();
+				throw exception;
+			}
+		}
+		return cliente;
+	}
+	
+	/**
+	 * M√©todo que agrega un Cliente.
+	 * @param cliente ClienteFrecuente, informaci√≥n del cliente a agregar.
+	 * @return ClienteFrecuente, informaci√≥n del cliente agregado.
+	 * @throws SQLException
+	 * @throws Exception
+	 */
+	public Cliente registrarCliente(Cliente cliente) throws SQLException, Exception
+	{
+		DAOTablaClientes daoClientes = new DAOTablaClientes();
+		try {
+			this.conn = darConexion();
+			daoClientes.setConn(conn);
+			cliente = daoClientes.agregarCliente(cliente);
+			
+		}catch (SQLException e) {
+			System.err.println("SQLException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		} catch (Exception e) {
+			System.err.println("GeneralException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		}finally {
+			try {
+				daoClientes.cerrarRecursos();
+				if(this.conn!=null)
+					this.conn.close();
+			} catch (SQLException exception) {
+				System.err.println("SQLException closing resources:" + exception.getMessage());
+				exception.printStackTrace();
+				throw exception;
+			}
+		}
+		return cliente;
+	}
 }

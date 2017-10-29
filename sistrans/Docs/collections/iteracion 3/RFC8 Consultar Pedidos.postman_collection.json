@@ -1,0 +1,55 @@
+{
+	"variables": [],
+	"info": {
+		"name": "RFC8 Consultar Pedidos",
+		"_postman_id": "a205a4f4-8c2a-d107-1806-d892befecb66",
+		"description": "Muestra la información consolidada de los pedidos hechos en RotondAndes. Consolida, como mínimo, para cada uno los\r\nrestaurantes y para cada uno de sus productos las ventas totales (en dinero y en cantidad), lo consumidos por clientes\r\nregistrados y por clientes no registrados.\r\nEsta operación es realizada por un usuario restaurante y por el administrador de RotondAndes.\r\nNOTA: Respetando la privacidad de los clientes, cuando un restaurante hace esta consulta obtiene la información de sus\r\npropias actividades, mientras que el administrador obtiene toda la información. Ver RNF1.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Pedir Pedidos Admin",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "http://localhost:8080/RotondAndes/rest/admin/pedidos",
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Pedir pedidos Restaurante",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "http://localhost:8080/RotondAndes/rest/pedidos/8",
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		}
+	]
+}

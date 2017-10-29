@@ -98,7 +98,7 @@ public class DAOTablaPedidos {
 		Restaurante restauranteTemp = null;
 		if(restaurante.next())
 		{
-			restauranteTemp = new Restaurante(restaurante.getLong("ID_REST"), null, null, null, null);
+			restauranteTemp = new Restaurante(restaurante.getLong("ID_REST"), null, null, null, null, null);
 		}
 		if(restaurante.getInt("CANTIDAD") <= 0)
 		{
@@ -281,7 +281,7 @@ public class DAOTablaPedidos {
 		conn.setAutoCommit(true);
 	}
 	/**
-	 * Método que obtiene el ID de la última Orden.
+	 * Método que obtiene el ID de la siguiente Orden.
 	 * @return
 	 * @throws SQLException
 	 * @throws Exception

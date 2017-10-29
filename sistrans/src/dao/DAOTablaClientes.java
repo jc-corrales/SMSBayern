@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.List;
 
 import vos.Cliente;
+import vos.ClienteFrecuente;
 import vos.Orden;
 import vos.Pedido;
 import vos.Producto;
@@ -169,5 +170,47 @@ public class DAOTablaClientes {
 			respuesta.add(pedido);
 		}
 		return respuesta;
+	}
+	/**
+	 * Método que obtiene el ID del sigueinte Cliente.
+	 * @return Long, siguiente ID de Clientes en la base de datos.
+	 * @throws SQLException
+	 * @throws Exception
+	 */
+	public Long getSiguienteIdCliente()throws SQLException, Exception
+	{
+		String sql = "SELECT * FROM CLIENTES\r\n" + 
+				"    WHERE ROWNUM = 1\r\n" + 
+				"    ORDER BY ID DESC";
+		PreparedStatement prepStmt= conn.prepareStatement(sql);
+		recursos.add(prepStmt);
+		ResultSet rs = prepStmt.executeQuery();
+		if(rs.next())
+		{
+			return rs.getLong("ID") + 1;
+		}
+		else
+		{
+			return (long) 1;
+		}
+	}
+	/**
+	 * Método que agrega un cliente a RotondAndes.
+	 * @param cliente Cliente, Información del cliente a agregar a RotondAndes.
+	 * @return Cliente, información del cliente agregado.
+	 * @throws SQLException
+	 * @throws Exception
+	 */
+	public Cliente agregarCliente(Cliente cliente)throws SQLException, Exception
+	{
+		Long idCliente = getSiguienteIdCliente();
+		String sql1 = "INSERT INTO CLIENTES (ID, NAME, MESA)\r\n" + 
+				"    VALUES (" + idCliente + ", '" + cliente.getNombre() + "', " + cliente.getMesa() + ")";
+		PreparedStatement prepStmt1 = conn.prepareStatement(sql1);
+		recursos.add(prepStmt1);
+		prepStmt1.executeQuery();
+		
+		cliente.setId(idCliente);
+		return cliente;
 	}
 }
