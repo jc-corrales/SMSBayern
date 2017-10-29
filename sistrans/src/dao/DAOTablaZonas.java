@@ -9,8 +9,6 @@ import java.util.List;
 
 import vos.Zona;
 import vos.Condicion;
-import vos.Producto;
-import vos.Restaurante;
 
 /**
  * Clase que administra las reglas de funcionamiento de una Zona.
@@ -122,28 +120,34 @@ public class DAOTablaZonas
 		sql += zona.getNombre() + "', ";
 		sql += (zona.getEsEspacioAbierto()? 1 : 0) + ",";
 		sql += zona.getCapacidad() + ", ";
-		sql += (zona.getEsIncluyente() ? 1 : 0) + ", ";
+		sql += (zona.getEsIncluyente() ? 1 : 0);
 		sql += ")";
 
 
-		if(zona.getCondiciones() != null){
-			String sqlCondiciones = "SELECT * FROM CONDICIONESTECNICAS";
-
-			PreparedStatement prepStmtCondiciones = conn.prepareStatement(sqlCondiciones);
-			recursos.add(prepStmtCondiciones);
-			ResultSet rsCondiciones = prepStmtCondiciones.executeQuery();
-			List<Condicion> condiciones = zona.getCondiciones();
-
-			for(Condicion cond : condiciones){
-				sql += ("\n" + "INSERT INTO CONDICIONZONA VALUES (" + zona.getId() +", "+ cond.getId() +");" );
-			}
-		}
 
 		System.out.println("SQL statement: " + sql);
 		PreparedStatement prepStmt = conn.prepareStatement(sql);
 		recursos.add(prepStmt);
 
 		prepStmt.executeQuery();
+		
+		if(zona.getCondiciones() != null){
+			String sqlCondiciones = "SELECT * FROM CONDICIONESTECNICAS";
+
+			PreparedStatement prepStmtCondiciones = conn.prepareStatement(sqlCondiciones);
+			recursos.add(prepStmtCondiciones);
+			prepStmtCondiciones.executeQuery();
+			List<Condicion> condiciones = zona.getCondiciones();
+
+			for(Condicion cond : condiciones){
+				String sqlZonas = ("INSERT INTO CONDICIONZONA VALUES (" + zona.getId() +", "+ cond.getId() +")" );
+				PreparedStatement prepStmtZonas = conn.prepareStatement(sqlZonas);
+				recursos.add(prepStmtZonas);
+				prepStmtZonas.executeQuery();
+				
+			}
+		}
+
 	}
 
 	public Zona darZona(Long id)  throws SQLException, Exception{

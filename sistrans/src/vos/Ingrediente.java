@@ -13,7 +13,11 @@ public class Ingrediente extends IngredienteBase{
 	private String description;
 	@JsonProperty(value="ingredientesEquivalentes")
 	private List<IngredienteBase> ingredientesEquivalentes;
-	
+	/**
+	 * Atributo que contiene la cantidad disponible de este ingrediente en bodega.
+	 */
+	@JsonProperty(value = "cantidadDisponible")
+	private Integer cantidadDisponible;
 	
 	/**
 	 * Método constructor de la clase menu
@@ -26,11 +30,13 @@ public class Ingrediente extends IngredienteBase{
 			@JsonProperty(value="name")String name,
 			@JsonProperty(value="descripcion")String descripcion, 
 			@JsonProperty(value = "description") String description, 
-			@JsonProperty(value = "ingredientesEquivalentes") List<IngredienteBase> ingredientesEquivalentes){
+			@JsonProperty(value = "ingredientesEquivalentes") List<IngredienteBase> ingredientesEquivalentes,
+			@JsonProperty(value = "cantidadDisponible")Integer cantidadDisponible){
 		super(id, name);
 		this.descripcion = descripcion;
 		this.description = description;
 		this.ingredientesEquivalentes = ingredientesEquivalentes;
+		this.cantidadDisponible = cantidadDisponible;
 	}
 	
 	/**
@@ -79,5 +85,21 @@ public class Ingrediente extends IngredienteBase{
 	 */
 	public void setIngredientesEquivalentes(List<IngredienteBase> ingredientes) {
 		this.ingredientesEquivalentes = ingredientes;
+	}
+	/**
+	 * Método que obtiene la cantidad disponible de este ingrediente en bodega.
+	 * @return Integer, cantidad disponible de este Ingrediente en bodega.
+	 */
+	public Integer getCantidadDisponible()
+	{
+		return cantidadDisponible;
+	}
+	/**
+	 * Método que establece la cantidad disponible de este ingrediente en bodega.
+	 * @param cantidadDisponible Integer, nueva cantidad disponible de este ingrediente en bodega.
+	 */
+	public void setCantidadDisponible(Integer cantidadDisponible)
+	{
+		this.cantidadDisponible = cantidadDisponible;
 	}
 }

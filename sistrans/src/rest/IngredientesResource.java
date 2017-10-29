@@ -3,10 +3,8 @@ package rest;
 import java.util.List;
 import javax.servlet.ServletContext;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
@@ -14,20 +12,19 @@ import javax.ws.rs.core.Response;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-
 import tm.RotondAndesTM;
-import vos.Zona;
-
+import vos.Ingrediente;
+import vos.IngredienteBase;
 
 /**
- * Clase que administra el Rest de la clase Zona.
+ * Clase que administra los ingredientes, los cuales se comparten en todo RotondAndes
  * @author ASUS
  *
  */
-@Path("zonas")
+@Path("ingredientes")
 @Produces("application/json")
 @Consumes("application/json")
-public class ZonasResource
+public class IngredientesResource
 {
 	/**
 	 * Clase que contiene la información del cuerpo de entrada.
@@ -37,11 +34,11 @@ public class ZonasResource
 	@XmlRootElement
 	public static class RequestBody {
 	    @XmlElement Long id;
-	    @XmlElement String nombre;
-	    @XmlElement Boolean esEspacioAbierto;
-	    @XmlElement Integer capacidad;
-	    @XmlElement Boolean esIncluyente;
-	    @XmlElement List<String> condiciones;
+	    @XmlElement String name;
+	    @XmlElement String descripcion;
+	    @XmlElement String description;
+	    @XmlElement List<IngredienteBase> ingredientesEquivalentes;
+	    @XmlElement Integer cantidadDisponible;
 	}
 	
 	/**
@@ -66,42 +63,22 @@ public class ZonasResource
 	}
 	
 	/**
-	 * Método que obtiene una Zona.
-	 * @param idZona Long, ID de la zona a obtener.
-	 * @return Response, toda la información de la Zona.
-	 */
-	@GET
-	@Path("{idZona: \\d+}")
-	@Produces( { MediaType.APPLICATION_JSON } )
-	public Response getZona(@PathParam("idZona") Long idZona) {
-		RotondAndesTM tm = new RotondAndesTM(getPath());
-		try {
-			Zona zona = tm.darZona(idZona);
-			return Response.status( 200 ).entity( zona ).build( );		
-		}catch( Exception e )
-		{
-			return Response.status( 500 ).entity( doErrorMessage( e ) ).build( );
-		}
-	}
-	
-	/**
-	 * Método que registra una nueva Zona.
-	 * @param zona Zona, datos de la Zona.
-	 * @return Response, Zona con toda la información proporcionada.
+	 * Método que agrega un nuevo ingrediente a RotondAdnes
+	 * @param ingrediente Ingrediente, toda la información respecto al Ingrediente.
+	 * @return
 	 */
 	@POST
 	@Consumes({ MediaType.APPLICATION_JSON })
-	public Response agregarZona(Zona zona) {
+	@Produces({ MediaType.APPLICATION_JSON })
+	public Response agregarIngrediente(Ingrediente ingrediente) {
 		RotondAndesTM tm = new RotondAndesTM(getPath());
 		try {
 			
-			Zona res = tm.agregarZona(zona);
+			Ingrediente res = tm.agregarIngrediente(ingrediente);
 			return Response.status( 200 ).entity( res ).build();	
 		}catch( Exception e )
 		{
 			return Response.status( 500 ).entity( doErrorMessage( e ) ).build( );
 		}
 	}
-	
-	
 }

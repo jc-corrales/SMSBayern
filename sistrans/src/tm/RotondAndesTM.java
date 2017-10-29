@@ -17,6 +17,8 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Properties;
+
+import dao.DAOConsumoClientes;
 import dao.DAOTablaClientes;
 import dao.DAOTablaClientesFrecuentes;
 import dao.DAOTablaIngredientes;
@@ -26,12 +28,11 @@ import dao.DAOTablaRestaurantes;
 import dao.DAOTablaZonas;
 import vos.Cliente;
 import vos.ClienteFrecuente;
+import vos.ConsumoCliente;
 import vos.EstadisticasPedidos;
 import vos.Ingrediente;
-import vos.IngredienteBase;
-import vos.Pedido;
+import vos.Orden;
 import vos.Producto;
-import vos.ProductoBase;
 import vos.Restaurante;
 import vos.Zona;
 
@@ -301,16 +302,24 @@ public class RotondAndesTM {
 		}
 		return cliente;
 	}
-
-	public Pedido agregarPedido(Long id, Long idProd, Long idRestProd) throws SQLException, Exception {
-		Pedido res = null;
+	/**
+	 * Método que emite una Orden con un sólo Pedido.
+	 * @param id Long, ID del cliente que hace el pedido.
+	 * @param idProd Long, ID del producto que se pide.
+	 * @param idRestProd Long, ID del restaurante dueño del producto que se pide.
+	 * @return Orden, Orden con toda la información del Pedido.
+	 * @throws SQLException
+	 * @throws Exception
+	 */
+	public Orden agregarUnaOrdenDeUnPedido(Long id, Long idProd, Long idRestProd) throws SQLException, Exception {
+		Orden res = null;
 		DAOTablaPedidos dao = new DAOTablaPedidos();
 		try {
 			this.conn = darConexion();
 			dao.setConn(conn);
 			Cliente cliente = darCliente(id);
 			Producto producto = darProducto(idProd, idRestProd);
-			res = dao.registrarPedido(cliente, producto);
+			res = dao.registrarUnPedido(cliente, producto, idRestProd);
 		}catch (SQLException e) {
 			System.err.println("SQLException:" + e.getMessage());
 			e.printStackTrace();
@@ -743,7 +752,14 @@ public class RotondAndesTM {
 		}
 		return respuesta;
 	}
-	
+	/**
+	 * Método que registra que dos Productos son equivalentes entre sí.
+	 * @param idRestaurante Long, ID del Restaurante dueño de los dos Productos.
+	 * @param idProducto1 Long, ID del Producto 1 a relacionar.
+	 * @param idProducto2 Long, ID del producto 2 a relacionar.
+	 * @throws SQLException
+	 * @throws Exception
+	 */
 	public void registrarProductosEquivalentes(Long idRestaurante, Long idProducto1, Long idProducto2)throws SQLException, Exception
 	{
 		DAOTablaProductos daoProductos = new DAOTablaProductos();
@@ -771,5 +787,136 @@ public class RotondAndesTM {
 				throw exception;
 			}
 		}
+	}
+	
+	/**
+	 * Método que agrega un nuevo Ingrediente a RotondAndes. Los ingredientes se comparten entre los restaurantes.
+	 * @param ingrediente Ingrediente, toda la información respecto al Ingrediente.
+	 * @return Ingrediente, Ingrediente que se ha agregado.
+	 * @throws SQLException
+	 * @throws Exception
+	 */
+	public Ingrediente agregarIngrediente(Ingrediente ingrediente) throws SQLException, Exception
+	{
+		Ingrediente respuesta;
+		DAOTablaIngredientes daoIngredientes = new DAOTablaIngredientes();
+		try {
+			this.conn = darConexion();
+			daoIngredientes.setConn(conn);
+			respuesta = daoIngredientes.agregarIngredienteSinEquivalentes(ingrediente);
+			
+		}catch (SQLException e) {
+			System.err.println("SQLException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		} catch (Exception e) {
+			System.err.println("GeneralException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		}finally {
+			try {
+				daoIngredientes.cerrarRecursos();
+				if(this.conn!=null)
+					this.conn.close();
+			} catch (SQLException exception) {
+				System.err.println("SQLException closing resources:" + exception.getMessage());
+				exception.printStackTrace();
+				throw exception;
+			}
+		}
+		return respuesta;
+	}
+	
+	/**
+	 * Método que obtiene toda la información de consulta de todos los clientes.
+	 * @return List<ConsumoCliente>, Lista de consumos de los clientes.
+	 * @throws SQLException
+	 * @throws Exception
+	 */
+	public List<ConsumoCliente> darEstadisticasConsumoClientes()throws SQLException, Exception
+	{
+		DAOConsumoClientes daoConsumo = new DAOConsumoClientes();
+		List<ConsumoCliente> respuesta;
+		try {
+			this.conn = darConexion();
+			daoConsumo.setConn(conn);
+			respuesta = daoConsumo.getConsumoClientes();
+			for(int i = 0; i < respuesta.size(); i++)
+			{
+				Long idCliente = respuesta.get(i).getCliente().getId();
+				respuesta.get(i).setCliente(darCliente(idCliente));
+			}
+//			System.out.println("after dao ------> " + zona.getId() + " || " + zona.getNombre());
+			if(respuesta.size() == 0) {
+				throw new Exception("No existe el Restaurante.");
+			}		
+		}catch (SQLException e) {
+			System.err.println("SQLException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		} catch (Exception e) {
+			System.err.println("GeneralException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		}finally {
+			try {
+
+				daoConsumo.cerrarRecursos();
+//				daoRes.cerrarRecursos();
+				if(this.conn!=null)
+					this.conn.close();
+			} catch (SQLException exception) {
+				System.err.println("SQLException closing resources:" + exception.getMessage());
+				exception.printStackTrace();
+				throw exception;
+			}
+		}
+		return respuesta;
+	}
+	/**
+	 * Método que obtiene el consumo de un cliente específico.
+	 * @param idCliente Long, ID del cliente a consultar.
+	 * @return List<ConsumoCliente>, Lista de consumos del cliente consultado.
+	 * @throws SQLException
+	 * @throws Exception
+	 */
+	public List<ConsumoCliente> darEstadisticasConsumoDeUnCliente(Long idCliente)throws SQLException, Exception
+	{
+		DAOConsumoClientes daoConsumo = new DAOConsumoClientes();
+		List<ConsumoCliente> respuesta;
+		try {
+			this.conn = darConexion();
+			daoConsumo.setConn(conn);
+			respuesta = daoConsumo.getConsumoUnCliente(idCliente);
+			for(int i = 0; i < respuesta.size(); i++)
+			{
+				respuesta.get(i).setCliente(darCliente(idCliente));
+			}
+//			System.out.println("after dao ------> " + zona.getId() + " || " + zona.getNombre());
+			if(respuesta.size() == 0) {
+				throw new Exception("No existe el Restaurante.");
+			}		
+		}catch (SQLException e) {
+			System.err.println("SQLException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		} catch (Exception e) {
+			System.err.println("GeneralException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		}finally {
+			try {
+
+				daoConsumo.cerrarRecursos();
+//				daoRes.cerrarRecursos();
+				if(this.conn!=null)
+					this.conn.close();
+			} catch (SQLException exception) {
+				System.err.println("SQLException closing resources:" + exception.getMessage());
+				exception.printStackTrace();
+				throw exception;
+			}
+		}
+		return respuesta;
 	}
 }

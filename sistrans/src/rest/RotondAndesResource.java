@@ -17,6 +17,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import tm.RotondAndesTM;
 import vos.Cliente;
+import vos.ConsumoCliente;
 import vos.EstadisticasPedidos;
 import vos.Producto;
 //import vos.ProductoBase;
@@ -87,10 +88,9 @@ public class RotondAndesResource {
 	@GET
 	@Path("pedidos")
 	@Produces( { MediaType.APPLICATION_JSON } )
-	public Response getZona() {
+	public Response getEstadisticasProductos() {
 		RotondAndesTM tm = new RotondAndesTM(getPath());
 		try {
-			System.out.println("ENTRO A METODO RESOURCE");
 			List<EstadisticasPedidos> respuesta = tm.darEstadisticasPedidos();
 			return Response.status( 200 ).entity( respuesta ).build( );		
 		}catch( Exception e )
@@ -99,6 +99,40 @@ public class RotondAndesResource {
 		}
 	}
 	
+	/**
+	 * Método que obtiene el consumo de todos los Clientes de RotondAdnes.
+	 * @return Response.
+	 */
+	@GET
+	@Path("consumo")
+	@Produces( { MediaType.APPLICATION_JSON } )
+	public Response getConsumosClientes() {
+		RotondAndesTM tm = new RotondAndesTM(getPath());
+		try {
+			List<ConsumoCliente> respuesta = tm.darEstadisticasConsumoClientes();
+			return Response.status( 200 ).entity( respuesta ).build( );		
+		}catch( Exception e )
+		{
+			return Response.status( 500 ).entity( doErrorMessage( e ) ).build( );
+		}
+	}
+	/**
+	 * Método que obtiene el consumo un cliente específico de RotondAndes.
+	 * @return Response.
+	 */
+	@GET
+	@Path("consumo/{id: \\d+}")
+	@Produces( { MediaType.APPLICATION_JSON } )
+	public Response getConsumosClientes(@PathParam("id") Long id) {
+		RotondAndesTM tm = new RotondAndesTM(getPath());
+		try {
+			List<ConsumoCliente> respuesta = tm.darEstadisticasConsumoDeUnCliente(id);
+			return Response.status( 200 ).entity( respuesta ).build( );		
+		}catch( Exception e )
+		{
+			return Response.status( 500 ).entity( doErrorMessage( e ) ).build( );
+		}
+	}
 	
 	private String getPath() {
 		return context.getRealPath("WEB-INF/ConnectionData");

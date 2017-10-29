@@ -10,7 +10,6 @@
  */
 package vos;
 
-import java.util.Collection;
 
 import org.codehaus.jackson.annotate.*;
 

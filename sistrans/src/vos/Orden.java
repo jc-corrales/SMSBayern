@@ -30,8 +30,8 @@ public class Orden
 	/**
 	 * Atributo que contiene los productos Ordenados.
 	 */
-	@JsonProperty(value = "productosOrdenados")
-	private List<Producto> productosOrdenados;
+	@JsonProperty(value = "pedidosOrdenados")
+	private List<Pedido> pedidosOrdenados;
 	/**
 	 * Atributo que contiene el cliente dueño de esta orden.
 	 */
@@ -44,11 +44,11 @@ public class Orden
 	 * @param productosOrdenados
 	 * @param cliente
 	 */
-	public Orden(@JsonProperty(value = "id")Long id, @JsonProperty(value = "costoTotal") Double costoTotal, @JsonProperty(value = "productosOrdenados")List<Producto> productosOrdenados, @JsonProperty(value = "cliente")Cliente cliente)
+	public Orden(@JsonProperty(value = "id")Long id, @JsonProperty(value = "costoTotal") Double costoTotal, @JsonProperty(value = "productosOrdenados")List<Pedido> pedidosOrdenados, @JsonProperty(value = "cliente")Cliente cliente)
 	{
 		this.id = id;
 		this.costoTotal = costoTotal;
-		this.productosOrdenados = productosOrdenados;
+		this.pedidosOrdenados = pedidosOrdenados;
 		this.cliente = cliente;
 	}
 	/**
@@ -79,17 +79,17 @@ public class Orden
 	 * Método que obtiene la lista de productos ordenados de esta orden.
 	 * @return List<ProductoVos>, Lista de productos Ordenados en esta orden.
 	 */
-	public List<Producto> getProductosOrdenados()
+	public List<Pedido> getProductosOrdenados()
 	{
-		return this.productosOrdenados;
+		return this.pedidosOrdenados;
 	}
 	/**
 	 * Método que establece la lista de productos ordenados de esta orden.
 	 * @param productosOrdenados List<ProductoVos>, Nueva lista de productos ordenados en esta orden.
 	 */
-	public void setProductosOrdenados(List<Producto> productosOrdenados)
+	public void setPedidosOrdenados(List<Pedido> pedidosOrdenados)
 	{
-		this.productosOrdenados = productosOrdenados;
+		this.pedidosOrdenados = pedidosOrdenados;
 	}
 	/**
 	 * Método que obtiene el cliente a nombre de quien está esta orden.

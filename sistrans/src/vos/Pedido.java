@@ -1,8 +1,6 @@
 package vos;
 
 import java.time.LocalDateTime;
-
-
 import org.codehaus.jackson.annotate.*;
 
 public class Pedido {

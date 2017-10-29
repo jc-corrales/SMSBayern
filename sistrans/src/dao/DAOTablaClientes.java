@@ -4,10 +4,14 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+//import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import vos.Cliente;
+import vos.Orden;
+import vos.Pedido;
 import vos.Producto;
 
 public class DAOTablaClientes {
@@ -49,8 +53,20 @@ public class DAOTablaClientes {
 			String name = rs.getString("NAME");
 			Long id = rs.getLong("ID");
 			Integer mesa = rs.getInt("MESA"); 
+			List<Orden> ordenes = new ArrayList<Orden>();
+			String sentenciaOrden = "SELECT * FROM ORDENES WHERE ID_CLIENTE = " + id;
+			PreparedStatement stamntOrden = conn.prepareStatement(sentenciaOrden);
+			recursos.add(stamntOrden);
+			ResultSet rsOrden = stamntOrden.executeQuery();
+			while(rsOrden.next())
+			{
+				Long idOrden = rsOrden.getLong("ID");
+				Double costoTotalOrden = rsOrden.getDouble("COSTOTOTAL");
+				List<Pedido> pedidos = getPedidosPorClienteSegunOrden(id, idOrden);
+				ordenes.add( new Orden(idOrden, costoTotalOrden, pedidos ,null));
+			}
 			
-			clientes.add(new Cliente(id, mesa, name));
+			clientes.add(new Cliente(id, mesa, name, ordenes));
 		}
 		return clientes;
 	}
@@ -68,7 +84,21 @@ public class DAOTablaClientes {
 			Long id2 = rs.getLong("ID");
 			String nameclientePorId = rs.getString("NAME");
 			Integer mesaClientePorId = rs.getInt("MESA");
-			cliente = new Cliente(id2, mesaClientePorId, nameclientePorId);
+			
+			List<Orden> ordenes = new ArrayList<Orden>();
+			String sentenciaOrden = "SELECT * FROM ORDENES WHERE ID_CLIENTE = " + id2;
+			PreparedStatement stamntOrden = conn.prepareStatement(sentenciaOrden);
+			recursos.add(stamntOrden);
+			ResultSet rsOrden = stamntOrden.executeQuery();
+			while(rsOrden.next())
+			{
+				Long idOrden = rsOrden.getLong("ID");
+				Double costoTotalOrden = rsOrden.getDouble("COSTOTOTAL");
+				ordenes.add( new Orden(idOrden, costoTotalOrden, null ,null));
+			}
+			
+			
+			cliente = new Cliente(id2, mesaClientePorId, nameclientePorId, ordenes);
 		}
 		return cliente;
 	}
@@ -87,10 +117,57 @@ public class DAOTablaClientes {
 			Long id2 = rsClientePorId.getLong("ID");
 			String nameclientePorId = rsClientePorId.getString("NAME");
 			Integer mesaClientePorId = rsClientePorId.getInt("MESA");
-			clientePorId = new Cliente(id2, mesaClientePorId, nameclientePorId);
+			clientePorId = new Cliente(id2, mesaClientePorId, nameclientePorId, null);
 		}
 
 		return clientePorId;
 	}
-
+	/**
+	 * Método que obtiene los Pedidos hechos por un cliente, por orden.
+	 * @param idCliente
+	 * @return
+	 * @throws SQLException
+	 * @throws Exception
+	 */
+	private List<Pedido> getPedidosPorClienteSegunOrden(Long idCliente, Long idOrden)throws SQLException, Exception
+	{
+		String sql = "SELECT * FROM PEDIDOS WHERE ID_CLIENTE = " + idCliente + " AND ID_ORDEN = " + idOrden; 
+		PreparedStatement stmt= conn.prepareStatement(sql);
+		recursos.add(stmt);
+		ResultSet rs = stmt.executeQuery();
+		List<Pedido> respuesta = new ArrayList<Pedido>();
+		while(rs.next())
+		{
+			Long id = rs.getLong("ID");
+			Date fecha = rs.getDate("FECHA");
+			Long idProducto = rs.getLong("ID_PRODUCTO");
+			Boolean servido = true;
+			if(rs.getInt("SERVIDO") == 0)
+			{
+				servido = false;
+			}
+			//PROCESAR PRODUCTO DE ORDEN
+			String sqlProducto = "SELECT * FROM PRODUCTO_RESTAURANTE PRODREST, PRODUCTOS\r\n" + 
+					"    WHERE PRODUCTOS.ID = Prodrest.Id_Prod AND PRODUCTOS.ID = " + idProducto;
+			PreparedStatement stmtProd= conn.prepareStatement(sqlProducto);
+			recursos.add(stmtProd);
+			ResultSet rsProd = stmtProd.executeQuery();
+			Producto producto = new Producto();
+			if(rsProd.next())
+			{
+				String nombre = rsProd.getString("NAME");
+				String descripcionEspaniol = rsProd.getString("DESCRIPCION");
+				String descripcionIngles = rsProd.getString("DESCRIPTION");
+				Double costoDeProduccion = rsProd.getDouble("COSTO_PRODUCCION");
+				Double precio = rsProd.getDouble("PRECIO");
+				
+				String categoria = rsProd.getString("CATEGORIA");
+				
+				producto = new Producto(idProducto, nombre, descripcionEspaniol, descripcionIngles, costoDeProduccion, null, precio, null, categoria, null, null);
+			}
+			Pedido pedido = new Pedido(id, null, producto, null, servido);
+			respuesta.add(pedido);
+		}
+		return respuesta;
+	}
 }

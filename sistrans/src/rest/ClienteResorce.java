@@ -1,28 +1,23 @@
 package rest;
 
 import java.util.List;
+
 import javax.servlet.ServletContext;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.codehaus.jackson.map.ObjectMapper;
 
 import tm.RotondAndesTM;
-import vos.Cliente;
-import vos.Pedido;
-import vos.Producto;
+import vos.ConsumoCliente;
+import vos.Orden;
 
 
 
@@ -31,13 +26,13 @@ import vos.Producto;
  * @author David Bautista
  */
 
-@Path("cliente")
+@Path("clientes")
 public class ClienteResorce {
 
 	@XmlRootElement
 	public static class RequestBody {
-	    @XmlElement Long idProd;
-	    @XmlElement Long idRestProd;
+	    @XmlElement public Long idProd;
+	    @XmlElement public Long idRestProd;
 	}
 	
 	
@@ -59,15 +54,31 @@ public class ClienteResorce {
 	public Response agregarPedido(@PathParam("id") Long id, RequestBody request) {
 		RotondAndesTM tm = new RotondAndesTM(getPath());
 		try {
-			Pedido pedido = tm.agregarPedido(id, request.idProd, request.idRestProd);
+			Orden orden = tm.agregarUnaOrdenDeUnPedido(id, request.idProd, request.idRestProd);
 			 
-			return Response.status( 200 ).entity( pedido ).build();	
+			return Response.status( 200 ).entity( orden ).build();	
 		}catch( Exception e )
 		{
 			return Response.status( 500 ).entity( doErrorMessage( e ) ).build( );
 		}
 	}
 	
-	
+	/**
+	 * Método que obtiene el consumo de todos los Clientes de RotondAdnes.
+	 * @return Response.
+	 */
+	@GET
+	@Path("{id: \\d+}/consumo")
+	@Produces( { MediaType.APPLICATION_JSON } )
+	public Response getConsumosClientes(@PathParam("id") Long id) {
+		RotondAndesTM tm = new RotondAndesTM(getPath());
+		try {
+			List<ConsumoCliente> respuesta = tm.darEstadisticasConsumoDeUnCliente(id);
+			return Response.status( 200 ).entity( respuesta ).build( );		
+		}catch( Exception e )
+		{
+			return Response.status( 500 ).entity( doErrorMessage( e ) ).build( );
+		}
+	}
 	
 }

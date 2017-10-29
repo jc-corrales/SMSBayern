@@ -9,10 +9,8 @@ import java.util.List;
 
 import org.codehaus.jackson.map.ObjectMapper;
 
-import vos.Ingrediente;
 import vos.Producto;
 import vos.ProductoBase;
-import vos.RotondAndes;
 import vos.TipoComida;
 
 public class DAOTablaProductos {
@@ -169,9 +167,13 @@ public class DAOTablaProductos {
 		}
 		return productos;
 	}
-
-
-
+	/**
+	 * Método que da los productos preferidos de un Cliente Frecuente. 
+	 * @param id Long, ID del cliente Frecuente.
+	 * @return List<ProductoBase>, Lista de Productos preferidos del Cliente Frecuente.
+	 * @throws SQLException
+	 * @throws Exception
+	 */
 	public List<ProductoBase> darPreferencias(Long id)  throws SQLException, Exception{
 		List<ProductoBase> preferencias = new ArrayList<>();
 		
@@ -238,7 +240,17 @@ public class DAOTablaProductos {
 			recursos.add(prepStmt3);
 			prepStmt3.executeQuery();
 		}
-		
+//		List<ProductoBase> equivalentes = producto.getProductosEquivalentes();
+//		if(equivalentes != null)
+//		{
+//			for(int i = 0; i < equivalentes.size(); i++)
+//			{
+//				String sql4 = "INSERT INTO PRODUCTOSSIMILARES (ID_RESTAURANTE, ID_PROD1, ID_PROD2) VALUES (" +idRestaurante+ ", " +producto.getId()+ ", " + equivalentes.get(i).getId()+ ")";	
+//				PreparedStatement prepStmt4 = conn.prepareStatement(sql4);
+//				recursos.add(prepStmt4);
+//				prepStmt4.executeQuery();
+//			}
+//		}
 		
 		conn.commit();
 		conn.setAutoCommit(true);

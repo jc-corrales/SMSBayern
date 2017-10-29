@@ -11,6 +11,7 @@ import java.util.List;
 
 import vos.Cliente;
 import vos.EstadisticasPedidos;
+import vos.Orden;
 import vos.Pedido;
 import vos.Producto;
 import vos.Restaurante;
@@ -60,13 +61,13 @@ public class DAOTablaPedidos {
 	 * @throws Exception
 	 */
 	public Long darIdMax() throws SQLException, Exception {
-		String sql = "SELECT COUNT(*) AS CONT FROM PEDIDOS";
+		String sql = "SELECT * FROM PEDIDOS WHERE ROWNUM = 1 ORDER BY ID DESC";
 
 		PreparedStatement prepStmt = conn.prepareStatement(sql);
 		recursos.add(prepStmt);
 		ResultSet rs = prepStmt.executeQuery();
 		if(rs.next())
-			return rs.getLong("CONT") + 1;
+			return rs.getLong("ID") + 1;
 		return 0L;
 	}
 
@@ -74,33 +75,58 @@ public class DAOTablaPedidos {
 	 * Método que registra un Pedido
 	 * @param cliente Cliente, Cliente a nombre de quién está el Pedido.
 	 * @param producto Producto, Producto Pedido.
+	 * @param idOrden Long, ID de la orden a la que este producto está asociado.
+	 * @param idRest Long, ID del Restaurante.
 	 * @return Pedido, Pedido con toda su información.
 	 * @throws SQLException
 	 * @throws Exception
 	 */
-	public Pedido registrarPedido(Cliente cliente, Producto producto) throws SQLException, Exception{
+	public Pedido registrarPedido(Cliente cliente, Producto producto, Long idOrden, Long idRest) throws SQLException, Exception{
+//		System.out.println("Entro metodo registrarPedido");
 		Long id =  darIdMax();	
 		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 		LocalDateTime localDate = LocalDateTime.now();
-		
-		String sqlRestaurante = "SELECT * FROM PRODUCTO_RESTAURANTE WHERE ID_PROD = " + producto.getId();
+//		System.out.println("pre sql 1");
+		String sqlRestaurante = "SELECT * FROM PRODUCTO_RESTAURANTE WHERE ID_PROD = " + producto.getId() + " AND ID_REST = " + idRest;
+//		System.out.println(sqlRestaurante);
 		PreparedStatement prepStmtRestaurante = conn.prepareStatement(sqlRestaurante);
+//		System.out.println(sqlRestaurante);
 		recursos.add(prepStmtRestaurante);
+//		System.out.println(sqlRestaurante);
 		ResultSet restaurante = prepStmtRestaurante.executeQuery();
+//		System.out.println("post sql 1");
+		Restaurante restauranteTemp = null;
+		if(restaurante.next())
+		{
+			restauranteTemp = new Restaurante(restaurante.getLong("ID_REST"), null, null, null, null);
+		}
+		if(restaurante.getInt("CANTIDAD") <= 0)
+		{
+			throw new Exception("No Hay Cantidad Suficiente.");
+		}
 		
-		Restaurante restauranteTemp = new Restaurante(restaurante.getLong("ID"), null, null, null, null);
+		String sql2 = "UPDATE PRODUCTO_RESTAURANTE SET CANTIDAD = (CANTIDAD - 1) WHERE ID_PROD = " + producto.getId() + " AND ID_REST = " + idRest;
+//		System.out.println(sqlRestaurante);
+		PreparedStatement prepStmt2 = conn.prepareStatement(sql2);
+//		System.out.println(sqlRestaurante);
+		recursos.add(prepStmt2);
+//		System.out.println(sqlRestaurante);
+		prepStmt2.executeQuery();
 		
+
+		System.out.println("Pre SQL");
 		String sql = "INSERT INTO PEDIDOS (ID, ID_CLIENTE, ID_PRODUCTO, FECHA, SERVIDO, ID_ORDEN, ID_RESTAURANTE) VALUES (";
 		sql += id + ", ";
 		sql += cliente.getId() + ", ";
 		sql += producto.getId() + ", ";
 		sql += "TIMESTAMP '" + dtf.format(localDate) + "', 0, ";
-		sql += cliente.getOrdenes().get(cliente.getOrdenes().size()-1).getId() + ", ";
+		sql += idOrden + ", ";
 		sql += restauranteTemp.getId() + ")";
-
+		System.out.println(sql);
 		PreparedStatement prepStmt = conn.prepareStatement(sql);
 		recursos.add(prepStmt);
 		prepStmt.executeQuery();
+		System.out.println("post ejecucción sql 2");
 		
 		return new Pedido(id, cliente, producto, localDate, false);
 	}
@@ -254,4 +280,47 @@ public class DAOTablaPedidos {
 		prepStmtUpdater.executeQuery();
 		conn.setAutoCommit(true);
 	}
+	/**
+	 * Método que obtiene el ID de la última Orden.
+	 * @return
+	 * @throws SQLException
+	 * @throws Exception
+	 */
+	public Long getSiguienteIdOrden()throws SQLException, Exception
+	{
+		String sql = "SELECT * FROM ORDENES\r\n" + 
+				"    WHERE ROWNUM = 1\r\n" + 
+				"    ORDER BY ID DESC";
+		PreparedStatement prepStmt= conn.prepareStatement(sql);
+		recursos.add(prepStmt);
+		ResultSet rs = prepStmt.executeQuery();
+		if(rs.next())
+		{
+			return rs.getLong("ID") + 1;
+		}
+		else
+		{
+			return (long) 1;
+		}
+	}
+	
+	public Orden registrarUnPedido(Cliente cliente, Producto producto, Long idRestProd)throws SQLException, Exception
+	{
+		List<Pedido> pedidos = new ArrayList<Pedido>();
+		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+		LocalDateTime localDate = LocalDateTime.now();
+		Orden orden = new Orden(getSiguienteIdOrden(), producto.getPrecio(), null, cliente);
+		
+		String sql = "INSERT INTO ORDENES (ID, ID_CLIENTE, COSTOTOTAL, FECHA)\r\n" + 
+				" VALUES (" + orden.getId() + ", " + orden.getCliente().getId() + ", " + orden.getCostoTotal() + ", TIMESTAMP '" + dtf.format(localDate) + "')";
+		PreparedStatement prepStmt= conn.prepareStatement(sql);
+		recursos.add(prepStmt);
+		prepStmt.executeQuery();
+		
+		Pedido pedido = registrarPedido(cliente, producto, orden.getId(), idRestProd);
+		pedidos.add(pedido);
+		orden.setPedidosOrdenados(pedidos);
+		return orden;
+	}
+	
 }

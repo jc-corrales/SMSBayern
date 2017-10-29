@@ -17,8 +17,6 @@ import org.codehaus.jackson.annotate.*;
 
 public class Producto extends ProductoBase
 {
-	
-
 	/**
 	 * Costo de Producciódel producto.
 	 */
