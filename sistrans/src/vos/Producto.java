@@ -17,6 +17,11 @@ import org.codehaus.jackson.annotate.*;
 
 public class Producto extends ProductoBase
 {
+	public final static String ENTRADA = "ENTRADA";
+	public final static String PLATOFUERTE = "PLATOFUERTE";
+	public final static String POSTRE = "POSTRE";
+	public final static String BEBIDA = "BEBIDA";
+	public final static String ACOMPANIAMIENTO = "ACOMPAÑAMIENTO";
 	/**
 	 * Costo de Producciódel producto.
 	 */

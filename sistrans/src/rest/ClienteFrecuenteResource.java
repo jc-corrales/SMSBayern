@@ -19,7 +19,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import tm.RotondAndesTM;
 import vos.ClienteFrecuente;
-@Path("clientes-frecuentes")
+@Path("clientesFrecuentes")
 public class ClienteFrecuenteResource {
 
 
@@ -33,7 +33,13 @@ public class ClienteFrecuenteResource {
 	@Context
 	private ServletContext context;
 
-
+	/**
+	 * Método que registra la preferencia de un Cliente Frecuente registrado.
+	 * @param id Long, ID del cliente.
+	 * @param idProd Long, ID del producto a registrar como preferido.
+	 * @param password String, contraseña del Cliente.
+	 * @return Response.
+	 */
 	@POST
 	@Path("{ClienteId: \\d+}/preferencias")
 	@Consumes({ MediaType.APPLICATION_JSON })
@@ -47,7 +53,13 @@ public class ClienteFrecuenteResource {
 			return Response.status(500).entity(doErrorMessage(e)).build();
 		}
 	}
-
+	/**
+	 * Método para borrar un Producto de las preferencias de un Cliente Frecuente Registrado.
+	 * @param id Long, ID del Cliente Frecuente registrado.
+	 * @param idProd Long, ID del Producto a remover de Preferidos.
+	 * @param password String, contraseña del Cliente Frecuente registrado.
+	 * @return Response.
+	 */
 	@DELETE
 	@Path("{ClienteId: \\d+}/preferencias")
 	@Consumes({ MediaType.APPLICATION_JSON })

@@ -1,0 +1,55 @@
+{
+	"variables": [],
+	"info": {
+		"name": "RF17 Cancelar Pedido",
+		"_postman_id": "5270fe46-fc3b-b7c3-98bb-efc6f3fdb5d0",
+		"description": "Cancela un pedido, siempre y cuando no haya sido ya servido. Debe manejar correctamente los casos de productos\r\nindividuales, menús y de una mesa: Los productos asociados al pedido deben quedar nuevamente disponibles para la\r\nventa. Esta operación puede ser realizada por un usuario restaurante. ",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Delete Pedido 23 (no servido)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "http://localhost:8080/RotondAndes/rest/pedidos/23",
+				"method": "DELETE",
+				"header": [],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Pedido 24 (servido)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 412\"] = responseCode.code === 412;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "http://localhost:8080/RotondAndes/rest/pedidos/24",
+				"method": "DELETE",
+				"header": [],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		}
+	]
+}

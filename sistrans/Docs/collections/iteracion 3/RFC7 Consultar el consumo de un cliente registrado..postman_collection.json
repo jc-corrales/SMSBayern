@@ -1,0 +1,77 @@
+{
+	"variables": [],
+	"info": {
+		"name": "RFC7 Consultar el consumo de un cliente registrado.",
+		"_postman_id": "dc2cf92c-322d-993c-f257-b7e918ddde3f",
+		"description": "Consulta los productos que ha consumido un cliente registrado de RotondAndes. Debe discriminar los productos que ha\r\nsolicitado independientemente, los de los menús y los solicitados en una mesa. Esta operación es realizada por los clientes\r\nregistrados y por el usuario administrador de RotondAndes.\r\nNOTA: Respetando la privacidad de los clientes, cuando un cliente registrado hace esta consulta obtiene la información ",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Consultar consumo de todos los clientes (admin)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "http://localhost:8080/RotondAndes/rest/admin/consumo",
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Consultar consumo de un cliente, ID = 7",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "http://localhost:8080/RotondAndes/rest/clientes/7/consumo",
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Obtener consumo de un cliente específico desde administrador.",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "http://localhost:8080/RotondAndes/rest/admin/consumo/7",
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		}
+	]
+}

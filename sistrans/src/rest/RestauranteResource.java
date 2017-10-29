@@ -17,8 +17,11 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import tm.RotondAndesTM;
 import vos.Ingrediente;
+import vos.Menu;
 import vos.Producto;
 import vos.ProductoBase;
+import vos.Representante;
+import vos.Restaurante;
 
 @Path("restaurantes")
 public class RestauranteResource {
@@ -126,4 +129,26 @@ public class RestauranteResource {
 			return Response.status( 500 ).entity( doErrorMessage( e ) ).build( );
 		}
 	}
+	
+	
+	/**
+	 * Método que registra una nueva Zona.
+	 * @param zona Zona, datos de la Zona.
+	 * @return Response, Zona con toda la información proporcionada.
+	 */
+	@POST
+	@Path("{idRestaurante: \\d+}/menus")
+	@Consumes({ MediaType.APPLICATION_JSON })
+	@Produces({ MediaType.APPLICATION_JSON })
+	public Response agregarMenu(@PathParam("idRestaurante") Long idRestaurante, Menu menu) {
+		RotondAndesTM tm = new RotondAndesTM(getPath());
+		try {
+			Menu res = tm.registrarMenu(idRestaurante, menu);
+			return Response.status( 200 ).entity( res ).build();	
+		}catch( Exception e )
+		{
+			return Response.status( 500 ).entity( doErrorMessage( e ) ).build( );
+		}
+	}
+	
 }

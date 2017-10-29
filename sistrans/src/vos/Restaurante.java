@@ -37,6 +37,11 @@ public class Restaurante {
 	@JsonProperty(value = "tipo")
 	private TipoComida tipo;
 	/**
+	 * Atributo que contiene el precio promedio de este Restaurante.
+	 */
+	@JsonProperty(value = "precio")
+	private Double precio;
+	/**
 	 * Método constructor de la clase Restaurante.
 	 * @param id Long
 	 * @param name String
@@ -50,7 +55,8 @@ public class Restaurante {
 			@JsonProperty(value="name") String name, 
 			@JsonProperty(value="paginaWeb") String pagina,
 			@JsonProperty(value = "productos")List<Producto> productos,
-			@JsonProperty(value = "tipo")TipoComida tipo
+			@JsonProperty(value = "tipo")TipoComida tipo,
+			@JsonProperty(value = "precio")Double precio
 			)
 			{
 		
@@ -193,5 +199,21 @@ public class Restaurante {
 	public void setTipoRestaurante(TipoComida tipo)
 	{
 		this.tipo = tipo;
+	}
+	/**
+	 * Método que obtiene el precio del Restaurante.
+	 * @return Double, Precio del Restaurante.
+	 */
+	public Double getPrecio()
+	{
+		return precio;
+	}
+	/**
+	 * Método que establece el Precio del Restaurante.
+	 * @param precio Double, nuevo precio del Restaurante.
+	 */
+	public void setPrecio(Double precio)
+	{
+		this.precio = precio;
 	}
 }

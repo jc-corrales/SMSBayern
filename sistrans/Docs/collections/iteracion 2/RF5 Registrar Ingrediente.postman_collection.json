@@ -1,0 +1,31 @@
+{
+	"variables": [],
+	"info": {
+		"name": "RF5 Registrar Ingrediente",
+		"_postman_id": "95445596-3ea1-9edd-fd1f-66f8c4d41855",
+		"description": "Registra la información básica de un producto, de acuerdo con el enunciado. Esta operación es realizada por un usuario\r\nrestaurante. NOTA: Para la iteración 2 no se contemplan las equivalencias de ingredientes.\r\n",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Agregar Ingrediente",
+			"request": {
+				"url": "http://localhost:8080/RotondAndes/rest/ingredientes",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"id\" : 101, \"name\": \"Queso Mozarella\", \"descripcion\" : \"lol1\", \"description\" : \"lol2\", \"cantidadDisponible\" : 50}\r\n"
+				},
+				"description": ""
+			},
+			"response": []
+		}
+	]
+}

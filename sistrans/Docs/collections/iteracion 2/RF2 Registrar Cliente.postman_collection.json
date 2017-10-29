@@ -1,0 +1,31 @@
+{
+	"variables": [],
+	"info": {
+		"name": "RF2 Registrar Cliente",
+		"_postman_id": "8462966e-3fdf-48b7-2547-11eb8e234fdb",
+		"description": "Registra la información básica de un cliente. Esta operación es realizada por un usuario administrador de RotondAndes.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Registrar un nuevo Cliente Frecuente.",
+			"request": {
+				"url": "http://localhost:8080/RotondAndes/rest/admin/clientesFrecuentes",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"mesa\" : 50, \"nombre\" : \"Alejandro\", \"contrasenia\" : \"ohiogldrg\"}"
+				},
+				"description": ""
+			},
+			"response": []
+		}
+	]
+}

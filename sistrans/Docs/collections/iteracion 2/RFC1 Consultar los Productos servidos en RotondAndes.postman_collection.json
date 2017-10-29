@@ -1,0 +1,50 @@
+{
+	"variables": [],
+	"info": {
+		"name": "RFC1 Consultar los Productos servidos en RotondAndes",
+		"_postman_id": "9683ef53-c28c-fe65-af9e-48570c678d8c",
+		"description": "Los usuarios de RotondAndes pueden consultar los productos ofrecidos por los restaurantes de la rotonda. Esta consulta\r\npuede estar discriminada por rango de fechas, restaurante, categoría de producto, rango de precios, entre otros. Los\r\nresultados deben ser clasificados según un criterio deseado por quien realiza la consulta. Debe ofrecerse la posibilidad de\r\nagrupamiento y ordenamiento de las respuestas según los intereses del usuario que consulta. ",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Consular un Producto",
+			"request": {
+				"url": {
+					"raw": "http://localhost:8080/RotondAndes/rest/admin/productos?filtro=1&parametro=1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"RotondAndes",
+						"rest",
+						"admin",
+						"productos"
+					],
+					"query": [
+						{
+							"key": "filtro",
+							"value": "1",
+							"equals": true,
+							"description": ""
+						},
+						{
+							"key": "parametro",
+							"value": "1",
+							"equals": true,
+							"description": ""
+						}
+					],
+					"variable": []
+				},
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		}
+	]
+}

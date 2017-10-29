@@ -1,0 +1,31 @@
+{
+	"variables": [],
+	"info": {
+		"name": "RF1 Registrar Usuario",
+		"_postman_id": "ee45b956-ecb6-455b-df27-81db5d2134f6",
+		"description": "Registra la información básica de un usuario (nombre, identificación, correo electrónico y rol) y la información particular\r\nsegún el rol. Debe basarse en la descripción de los siguientes requerimientos para definir de manera completa la\r\ninformación necesaria. ",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Registrar Cliente",
+			"request": {
+				"url": "http://localhost:8080/RotondAndes/rest/clientes",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"nombre\" : \"francisco\", \"mesa\" : 505}"
+				},
+				"description": ""
+			},
+			"response": []
+		}
+	]
+}

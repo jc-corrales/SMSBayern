@@ -31,8 +31,10 @@ import vos.ClienteFrecuente;
 import vos.ConsumoCliente;
 import vos.EstadisticasPedidos;
 import vos.Ingrediente;
+import vos.Menu;
 import vos.Orden;
 import vos.Producto;
+import vos.Representante;
 import vos.Restaurante;
 import vos.Zona;
 
@@ -125,9 +127,9 @@ public class RotondAndesTM {
 
 
 
-	////////////////////////////////////////
-	///////Transacciones////////////////////
-	////////////////////////////////////////
+	//--------------------------------------------------
+	//Transacciones-------------------------------------
+	//--------------------------------------------------
 
 	public List<Cliente> darClientes() throws Exception {
 		List<Cliente> clientes; 
@@ -268,7 +270,9 @@ public class RotondAndesTM {
 		try {
 			this.conn = darConexion();
 			dao.setConn(conn);
-
+			System.out.println(id);
+			System.out.println(idProd);
+			System.out.println(password);
 			//Verificar Cliente
 			if(!dao.verficarCliente(id, password)) 
 				throw new Exception("Clave invalida");
@@ -442,7 +446,13 @@ public class RotondAndesTM {
 		}
 		return productos; 
 	}
-
+	/**
+	 * Método para agregar una Zona a RotondAndes
+	 * @param zona Zona, toda la información de la zona a agregar.
+	 * @return Zona.
+	 * @throws SQLException
+	 * @throws Exception
+	 */
 	public Zona agregarZona(Zona zona)throws SQLException, Exception{
 
 		DAOTablaZonas dao = new DAOTablaZonas();
@@ -488,7 +498,8 @@ public class RotondAndesTM {
 			daoZona.setConn(conn);
 			zona = daoZona.darZona(id);
 			System.out.println("after dao ------> " + zona.getId() + " || " + zona.getNombre());
-			if(zona == null) {
+			if(zona == null)
+			{
 				throw new Exception("NO EXISTE LA ZONA");
 			}
 			//AGREGACIÓN DE RESTAURANTES A ZONA
@@ -918,5 +929,188 @@ public class RotondAndesTM {
 			}
 		}
 		return respuesta;
+	}
+	/**
+	 * Método que agregar un Menú para un Restaurante.
+	 * Al menos uno de los parámetros debe ser no nulo y el restaurante debe ofrecer los productos
+	 * cuyos IDs está introduciendo por parámetro.
+	 * @param idRestaurante Long, ID del Restaurante.
+	 * @param idEntrada Long, ID de la Entrada.
+	 * @param idPlatoFuerte Long, ID del Plato Fuerte.
+	 * @param idPostre Long, ID del Postre.
+	 * @param idBebida Long, ID de la Bebida.
+	 * @param idAcompaniamiento Long, ID del Acompañamiento.
+	 * @return Boolean, booleano que indica si el procedimiento fue exitoso.
+	 * @throws SQLException
+	 * @throws Exception
+	 */
+	public Menu registrarMenu (Long idRestaurante, Menu menu) throws SQLException, Exception
+	{
+		Menu respuesta;
+		DAOTablaRestaurantes daoRestaurantes = new DAOTablaRestaurantes();
+		try {
+			this.conn = darConexion();
+			daoRestaurantes.setConn(conn);
+			
+			if(menu.getEntrada() != null)
+			{
+				menu.setEntrada(darProducto(menu.getEntrada().getId(), idRestaurante));
+			}
+			if(menu.getPlatoFuerte() != null)
+			{
+				menu.setPlatoFuerte(darProducto(menu.getPlatoFuerte().getId(), idRestaurante));
+			}
+			if(menu.getPostre()!= null)
+			{
+				menu.setPostre(darProducto(menu.getPostre().getId(), idRestaurante));
+			}
+			if(menu.getBebida() != null)
+			{
+				menu.setBebida(darProducto(menu.getBebida().getId(), idRestaurante));
+			}
+			if(menu.getAcompaniamiento() != null)
+			{
+				menu.setAcompaniamiento(darProducto(menu.getAcompaniamiento().getId(), idRestaurante));
+			}
+			respuesta = daoRestaurantes.registrarMenu(idRestaurante, menu);
+		}catch (SQLException e) {
+			System.err.println("SQLException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		} catch (Exception e) {
+			System.err.println("GeneralException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		}finally {
+			try {
+				daoRestaurantes.cerrarRecursos();
+				if(this.conn!=null)
+					this.conn.close();
+			} catch (SQLException exception) {
+				System.err.println("SQLException closing resources:" + exception.getMessage());
+				exception.printStackTrace();
+				throw exception;
+			}
+		}
+		return respuesta;
+	}
+	
+	/**
+	 * Método que regitra un Restaurante en la base de datos.
+	 * @param restaurante Restaurante, información del Restaurante.
+	 * @param representante Representante, información del Representante.
+	 * @param precio
+	 * @param idZona
+	 * @return
+	 * @throws SQLException
+	 * @throws Exception
+	 */
+	public Restaurante registrarRestaurante(Restaurante restaurante, Representante representante, Long idZona) throws SQLException, Exception
+	{
+		Restaurante respuesta;
+		DAOTablaRestaurantes daoRestaurantes = new DAOTablaRestaurantes();
+		try {
+			this.conn = darConexion();
+			daoRestaurantes.setConn(conn);
+			Zona zona = darZona(idZona);
+			if(zona == null)
+			{
+				throw new Exception("Zona no existe");
+			}
+			respuesta = daoRestaurantes.registrarRestaurante(restaurante, representante, zona.getId());
+			
+		}catch (SQLException e) {
+			System.err.println("SQLException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		} catch (Exception e) {
+			System.err.println("GeneralException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		}finally {
+			try {
+				daoRestaurantes.cerrarRecursos();
+				if(this.conn!=null)
+					this.conn.close();
+			} catch (SQLException exception) {
+				System.err.println("SQLException closing resources:" + exception.getMessage());
+				exception.printStackTrace();
+				throw exception;
+			}
+		}
+		return respuesta;
+	}
+	/**
+	 * Método que agrega un Cliente Frecuente.
+	 * @param cliente ClienteFrecuente, información del cliente a agregar.
+	 * @return ClienteFrecuente, información del cliente agregado.
+	 * @throws SQLException
+	 * @throws Exception
+	 */
+	public ClienteFrecuente registrarClienteFrecuente(ClienteFrecuente cliente) throws SQLException, Exception
+	{
+		DAOTablaClientesFrecuentes daoClientesFrecuentes = new DAOTablaClientesFrecuentes();
+		try {
+			this.conn = darConexion();
+			daoClientesFrecuentes.setConn(conn);
+			cliente = daoClientesFrecuentes.agregarClienteFrecuente(cliente);
+			
+		}catch (SQLException e) {
+			System.err.println("SQLException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		} catch (Exception e) {
+			System.err.println("GeneralException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		}finally {
+			try {
+				daoClientesFrecuentes.cerrarRecursos();
+				if(this.conn!=null)
+					this.conn.close();
+			} catch (SQLException exception) {
+				System.err.println("SQLException closing resources:" + exception.getMessage());
+				exception.printStackTrace();
+				throw exception;
+			}
+		}
+		return cliente;
+	}
+	
+	/**
+	 * Método que agrega un Cliente.
+	 * @param cliente ClienteFrecuente, información del cliente a agregar.
+	 * @return ClienteFrecuente, información del cliente agregado.
+	 * @throws SQLException
+	 * @throws Exception
+	 */
+	public Cliente registrarCliente(Cliente cliente) throws SQLException, Exception
+	{
+		DAOTablaClientes daoClientes = new DAOTablaClientes();
+		try {
+			this.conn = darConexion();
+			daoClientes.setConn(conn);
+			cliente = daoClientes.agregarCliente(cliente);
+			
+		}catch (SQLException e) {
+			System.err.println("SQLException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		} catch (Exception e) {
+			System.err.println("GeneralException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		}finally {
+			try {
+				daoClientes.cerrarRecursos();
+				if(this.conn!=null)
+					this.conn.close();
+			} catch (SQLException exception) {
+				System.err.println("SQLException closing resources:" + exception.getMessage());
+				exception.printStackTrace();
+				throw exception;
+			}
+		}
+		return cliente;
 	}
 }

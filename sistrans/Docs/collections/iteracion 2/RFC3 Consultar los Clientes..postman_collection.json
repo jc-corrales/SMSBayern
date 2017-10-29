@@ -1,0 +1,33 @@
+{
+	"variables": [],
+	"info": {
+		"name": "RFC3 Consultar los Clientes.",
+		"_postman_id": "04b3d593-b048-48fa-7837-2c11cb880ff7",
+		"description": "Obtener todos los datos asociados con un cliente: sus datos básicos, preferencias, su historial de pedidos, frecuencia de\r\ncompra por día de la semana.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Consultar los clientes",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "http://localhost:8080/RotondAndes/rest/admin/clientes",
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		}
+	]
+}

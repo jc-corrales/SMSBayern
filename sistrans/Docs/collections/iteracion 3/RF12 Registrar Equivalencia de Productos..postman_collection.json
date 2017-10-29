@@ -1,0 +1,44 @@
+{
+	"variables": [],
+	"info": {
+		"name": "RF12 Registrar Equivalencia de Productos.",
+		"_postman_id": "72322806-7efd-c4ff-ea6e-83fd6e683a58",
+		"description": "Registra en RotondAndes que dos productos son equivalentes y que pueden ser entonces ser solicitados\r\nindiferentemente por un cliente. Dos productos equivalentes deben ser del mismo tipo (entrada, fuerte, postre, …). Suele\r\nocurrir para los cambios en los menús que ofrece el restaurante. Por ejemplo, un restaurante de hamburguesas puede\r\nregistrar como equivalentes las papas a la francesa, los deditos de yuca y las papas en casco. Esta operación es realizada\r\npor un usuario restaurante.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Restaurante 1, registrar equivalencia entre producto 1 y 7",
+			"request": {
+				"url": "http://localhost:8080/RotondAndes/rest/restaurantes/1/producto1/1/producto2/7",
+				"method": "POST",
+				"header": [],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Restaurante 1, registrar equivalencia productos 1 y 7 de nuevo (error)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 500\"] = responseCode.code === 500;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "http://localhost:8080/RotondAndes/rest/restaurantes/1/producto1/1/producto2/7",
+				"method": "POST",
+				"header": [],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		}
+	]
+}
