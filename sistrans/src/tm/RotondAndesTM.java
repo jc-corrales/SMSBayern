@@ -31,7 +31,9 @@ import vos.ClienteFrecuente;
 import vos.ConsumoCliente;
 import vos.EstadisticasPedidos;
 import vos.Ingrediente;
+import vos.IngredientesSimilares;
 import vos.Orden;
+import vos.Pedido;
 import vos.Producto;
 import vos.Restaurante;
 import vos.Zona;
@@ -225,6 +227,129 @@ public class RotondAndesTM {
 		}
 
 		return res;
+	}
+	
+	/**
+	 * RF11
+	 * Manda los ids de ing1, ing2 y restaurante para crear un nuevo ingrediente equivalente(base)
+	 * @param filtro
+	 * @param parametro
+	 * @return
+	 * @throws SQLException
+	 * @throws Exception
+	 */
+	public IngredientesSimilares registrar2IngredientesEquivalentes(Long idIng1, Long idIng2, Long idRest) throws SQLException, Exception{
+		IngredientesSimilares ingS;
+		DAOTablaIngredientes daoIng = new DAOTablaIngredientes();
+		try {
+			this.conn = darConexion();
+			daoIng.setConn(conn);
+			
+			ingS = daoIng.agregarIngredientesSimilares(idIng1, idIng2, idRest);
+			
+		}catch (SQLException e)
+		{
+			System.err.println("SQLException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		} catch (Exception e)
+		{
+			System.err.println("GeneralException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		} finally {
+			try {
+				daoIng.cerrarRecursos();
+				if(this.conn != null)
+					this.conn.close();
+			} catch (SQLException exception)
+			{
+				System.err.println("SQLException closing resources:" + exception.getMessage());
+				exception.printStackTrace();
+				throw exception;
+			}
+		}
+		return ingS;
+	}
+	
+	/**
+	 * RF13 Surtir restaurantes
+	 */
+	public void registrarCantidadProductosDisponibles(Long idRest, Long idProd, int pCantidad)
+	{
+		DAOTablaProductos daoPro = new DAOTablaProductos();
+		DAOTablaIngredientes daoIng = new DAOTablaIngredientes();
+		try 
+		{
+			this.conn = darConexion();
+			daoPro.setConn(conn);
+			daoIng.setConn(conn);
+			
+			daoPro.registrarCantidadProductosDisponibles(pCantidad, idProd, idRest);
+			List<Long> info = daoPro.darIngredientesDeProducto(idProd);
+			daoIng.reducirCantidadIngredientesProducto(idProd, info);
+			
+		}catch (SQLException e) {
+			System.err.println("SQLException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		} catch (Exception e) {
+			System.err.println("GeneralException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		}finally {
+			try {
+				daoPro.cerrarRecursos();
+				daoIng.cerrarRecursos();
+				if(this.conn!=null)
+					this.conn.close();
+			} catch (SQLException exception) {
+				System.err.println("SQLException closing resources:" + exception.getMessage());
+				exception.printStackTrace();
+				throw exception;
+			}
+		}
+	}
+
+/**
+ * 
+ * @param id
+ * @param idProd
+ * @param idRestProd
+ * @return
+ * @throws SQLException
+ * @throws Exception
+ */
+	public Pedido agregarPedido(Long id, Long idProd, Long idRestProd) throws SQLException, Exception {
+		Pedido res = null;
+		DAOTablaPedidos dao = new DAOTablaPedidos();
+		try {
+			this.conn = darConexion();
+			dao.setConn(conn);
+			Cliente cliente = darCliente(id);
+			Producto producto = darProducto(idProd, idRestProd);
+			res = dao.registrarPedido(cliente, producto);
+		}catch (SQLException e) {
+			System.err.println("SQLException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		} catch (Exception e) {
+			System.err.println("GeneralException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		}finally {
+			try {
+				dao.cerrarRecursos();
+				if(this.conn!=null)
+					this.conn.close();
+			} catch (SQLException exception) {
+				System.err.println("SQLException closing resources:" + exception.getMessage());
+				exception.printStackTrace();
+				throw exception;
+			}
+		}
+		return res;
+
 	}
 
 
@@ -919,4 +1044,10 @@ public class RotondAndesTM {
 		}
 		return respuesta;
 	}
+	
+	/**
+	 * RF14
+	 */
+	
+	public 
 }
