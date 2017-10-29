@@ -9,6 +9,8 @@ import java.util.List;
 
 import org.codehaus.jackson.map.ObjectMapper;
 
+import vos.Ingrediente;
+import vos.Menu;
 import vos.Producto;
 import vos.ProductoBase;
 import vos.TipoComida;
@@ -124,9 +126,9 @@ public class DAOTablaProductos {
 		return prods;
 	}
 	/**
-	 * MÈtodo din·mico, obtiene una lista de Productos seg˙n unos par·metros de b˙squeda.
+	 * M√©todo din√°mico, obtiene una lista de Productos seg√∫n unos par√°metros de b√∫squeda.
 	 * @param filtro Integer, tipo de filtro.
-	 * @param parametro String, par·metro seg˙n el cual realizar la b˙squeda.
+	 * @param parametro String, par√°metro seg√∫n el cual realizar la b√∫squeda.
 	 * @return List<Producto>, lista de Productos.
 	 * @throws SQLException
 	 * @throws Exception
@@ -173,7 +175,7 @@ public class DAOTablaProductos {
 		return productos;
 	}
 	/**
-	 * MÈtodo que da los productos preferidos de un Cliente Frecuente. 
+	 * M√©todo que da los productos preferidos de un Cliente Frecuente. 
 	 * @param id Long, ID del cliente Frecuente.
 	 * @return List<ProductoBase>, Lista de Productos preferidos del Cliente Frecuente.
 	 * @throws SQLException
@@ -201,7 +203,7 @@ public class DAOTablaProductos {
 		return preferencias;
 	}
 	/**
-	 * MÈtodo que crea un Producto general en la Base de Datos.
+	 * M√©todo que crea un Producto general en la Base de Datos.
 	 * @param producto
 	 * @return
 	 * @throws SQLException
@@ -210,7 +212,7 @@ public class DAOTablaProductos {
 	public Producto agregarProductoSinEquivalencias(Long idRestaurante, Producto producto)throws SQLException, Exception
 	{
 		conn.setAutoCommit(false);
-		//Agregar informaciÛn para el Producto base.
+		//Agregar informaci√≥n para el Producto base.
 		String sqlComprobar = "SELECT * FROM PRODUCTOS WHERE ID = " + producto.getId();
 		
 		PreparedStatement prepComprobar = conn.prepareStatement(sqlComprobar);
@@ -228,7 +230,7 @@ public class DAOTablaProductos {
 			prepStmt.executeQuery();
 		}
 
-		//Agregar informaciÛn para Restaurante_Producto (Lo especÌfico para el Restaurante)
+		//Agregar informaci√≥n para Restaurante_Producto (Lo espec√≠fico para el Restaurante)
 		String sql2 = "INSERT INTO PRODUCTO_RESTAURANTE (ID_PROD, ID_REST, PRECIO, COSTO_PRODUCCION, CANTIDAD)\r\n" + 
 				"    VALUES (" + producto.getId()+", "+ idRestaurante +", "+ producto.getPrecio()+", "+producto.getCostoDeProduccion()+", "+producto.getCantidad()+")\r\n";
 		
@@ -263,8 +265,8 @@ public class DAOTablaProductos {
 	}
 
 	/**
-	 * MÈtodo que registra la equivalencia entre dos productos.
-	 * @param idRestaurante Long, ID del restaurante dueÒo de los dos productos.
+	 * M√©todo que registra la equivalencia entre dos productos.
+	 * @param idRestaurante Long, ID del restaurante due√±o de los dos productos.
 	 * @param idProducto1 Long, ID del producto 1.
 	 * @param idProducto2 Long, ID del producto 2.
 	 * @throws SQLException
@@ -307,8 +309,87 @@ public class DAOTablaProductos {
 		conn.commit();
 		conn.setAutoCommit(true);
 	}
+  	/**
+	 * RF 14
+	 * Registrar Pedido de un producto (generalmente un men√∫) con equivalencias.
+	 * 
+	 */
+	public Menu registrarPedidoProductoEquivalencias(long pidp1, long pidp2, long pidr)
+	{
+		String sqlExisteOtroMenu = "SELECT ID_PROD2 FROM PRODUCTOSSIMILARES WHERE" + pidp1 + "= PRODUCTOSSIMILARES.ID_PROD1 AND" + pidp2 + "= PRODUCTOSSIMILARES.ID_PROD2" ; 
+		PreparedStatement st = conn.prepareStatement(sqlExisteOtroMenu);
+		recursos.add(st);
+		ResultSet rs = st.executeQuery();
+		Menu resp = new Menu(null, null, null, null, null, null, null, null, null, null);
+
+		if(rs != null)
+		{
+		long idNuevoMenu = 0;
+		
+			System.out.println("Si est√° el otro men√∫ disponible");
+			{
+				idNuevoMenu = rs.getLong("ID_PROD2");
+				
+				String sqlprod = "SELECT * FROM MENUS WHERE ID = " + idNuevoMenu;
+				PreparedStatement st2 = conn.prepareStatement(sqlprod);
+				recursos.add(st2);
+				ResultSet rs2 = st2.executeQuery();
+				
+				resp.setId(rs2.getLong("ID"));
+				resp.setBebida(rs2.getString("BEBIDA"));
+				resp.setCostoProduccion(rs2.getDouble("COSTO_PRODUCCION"));
+				
+				
+			}
+		}
+		
+		while(rs.next()) {
+			ProductoBase prod = new ProductoBase();
+			prod.setId(rs.getLong("ID"));
+			prod.setNombre(rs.getString("NAME"));
+			prod.setDescripcionEspaniol(rs.getString("DESCRIPCION"));
+			prod.setDescripcionIngles(rs.getString("DESCRIPTION"));
+			prod.setCategoria(rs.getString("CATEGORIA"));
+			
+			preferencias.add(prod);
+		}
+		
+		/**
+		 * RF13 SURTIR RESTAURANTE 
+		 * @throws SQLException 
+		 */
+		public void registrarCantidadProductosDisponibles(int pCantidad, long idProd, long idRest) throws SQLException
+		{
+			String sqlInsertar = "INSERT INTO PRODUCTO_RESTAURANTE(CANTIDAD) VALUES"+ pCantidad + " WHERE PRODUCTO_RESTAURANTE.ID_PROD =" + idProd + "AND PRODUCTO_RESTAURANTE.ID_REST =" + idRest;
+			PreparedStatement prepStmt = conn.prepareStatement(sqlInsertar);
+			recursos.add(prepStmt);
+			prepStmt.executeQuery();
+			conn.commit();
+			conn.setAutoCommit(true);
+		}
+		
+		/**
+		 * Dar los ids de los ingredientes de un producto
+		 * @throws SQLException 
+		 */
+		public List<Long> darIngredientesDeProducto(Long idProd) throws SQLException
+		{
+			List<Long> resp = new ArrayList<>();
+			
+			String sql = "SELECT ID_INGREDIENTE FROM INGREDIENTES_PRODUCTO WHERE ID_PRODUCTO = " + idProd;
+			PreparedStatement prepStmt = conn.prepareStatement(sql);
+			recursos.add(prepStmt);
+			ResultSet rs = prepStmt.executeQuery();
+			
+			while(rs.next())
+			{
+				resp.add(rs.getLong("ID_INGREDIENTE"));
+			}
+			
+			return resp;
+		}
 	/**
-	 * MÈtodo que obtiene los productos m·s ofrecidos por Restaurantes en RotondAndes.
+	 * M√©todo que obtiene los productos m√°s ofrecidos por Restaurantes en RotondAndes.
 	 * @return List<Producto>, lista de Productos.
 	 * @throws SQLException
 	 * @throws Exception

@@ -7,8 +7,10 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+
 import vos.Ingrediente;
 import vos.IngredienteBase;
+import vos.IngredientesSimilares;
 
 public class DAOTablaIngredientes {
 	private ArrayList<Object> recursos;
@@ -89,5 +91,67 @@ public class DAOTablaIngredientes {
 		conn.setAutoCommit(true);
 		return ingrediente;
 	}
-
+	
+	/**
+	 * Método que agrega un nuevo ingrediente equivalente con los ids de los ingredientes y el id del restaurante.
+	 * @param idIngrediente1
+	 * @param idIngrediente2
+	 * @param idRestaurante
+	 * @throws SQLException
+	 * @throws Exception
+	 */
+	
+	public IngredientesSimilares agregarIngredientesSimilares(Long idIngrediente1, Long idIngrediente2, Long idRestaurante) throws SQLException, Exception{
+		String sql = "INSERT INTO INGREDIENTESSIMILARES VALUES" + idIngrediente1 + "," + idIngrediente2 + "," + idRestaurante;
+		PreparedStatement pst = conn.prepareStatement(sql);
+		pst.executeUpdate();
+		
+		IngredientesSimilares resp = new IngredientesSimilares(idIngrediente1, idIngrediente2, idRestaurante);
+		return resp;
+	}
+	
+	
+	/**
+	 * Método de consulta de los los ingredientes similares de la base de datos
+	 * Para consultar que el método de agregarIngredientesSimilares funciona bien
+	 */
+	public List<IngredientesSimilares> darIngredientesSimilares() throws SQLException, Exception
+	{
+		String sql = "SELECT * FROM INGREDIENTESSIMILARES";
+		PreparedStatement pst = conn.prepareStatement(sql);
+		recursos.add(pst);
+		ResultSet rs = pst.executeQuery();
+		
+		List<IngredientesSimilares> ingsS = new ArrayList<>();
+		
+		while(rs.next())
+		{
+			IngredientesSimilares ingS = new IngredientesSimilares(rs.getLong("ID_INGREDIENTE1"), rs.getLong("ID_INGREDIENTE2"), rs.getLong("ID_REST"));
+			ingsS.add(ingS);
+		}
+		return ingsS;
+		
+	}
+	
+	/**
+	 * Método para decrementar el número de ingredientes utilizado por un producto
+	 * No se adiciona un parámetro de cantidad debido a que se supone que se resta por uno
+	 * y aquellas cosas que se restan mas veces, se espera que se resten repetidas veces
+	 * @throws SQLException 
+	 */
+	
+	public void reducirCantidadIngredientesProducto(long idProducto, List<Long> listaidIngredientes) throws SQLException
+	{
+		for (int i = 0; i < listaidIngredientes.size(); i++)
+		{
+			String sql = "UPDATE INGREDIENTES_PRODUCTO SET CANTIDAD = CANTIDAD - 1 WHERE ID_PRODUCTO" + idProducto + "AND ID_INGREDIENTE =" + listaidIngredientes.get(i);
+			PreparedStatement pst = conn.prepareStatement(sql);
+			recursos.add(pst);
+			pst.executeUpdate();
+		}
+		 
+	}
+	
 }
+
+
