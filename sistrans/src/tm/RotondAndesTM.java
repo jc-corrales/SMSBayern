@@ -278,7 +278,7 @@ public class RotondAndesTM {
 	/**
 	 * RF13 Surtir restaurantes
 	 */
-	public void registrarCantidadProductosDisponibles(Long idRest, Long idProd, int pCantidad)
+	public void registrarCantidadProductosDisponibles(Long idRest, Long idProd, int pCantidad)throws SQLException, Exception
 	{
 		DAOTablaProductos daoPro = new DAOTablaProductos();
 		DAOTablaIngredientes daoIng = new DAOTablaIngredientes();
@@ -287,11 +287,28 @@ public class RotondAndesTM {
 			this.conn = darConexion();
 			daoPro.setConn(conn);
 			daoIng.setConn(conn);
-			
+			List<Ingrediente> ingredientes = daoIng.darIngredientesProducto(idProd);
+			//Ciclo que verifica si hay suficientes ingredientes, para todos los ingredientes.
+			for(int i = 0; i < ingredientes.size(); i++)
+			{
+				Ingrediente ingrediente = ingredientes.get(i);
+				Integer cantidadRequerida = daoIng.darIngredientesRequeridosPorProducto(idProd, ingrediente.getId());
+				if(ingrediente.getCantidadDisponible() < (pCantidad*cantidadRequerida))
+				{
+					throw new Exception ("No hay suficiente cantidad de Ingrediente con ID: " + ingrediente.getId());
+				}
+				
+			}
+			//Ciclo que reduce los Ingredientes totales.
+			for(int j = 0; j < ingredientes.size(); j++)
+			{
+				Ingrediente ingrediente = ingredientes.get(j);
+				Integer cantidadRequerida = daoIng.darIngredientesRequeridosPorProducto(idProd, ingrediente.getId());
+				daoIng.reducirCantidadIngredientesProducto(idProd, pCantidad*cantidadRequerida);
+			}
+//			List<Long> info = daoPro.darIngredientesDeProducto(idProd);
+//			daoIng.reducirCantidadIngredientesProducto(idProd, info);
 			daoPro.registrarCantidadProductosDisponibles(pCantidad, idProd, idRest);
-			List<Long> info = daoPro.darIngredientesDeProducto(idProd);
-			daoIng.reducirCantidadIngredientesProducto(idProd, info);
-			
 		}catch (SQLException e) {
 			System.err.println("SQLException:" + e.getMessage());
 			e.printStackTrace();
@@ -313,47 +330,47 @@ public class RotondAndesTM {
 			}
 		}
 	}
-
-/**
- * 
- * @param id
- * @param idProd
- * @param idRestProd
- * @return
- * @throws SQLException
- * @throws Exception
- */
-	public Pedido agregarPedido(Long id, Long idProd, Long idRestProd) throws SQLException, Exception {
-		Pedido res = null;
-		DAOTablaPedidos dao = new DAOTablaPedidos();
-		try {
-			this.conn = darConexion();
-			dao.setConn(conn);
-			Cliente cliente = darCliente(id);
-			Producto producto = darProducto(idProd, idRestProd);
-			res = dao.registrarPedido(cliente, producto);
-		}catch (SQLException e) {
-			System.err.println("SQLException:" + e.getMessage());
-			e.printStackTrace();
-			throw e;
-		} catch (Exception e) {
-			System.err.println("GeneralException:" + e.getMessage());
-			e.printStackTrace();
-			throw e;
-		}finally {
-			try {
-				dao.cerrarRecursos();
-				if(this.conn!=null)
-					this.conn.close();
-			} catch (SQLException exception) {
-				System.err.println("SQLException closing resources:" + exception.getMessage());
-				exception.printStackTrace();
-				throw exception;
-			}
-		}
-		return res;
-
-	}
+//	/**
+//	 * 
+//	 * @param id
+//	 * @param idProd
+//	 * @param idRestProd
+//	 * @return
+//	 * @throws SQLException
+//	 * @throws Exception
+//	 */
+//	public Pedido agregarPedido(Long id, Long idProd, Long idRestProd) throws SQLException, Exception {
+//		Pedido res = null;
+//		DAOTablaPedidos dao = new DAOTablaPedidos();
+//		try {
+//			this.conn = darConexion();
+//			dao.setConn(conn);
+//			Cliente cliente = darCliente(id);
+//			Producto producto = darProducto(idProd, idRestProd);
+//			res = dao.registrarPedido(cliente, producto, (long) 1, idRestProd);
+//			//TODO ARREGLAR PARA PROCESAR ORDENES
+//		}catch (SQLException e) {
+//			System.err.println("SQLException:" + e.getMessage());
+//			e.printStackTrace();
+//			throw e;
+//		} catch (Exception e) {
+//			System.err.println("GeneralException:" + e.getMessage());
+//			e.printStackTrace();
+//			throw e;
+//		}finally {
+//			try {
+//				dao.cerrarRecursos();
+//				if(this.conn!=null)
+//					this.conn.close();
+//			} catch (SQLException exception) {
+//				System.err.println("SQLException closing resources:" + exception.getMessage());
+//				exception.printStackTrace();
+//				throw exception;
+//			}
+//		}
+//		return res;
+//
+//	}
 
 
 

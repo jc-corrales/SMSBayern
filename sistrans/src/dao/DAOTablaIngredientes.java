@@ -63,7 +63,20 @@ public class DAOTablaIngredientes {
 		return ings;
 	}
 
+	public Integer darIngredientesRequeridosPorProducto(Long idProducto, Long idIngrediente) throws SQLException, Exception{
+		Integer respuesta = 0;
+		String sql = "SELECT * FROM INGREDIENTES, INGREDIENTES_PRODUCTO WHERE ID = ID_INGREDIENTE AND ID_PRODUCTO = " + idProducto + " AND ID = " + idIngrediente;
+		PreparedStatement st = conn.prepareStatement(sql);
+		recursos.add(st);
+		ResultSet rs = st.executeQuery();
 
+		if(rs.next())
+		{
+			rs.getInt("INGREDIENTES_PRODUCTO.CANTIDAD");
+		}
+		return respuesta;
+	}
+	
 	private List<IngredienteBase> darIngredientesEquivalentes(Long idIngrediente) throws SQLException, Exception{
 		String sql = "SELECT * FROM INGREDIENTES, INGREDIENTESSIMILARES WHERE ID_INGREDIENTE2 = ID AND ID_INGREDIENTE1 = " + idIngrediente;
 		PreparedStatement st = conn.prepareStatement(sql);
@@ -140,16 +153,13 @@ public class DAOTablaIngredientes {
 	 * @throws SQLException 
 	 */
 	
-	public void reducirCantidadIngredientesProducto(long idProducto, List<Long> listaidIngredientes) throws SQLException
+	public void reducirCantidadIngredientesProducto(Long idIngrediente, Integer cantidad) throws SQLException
 	{
-		for (int i = 0; i < listaidIngredientes.size(); i++)
-		{
-			String sql = "UPDATE INGREDIENTES_PRODUCTO SET CANTIDAD = CANTIDAD - 1 WHERE ID_PRODUCTO" + idProducto + "AND ID_INGREDIENTE =" + listaidIngredientes.get(i);
-			PreparedStatement pst = conn.prepareStatement(sql);
-			recursos.add(pst);
-			pst.executeUpdate();
-		}
-		 
+
+		String sql = "UPDATE INGREDIENTES SET CANTIDAD_DISPONIBLE = CANTIDAD_DISPONIBLE - " + cantidad + " WHERE ID =" + idIngrediente;
+		PreparedStatement pst = conn.prepareStatement(sql);
+		recursos.add(pst);
+		pst.executeUpdate();
 	}
 	
 }

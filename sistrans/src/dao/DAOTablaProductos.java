@@ -309,50 +309,51 @@ public class DAOTablaProductos {
 		conn.commit();
 		conn.setAutoCommit(true);
 	}
-  	/**
-	 * RF 14
-	 * Registrar Pedido de un producto (generalmente un menú) con equivalencias.
-	 * 
-	 */
-	public Menu registrarPedidoProductoEquivalencias(long pidp1, long pidp2, long pidr)
-	{
-		String sqlExisteOtroMenu = "SELECT ID_PROD2 FROM PRODUCTOSSIMILARES WHERE" + pidp1 + "= PRODUCTOSSIMILARES.ID_PROD1 AND" + pidp2 + "= PRODUCTOSSIMILARES.ID_PROD2" ; 
-		PreparedStatement st = conn.prepareStatement(sqlExisteOtroMenu);
-		recursos.add(st);
-		ResultSet rs = st.executeQuery();
-		Menu resp = new Menu(null, null, null, null, null, null, null, null, null, null);
-
-		if(rs != null)
-		{
-		long idNuevoMenu = 0;
-		
-			System.out.println("Si está el otro menú disponible");
-			{
-				idNuevoMenu = rs.getLong("ID_PROD2");
-				
-				String sqlprod = "SELECT * FROM MENUS WHERE ID = " + idNuevoMenu;
-				PreparedStatement st2 = conn.prepareStatement(sqlprod);
-				recursos.add(st2);
-				ResultSet rs2 = st2.executeQuery();
-				
-				resp.setId(rs2.getLong("ID"));
-				resp.setBebida(rs2.getString("BEBIDA"));
-				resp.setCostoProduccion(rs2.getDouble("COSTO_PRODUCCION"));
-				
-				
-			}
-		}
-		
-		while(rs.next()) {
-			ProductoBase prod = new ProductoBase();
-			prod.setId(rs.getLong("ID"));
-			prod.setNombre(rs.getString("NAME"));
-			prod.setDescripcionEspaniol(rs.getString("DESCRIPCION"));
-			prod.setDescripcionIngles(rs.getString("DESCRIPTION"));
-			prod.setCategoria(rs.getString("CATEGORIA"));
-			
-			preferencias.add(prod);
-		}
+//  	/**
+//	 * RF 14
+//	 * Registrar Pedido de un producto (generalmente un menú) con equivalencias.
+//	 * 
+//	 */
+//	public Menu registrarPedidoProductoEquivalencias(long pidp1, long pidp2, long pidr)
+//	{
+//		String sqlExisteOtroMenu = "SELECT ID_PROD2 FROM PRODUCTOSSIMILARES WHERE" + pidp1 + "= PRODUCTOSSIMILARES.ID_PROD1 AND" + pidp2 + "= PRODUCTOSSIMILARES.ID_PROD2" ; 
+//		PreparedStatement st = conn.prepareStatement(sqlExisteOtroMenu);
+//		recursos.add(st);
+//		ResultSet rs = st.executeQuery();
+//		Menu resp = new Menu(null, null, null, null, null, null, null, null, null, null);
+//
+//		if(rs != null)
+//		{
+//		long idNuevoMenu = 0;
+//		
+//			System.out.println("Si está el otro menú disponible");
+//			{
+//				idNuevoMenu = rs.getLong("ID_PROD2");
+//				
+//				String sqlprod = "SELECT * FROM MENUS WHERE ID = " + idNuevoMenu;
+//				PreparedStatement st2 = conn.prepareStatement(sqlprod);
+//				recursos.add(st2);
+//				ResultSet rs2 = st2.executeQuery();
+//				
+//				resp.setId(rs2.getLong("ID"));
+//				resp.setBebida(rs2.getString("BEBIDA"));
+//				resp.setCostoProduccion(rs2.getDouble("COSTO_PRODUCCION"));
+//				
+//				
+//			}
+//		}
+//		
+//		while(rs.next()) {
+//			ProductoBase prod = new ProductoBase();
+//			prod.setId(rs.getLong("ID"));
+//			prod.setNombre(rs.getString("NAME"));
+//			prod.setDescripcionEspaniol(rs.getString("DESCRIPCION"));
+//			prod.setDescripcionIngles(rs.getString("DESCRIPTION"));
+//			prod.setCategoria(rs.getString("CATEGORIA"));
+//			
+//			preferencias.add(prod);
+//		}
+//	}
 		
 		/**
 		 * RF13 SURTIR RESTAURANTE 
@@ -360,7 +361,7 @@ public class DAOTablaProductos {
 		 */
 		public void registrarCantidadProductosDisponibles(int pCantidad, long idProd, long idRest) throws SQLException
 		{
-			String sqlInsertar = "INSERT INTO PRODUCTO_RESTAURANTE(CANTIDAD) VALUES"+ pCantidad + " WHERE PRODUCTO_RESTAURANTE.ID_PROD =" + idProd + "AND PRODUCTO_RESTAURANTE.ID_REST =" + idRest;
+			String sqlInsertar = "UPDATE PRODUCTO_RESTAURANTE SET CANTIDAD = CANTIDAD +"+ pCantidad + " WHERE PRODUCTO_RESTAURANTE.ID_PROD =" + idProd + "AND PRODUCTO_RESTAURANTE.ID_REST =" + idRest;
 			PreparedStatement prepStmt = conn.prepareStatement(sqlInsertar);
 			recursos.add(prepStmt);
 			prepStmt.executeQuery();
