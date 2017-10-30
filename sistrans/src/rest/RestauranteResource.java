@@ -111,9 +111,9 @@ public class RestauranteResource {
 	
 	
 	/**
-	 * Método que registra una nueva Zona.
-	 * @param zona Zona, datos de la Zona.
-	 * @return Response, Zona con toda la información proporcionada.
+	 * Método que registra un nuevo Producto.
+	 * @param zona Zona, datos del nuevo Producto a agregar.
+	 * @return Response, Producto con toda la información proporcionada.
 	 */
 	@POST
 	@Path("{idRestaurante: \\d+}")

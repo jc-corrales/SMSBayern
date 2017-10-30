@@ -1,0 +1,22 @@
+{
+	"variables": [],
+	"info": {
+		"name": "RFC6 Obtener los datos de los productos más vendidos",
+		"_postman_id": "084f201b-e1a8-e50b-70a9-efaee5a5bb01",
+		"description": "Esta consulta retorna toda la información de los productos más vendidos en un periodo de tiempo, para todas las zonas\r\nde RotondAndes.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Obtener productos más vendidos",
+			"request": {
+				"url": "http://localhost:8080/RotondAndes/rest/productos/masVendidos",
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		}
+	]
+}

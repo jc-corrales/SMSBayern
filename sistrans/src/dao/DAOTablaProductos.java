@@ -415,14 +415,14 @@ public class DAOTablaProductos {
 			String descripcionEspaniol = rs1.getString("DESCRIPCION");
 			String descripcionIngles = rs1.getString("DESCRIPTION");
 			String categoria = rs1.getString("CATEGORIA");
-			numMax = rs1.getInt("CANTIDAD");
+			numMax = rs1.getInt("NUMVECESOFRECIDOS");
 		
 			Producto temp = new Producto(id, nombre, descripcionEspaniol, descripcionIngles, null, null, null, null, categoria, null, numMax);
 			productos.add(temp);
 		}
 		while(rs1.next())
 		{
-			if(rs1.getInt("CANTIDAD") == numMax)
+			if(rs1.getInt("NUMVECESOFRECIDOS") == numMax)
 			{
 				Long id =rs1.getLong("ID");
 				String nombre = rs1.getString("NAME");
@@ -434,5 +434,50 @@ public class DAOTablaProductos {
 			}
 		}
 		return productos;
+	}
+	
+	/**
+	 * MÃ©todo que obtiene los productos más vendidos.
+	 * @return List<Long[]>, Lista de Identificadores.
+	 * Long[0] Contiene el ID del producto.
+	 * Long [1] Contiene el ID del restaurante.
+	 * @throws SQLException
+	 * @throws Exception
+	 */
+	public List<Long[]> darProductosMasVendido()throws SQLException, Exception
+	{
+		List<Long[]> ids = new ArrayList<Long[]>();
+		String sql = "SELECT ID_PRODUCTO, ID_RESTAURANTE, COUNT(ID) AS NUMVECESPEDIDO\r\n" + 
+				"    FROM PEDIDOS\r\n" + 
+				"    GROUP BY ID_PRODUCTO, ID_RESTAURANTE\r\n" + 
+				"    ORDER BY NUMVECESPEDIDO DESC";
+		
+		PreparedStatement prepStmt= conn.prepareStatement(sql);
+		recursos.add(prepStmt);
+		ResultSet rs1 = prepStmt.executeQuery();
+		Integer numMax = 0;
+		if(rs1.next())
+		{
+			Long idProd =rs1.getLong("ID_PRODUCTO");
+			Long idRest = rs1.getLong("ID_RESTAURANTE");
+			numMax = rs1.getInt("NUMVECESPEDIDO");
+			Long datos[] = new Long[2];
+			datos[0] = idProd;
+			datos[1] = idRest;
+			ids.add(datos);
+		}
+		while(rs1.next())
+		{
+			if(rs1.getInt("NUMVECESPEDIDO") == numMax)
+			{
+				Long idProd =rs1.getLong("ID_PRODUCTO");
+				Long idRest = rs1.getLong("ID_RESTAURANTE");
+				Long datos[] = new Long[2];
+				datos[0] = idProd;
+				datos[1] = idRest;
+				ids.add(datos);;
+			}
+		}
+		return ids;
 	}
 }

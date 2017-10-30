@@ -15,6 +15,7 @@ import java.io.FileInputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
@@ -1260,5 +1261,82 @@ public class RotondAndesTM {
 			}
 		}
 		return cliente;
+	}
+	/**
+	 * Método que da el o los Productos más ofrecidos en RotondAndes.
+	 * @return List<Producto>, Lista de Productos más ofrecidos.
+	 * @throws SQLException
+	 * @throws Exception
+	 */
+	public List<Producto> darProductoMasOfrecido() throws SQLException, Exception
+	{
+		List<Producto> productos;
+		DAOTablaProductos daoProductos = new DAOTablaProductos();
+		try {
+			this.conn = darConexion();
+			daoProductos.setConn(conn);
+			productos = daoProductos.darProductosMasOfrecidos();
+			
+		}catch (SQLException e) {
+			System.err.println("SQLException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		} catch (Exception e) {
+			System.err.println("GeneralException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		}finally {
+			try {
+				daoProductos.cerrarRecursos();
+				if(this.conn!=null)
+					this.conn.close();
+			} catch (SQLException exception) {
+				System.err.println("SQLException closing resources:" + exception.getMessage());
+				exception.printStackTrace();
+				throw exception;
+			}
+		}
+		return productos;
+	}
+	/**
+	 * Método que obtiene los productos más vendidos en RotondAndes.
+	 * @return List<Producto>, Lista de Productos más Vendidos.
+	 * @throws SQLException
+	 * @throws Exception
+	 */
+	public List<Producto> darProductoMasVendido() throws SQLException, Exception
+	{
+		List<Producto> productos = new ArrayList<Producto>();
+		DAOTablaProductos daoProductos = new DAOTablaProductos();
+		try {
+			this.conn = darConexion();
+			daoProductos.setConn(conn);
+			List<Long[]> idProductos = daoProductos.darProductosMasVendido();
+			for(int i = 0; i < idProductos.size(); i++)
+			{
+				Long [] ids = idProductos.get(i);
+				productos.add(darProducto( ids[0], ids[1]));
+			}
+			
+		}catch (SQLException e) {
+			System.err.println("SQLException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		} catch (Exception e) {
+			System.err.println("GeneralException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		}finally {
+			try {
+				daoProductos.cerrarRecursos();
+				if(this.conn!=null)
+					this.conn.close();
+			} catch (SQLException exception) {
+				System.err.println("SQLException closing resources:" + exception.getMessage());
+				exception.printStackTrace();
+				throw exception;
+			}
+		}
+		return productos;
 	}
 }

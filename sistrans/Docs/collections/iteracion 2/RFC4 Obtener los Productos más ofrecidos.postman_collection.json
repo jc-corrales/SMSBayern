@@ -1,0 +1,22 @@
+{
+	"variables": [],
+	"info": {
+		"name": "RFC4 Obtener los Productos más ofrecidos",
+		"_postman_id": "d4353f2a-3149-efed-dad7-fbff9ca31c28",
+		"description": "Obtener todos los datos del producto que está presente en el mayor número de menús.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "RFC5 Obtener los Productos más ofrecidos",
+			"request": {
+				"url": "http://localhost:8080/RotondAndes/rest/productos/masOfrecidos",
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		}
+	]
+}

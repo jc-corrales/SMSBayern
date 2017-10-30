@@ -3,6 +3,7 @@ package rest;
 import java.util.List;
 import javax.servlet.ServletContext;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -75,6 +76,42 @@ public class ProductosResource
 		RotondAndesTM tm = new RotondAndesTM(getPath());
 		try {
 			Producto res = tm.agregarProducto(idRestaurante, producto);;
+			return Response.status( 200 ).entity( res ).build();	
+		}catch( Exception e )
+		{
+			return Response.status( 500 ).entity( doErrorMessage( e ) ).build( );
+		}
+	}
+	/**
+	 * Método que obtiene el, o los, Productos más ofrecidos en RotonAndes.
+	 * @param idRestaurante
+	 * @param producto
+	 * @return
+	 */
+	@GET
+	@Path("masOfrecidos")
+	@Produces({ MediaType.APPLICATION_JSON })
+	public Response obtenerProductoMasOfrecido() {
+		RotondAndesTM tm = new RotondAndesTM(getPath());
+		try {
+			List<Producto> res = tm.darProductoMasOfrecido();
+			return Response.status( 200 ).entity( res ).build();	
+		}catch( Exception e )
+		{
+			return Response.status( 500 ).entity( doErrorMessage( e ) ).build( );
+		}
+	}
+	/**
+	 * Método que obtiene los Productos más vendidos.
+	 * @return Response
+	 */
+	@GET
+	@Path("masVendidos")
+	@Produces({ MediaType.APPLICATION_JSON })
+	public Response obtenerProductoMasVendido() {
+		RotondAndesTM tm = new RotondAndesTM(getPath());
+		try {
+			List<Producto> res = tm.darProductoMasVendido();
 			return Response.status( 200 ).entity( res ).build();	
 		}catch( Exception e )
 		{
