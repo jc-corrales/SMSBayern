@@ -9,11 +9,11 @@ public class Pedido {
 	 */
 	@JsonProperty(value = "id")
 	private Long id;
-	/**
-	 * Atributo que contiene el cliente dueño de este pedido.
-	 */
-	@JsonProperty(value = "cliente")
-	private Cliente cliente;
+//	/**
+//	 * Atributo que contiene el cliente dueño de este pedido.
+//	 */
+//	@JsonProperty(value = "cliente")
+//	private Cliente cliente;
 	/**
 	 * Atributo que contiene el producto pedido.
 	 */
@@ -42,13 +42,13 @@ public class Pedido {
 	 * @param restaurante Restaurante, restaurante dueño del pedido.
 	 */
 	public Pedido(@JsonProperty(value = "id") Long id, 
-			@JsonProperty(value = "cliente") Cliente cliente, 
+//			@JsonProperty(value = "cliente") Cliente cliente, 
 			@JsonProperty(value = "producto") Producto producto,
 			@JsonProperty(value = "fecha") LocalDateTime fecha,
 			@JsonProperty(value = "servido") Boolean servido
 			) {
 		this.id = id;
-		this.cliente = cliente;
+//		this.cliente = cliente;
 		this.producto = producto;
 		this.fecha = fecha; 
 		this.servido = servido;
@@ -67,13 +67,13 @@ public class Pedido {
 	public void setId(Long id) {
 		this.id = id;
 	}
-	/**
-	 * Método que obtiene el cliente dueño de este pedido.
-	 * @return Cliente, cliente del Pedido.
-	 */
-	public Cliente getCliente() {
-		return this.cliente;
-	}
+//	/**
+//	 * Método que obtiene el cliente dueño de este pedido.
+//	 * @return Cliente, cliente del Pedido.
+//	 */
+//	public Cliente getCliente() {
+//		return this.cliente;
+//	}
 	/**
 	 * Método que obtiene el Producto pedido en este Pedido.
 	 * @return Producto, producto del pedido.
@@ -95,13 +95,13 @@ public class Pedido {
 	public Boolean getServido() {
 		return this.servido;
 	}
-	/**
-	 * Método que establece el Cliente de este Pedido.
-	 * @param cliente Cliente, nuevo cliente dueño de este Pedido.
-	 */
-	public void setCliente(Cliente cliente) {
-		this.cliente = cliente; 
-	}
+//	/**
+//	 * Método que establece el Cliente de este Pedido.
+//	 * @param cliente Cliente, nuevo cliente dueño de este Pedido.
+//	 */
+//	public void setCliente(Cliente cliente) {
+//		this.cliente = cliente; 
+//	}
 	/**
 	 * Método que establece el Producto en este Pedido.
 	 * @param producto Producto, nuevo Producto del Pedido.

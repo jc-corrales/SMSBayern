@@ -32,6 +32,9 @@ public class RotondAndesResource {
 	@XmlRootElement
 	public static class RequestBody {
 	    @XmlElement Object parametro;
+	    @XmlElement String nombreAdmin;
+	    @XmlElement Long idAdmin;
+	    @XmlElement String passwordAdmin;
 	}
 	
 	
@@ -181,6 +184,26 @@ public class RotondAndesResource {
 		RotondAndesTM tm = new RotondAndesTM(getPath());
 		try {
 			ClienteFrecuente res = tm.registrarClienteFrecuente(cliente);
+			return Response.status( 200 ).entity( res ).build();	
+		}catch( Exception e )
+		{
+			return Response.status( 500 ).entity( doErrorMessage( e ) ).build( );
+		}
+	}
+	
+	
+	/**
+	 * Método que agrega un Cliente Frecuente a RotondAndes.
+	 * @param cliente ClienteFrecuente, información del Cliente Frecuente.
+	 * @return Respone.
+	 */
+	@POST
+	@Consumes({ MediaType.APPLICATION_JSON })
+	@Produces({ MediaType.APPLICATION_JSON })
+	public Response agregarAdministrador(RequestBody entrada) {
+		RotondAndesTM tm = new RotondAndesTM(getPath());
+		try {
+			Boolean res = tm.registrarAdministrador(entrada.idAdmin, entrada.passwordAdmin);
 			return Response.status( 200 ).entity( res ).build();	
 		}catch( Exception e )
 		{

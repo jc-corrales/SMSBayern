@@ -44,6 +44,8 @@ public class RestauranteResource {
 	    @XmlElement Double precio;
 	    @XmlElement List<String> tiposComida;
 	    @XmlElement Integer cantidad;
+	    @XmlElement Long idRepresentante;
+	    @XmlElement String passwordRepresentante;
 	}
 	@Context
 	private ServletContext context;
@@ -97,12 +99,12 @@ public class RestauranteResource {
 	 */
 	@POST
 	@Path("{idRestaurante: \\d+}/producto1/{idProducto1: \\d+}/producto2/{idProducto2: \\d+}")
-	public Response registrarProductosEquivalentes(@PathParam("idRestaurante")Long idRestaurante, @PathParam("idProducto1")Long idProducto1, @PathParam("idProducto2")Long idProducto2)
+	public Response registrarProductosEquivalentes(@PathParam("idRestaurante")Long idRestaurante, @PathParam("idProducto1")Long idProducto1, @PathParam("idProducto2")Long idProducto2, RequestBodyProducto entrada)
 	{
 		RotondAndesTM tm = new RotondAndesTM(getPath());
 		try {	 
-			tm.registrarProductosEquivalentes(idRestaurante, idProducto1, idProducto2);
-			return Response.status( 200 ).entity( "{ \"RESPUESTA\": \" Equivalencia Registrada \"}" ).build();	
+			tm.registrarProductosEquivalentes(idRestaurante, idProducto1, idProducto2, entrada.idRepresentante, entrada.passwordRepresentante);
+			return Response.status( 200 ).entity( "{ \"RESPUESTA\": \" Equivalentes registrados \"}" ).build();	
 		}catch( Exception e )
 		{
 			return Response.status( 500 ).entity( doErrorMessage( e ) ).build( );

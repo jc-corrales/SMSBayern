@@ -44,10 +44,10 @@ public class ClienteFrecuenteResource {
 	@Path("{ClienteId: \\d+}/preferencias")
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces( { MediaType.APPLICATION_JSON  } )
-	public Response setPreferenciaCliente(@PathParam("ClienteId") Long id, @QueryParam("idProd") Long idProd, @HeaderParam("password") String password){
+	public Response setPreferenciaCliente(@PathParam("ClienteId") Long id, RequestBody request){
 		RotondAndesTM tm = new RotondAndesTM(getPath());
 		try {
-			ClienteFrecuente rt = tm.agregarPreferenciaClienteFrecuente(id, password, idProd);
+			ClienteFrecuente rt = tm.agregarPreferenciaClienteFrecuente(id, request.password, request.idProd);
 			return Response.status(200).entity(rt).build();
 		} catch (Exception e) {
 			return Response.status(500).entity(doErrorMessage(e)).build();

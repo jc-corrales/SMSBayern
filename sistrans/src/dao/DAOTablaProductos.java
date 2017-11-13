@@ -275,39 +275,12 @@ public class DAOTablaProductos {
 	public void registrarEquivalenciaDeProductos(Long idRestaurante, Long idProducto1, Long idProducto2)throws SQLException, Exception
 	{
 		
-		String sqlComprobar1 = "SELECT * FROM PRODUCTOS WHERE ID = " + idProducto1;
-		
-		PreparedStatement prepComprobar1 = conn.prepareStatement(sqlComprobar1);
-		recursos.add(prepComprobar1);
-		ResultSet rs1 = prepComprobar1.executeQuery();
-		
-		String sqlComprobar2 = "SELECT * FROM PRODUCTOS WHERE ID = " + idProducto2;
-		
-		PreparedStatement prepComprobar2 = conn.prepareStatement(sqlComprobar2);
-		recursos.add(prepComprobar2);
-		ResultSet rs2 = prepComprobar2.executeQuery();
-		
-		if(!rs1.next())
-		{
-			throw new Exception("El producto con ID: " + idProducto1 + " no existe.");
-		}
-		if(!rs2.next())
-		{
-			throw new Exception("El producto con ID: " + idProducto2 + " no existe.");
-		}
-		if((rs1.getLong("ID_RESTAURANTE") != (rs2.getLong("ID_RESTAURANTE"))) || ((rs1.getLong("ID_RESTAURANTE") != idRestaurante)) || ((rs2.getLong("ID_RESTAURANTE")!= idRestaurante)))
-		{
-			throw new Exception("Los Productos no pertenecen al mismo restaurante.");
-		}
-		conn.setAutoCommit(false);
-		
 		String sqlInsertar = "INSERT INTO ISIS2304B121720.PRODUCTOSSIMILARES (ID_RESTAURANTE, ID_PROD1, ID_PROD2)\r\n" + 
 				"    VALUES("+idRestaurante + ", " + idProducto1 + ", " + idProducto2+ ")";
 		PreparedStatement prepStmt = conn.prepareStatement(sqlInsertar);
 		recursos.add(prepStmt);
 		prepStmt.executeQuery();
 		conn.commit();
-		conn.setAutoCommit(true);
 	}
 //  	/**
 //	 * RF 14

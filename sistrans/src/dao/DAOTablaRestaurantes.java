@@ -93,129 +93,151 @@ public class DAOTablaRestaurantes {
 	{
 		conn.setAutoCommit(false);
 		System.out.println("ENTRO A METODO MENU DAO");
-		Long idEntrada = menu.getEntrada().getId();
-		Long idPlatoFuerte = menu.getPlatoFuerte().getId();
-		Long idPostre = menu.getPostre().getId();
-		Long idBebida = menu.getBebida().getId();
-		Long idAcompaniamiento = menu.getAcompaniamiento().getId();
+		Long idEntrada = null;
+		if(menu.getEntrada() != null)
+		{
+			idEntrada = menu.getEntrada().getId();
+		}
+		Long idPlatoFuerte = null;
+		if(menu.getPlatoFuerte() != null)
+		{
+			menu.getPlatoFuerte().getId();
+		}
+		Long idPostre = null;
+		if(menu.getPostre() != null)
+		{
+			idPostre = menu.getPostre().getId();
+		}
+		Long idBebida = null;
+		if(menu.getBebida() != null)
+		{
+			idBebida = menu.getBebida().getId();
+		}
+		Long idAcompaniamiento = null;
+		if(menu.getAcompaniamiento() != null)
+		{
+			idAcompaniamiento = menu.getAcompaniamiento().getId();
+		}
+		Double precio = menu.getPrecio();
 		if((idEntrada == null) && (idPlatoFuerte == null) && (idAcompaniamiento == null) && (idPostre == null) && (idBebida == null))
 		{
 			throw new Exception("Todos los valores están vacíos, por favor revisar la petición.");
 		}
-		System.out.println("Inicio comprobar Entrada");
-		if(idEntrada != null)
-		{
-			String sql = "SELECT * \r\n" + 
-					"    FROM PRODUCTOS, PRODUCTO_RESTAURANTE\r\n" + 
-					"    WHERE PRODUCTOS.ID = PRODUCTO_RESTAURANTE.ID_PROD AND PRODUCTOS.ID = " + idEntrada +" AND PRODUCTO_RESTAURANTE.ID_REST = " + idRestaurante;
-			PreparedStatement st = conn.prepareStatement(sql);
-			recursos.add(st);
-			ResultSet rs = st.executeQuery();
-			if(rs.next())
-			{
-				if(!rs.getString("CATEGORIA").equals(Producto.ENTRADA))
-				{
-					throw new Exception("El producto en el campo de Entrada NO es una entrada, intentar con otro producto.");
-				}
-			}
-			else
-			{
-				throw new Exception("La entrada que se introdujo por parámetro no existe.");
-			}
-		}
-		System.out.println("Inicio fin comprobar Entrada");
-		System.out.println("Inicio comprobar Plato Fuerte");
-		if(idPlatoFuerte != null)
-		{
-			String sql = "SELECT * \r\n" + 
-					"    FROM PRODUCTOS, PRODUCTO_RESTAURANTE\r\n" + 
-					"    WHERE PRODUCTOS.ID = PRODUCTO_RESTAURANTE.ID_PROD AND PRODUCTOS.ID = " + idPlatoFuerte +" AND PRODUCTO_RESTAURANTE.ID_REST = " + idRestaurante;
-			PreparedStatement st = conn.prepareStatement(sql);
-			recursos.add(st);
-			ResultSet rs = st.executeQuery();
-			if(rs.next())
-			{
-				if(!rs.getString("CATEGORIA").equals(Producto.PLATOFUERTE))
-				{
-					throw new Exception("El producto en el campo de Plato Fuerte NO es un Plato Fuerte, intentar con otro producto.");
-				}
-			}
-			else
-			{
-				throw new Exception("El Plato Fuerte que se introdujo por parámetro no existe.");
-			}
-		}
-		System.out.println("Fin comprobar Plato Fuerte");
-		System.out.println("Inicio comprobar Postre");
-		if(idPostre != null)
-		{
-			String sql = "SELECT * \r\n" + 
-					"    FROM PRODUCTOS, PRODUCTO_RESTAURANTE\r\n" + 
-					"    WHERE PRODUCTOS.ID = PRODUCTO_RESTAURANTE.ID_PROD AND PRODUCTOS.ID = " + idPostre +" AND PRODUCTO_RESTAURANTE.ID_REST = " + idRestaurante;
-			PreparedStatement st = conn.prepareStatement(sql);
-			recursos.add(st);
-			ResultSet rs = st.executeQuery();
-			if(rs.next())
-			{
-				if(!rs.getString("CATEGORIA").equals(Producto.POSTRE))
-				{
-					throw new Exception("El producto en el campo de Postre NO es un Postre, intentar con otro producto.");
-				}
-			}
-			else
-			{
-				throw new Exception("El Postre que se introdujo por parámetro no existe.");
-			}
-		}
-		System.out.println("Fin comprobar Postre");
-		System.out.println("Inicio comprobar Bebida");
-		if(idBebida != null)
-		{
-			String sql = "SELECT * \r\n" + 
-					"    FROM PRODUCTOS, PRODUCTO_RESTAURANTE\r\n" + 
-					"    WHERE PRODUCTOS.ID = PRODUCTO_RESTAURANTE.ID_PROD AND PRODUCTOS.ID = " + idBebida +" AND PRODUCTO_RESTAURANTE.ID_REST = " + idRestaurante;
-			PreparedStatement st = conn.prepareStatement(sql);
-			recursos.add(st);
-			ResultSet rs = st.executeQuery();
-			if(rs.next())
-			{
-				if(!rs.getString("CATEGORIA").equals(Producto.BEBIDA))
-				{
-					throw new Exception("El producto en el campo de Bebida NO es una Bebida, intentar con otro producto.");
-				}
-			}
-			else
-			{
-				throw new Exception("La Bebida que se introdujo por parámetro no existe.");
-			}
-		}
-		System.out.println("Fin comprobar Bebida");
-		System.out.println("Inicio comprobar Acompañamiento");
-		if(idAcompaniamiento != null)
-		{
-			String sql = "SELECT * \r\n" + 
-					"    FROM PRODUCTOS, PRODUCTO_RESTAURANTE\r\n" + 
-					"    WHERE PRODUCTOS.ID = PRODUCTO_RESTAURANTE.ID_PROD AND PRODUCTOS.ID = " + idAcompaniamiento +" AND PRODUCTO_RESTAURANTE.ID_REST = " + idRestaurante;
-			PreparedStatement st = conn.prepareStatement(sql);
-			recursos.add(st);
-			ResultSet rs = st.executeQuery();
-			if(rs.next())
-			{
-				if(!rs.getString("CATEGORIA").equals(Producto.ACOMPANIAMIENTO))
-				{
-					throw new Exception("El producto en el campo de Acompañamiento NO es un Acompañamiento, intentar con otro producto.");
-				}
-			}
-			else
-			{
-				throw new Exception("El Acompañamieno que se introdujo por parámetro no existe.");
-			}
-		}
-		System.out.println("Fin comprobar Acompañamiento.");
+//		System.out.println("Inicio comprobar Entrada");
+//		if(idEntrada != null)
+//		{
+//			String sql = "SELECT * \r\n" + 
+//					"    FROM PRODUCTOS, PRODUCTO_RESTAURANTE\r\n" + 
+//					"    WHERE PRODUCTOS.ID = PRODUCTO_RESTAURANTE.ID_PROD AND PRODUCTOS.ID = " + idEntrada +" AND PRODUCTO_RESTAURANTE.ID_REST = " + idRestaurante;
+//			PreparedStatement st = conn.prepareStatement(sql);
+//			recursos.add(st);
+//			ResultSet rs = st.executeQuery();
+//			if(rs.next())
+//			{
+//				if(!rs.getString("CATEGORIA").equals(Producto.ENTRADA))
+//				{
+//					throw new Exception("El producto en el campo de Entrada NO es una entrada, intentar con otro producto.");
+//				}
+//			}
+//			else
+//			{
+//				throw new Exception("La entrada que se introdujo por parámetro no existe.");
+//			}
+//		}
+//		System.out.println("Inicio fin comprobar Entrada");
+//		System.out.println("Inicio comprobar Plato Fuerte");
+//		if(idPlatoFuerte != null)
+//		{
+//			String sql = "SELECT * \r\n" + 
+//					"    FROM PRODUCTOS, PRODUCTO_RESTAURANTE\r\n" + 
+//					"    WHERE PRODUCTOS.ID = PRODUCTO_RESTAURANTE.ID_PROD AND PRODUCTOS.ID = " + idPlatoFuerte +" AND PRODUCTO_RESTAURANTE.ID_REST = " + idRestaurante;
+//			PreparedStatement st = conn.prepareStatement(sql);
+//			recursos.add(st);
+//			ResultSet rs = st.executeQuery();
+//			if(rs.next())
+//			{
+//				if(!rs.getString("CATEGORIA").equals(Producto.PLATOFUERTE))
+//				{
+//					throw new Exception("El producto en el campo de Plato Fuerte NO es un Plato Fuerte, intentar con otro producto.");
+//				}
+//			}
+//			else
+//			{
+//				throw new Exception("El Plato Fuerte que se introdujo por parámetro no existe.");
+//			}
+//		}
+//		System.out.println("Fin comprobar Plato Fuerte");
+//		System.out.println("Inicio comprobar Postre");
+//		if(idPostre != null)
+//		{
+//			String sql = "SELECT * \r\n" + 
+//					"    FROM PRODUCTOS, PRODUCTO_RESTAURANTE\r\n" + 
+//					"    WHERE PRODUCTOS.ID = PRODUCTO_RESTAURANTE.ID_PROD AND PRODUCTOS.ID = " + idPostre +" AND PRODUCTO_RESTAURANTE.ID_REST = " + idRestaurante;
+//			PreparedStatement st = conn.prepareStatement(sql);
+//			recursos.add(st);
+//			ResultSet rs = st.executeQuery();
+//			if(rs.next())
+//			{
+//				if(!rs.getString("CATEGORIA").equals(Producto.POSTRE))
+//				{
+//					throw new Exception("El producto en el campo de Postre NO es un Postre, intentar con otro producto.");
+//				}
+//			}
+//			else
+//			{
+//				throw new Exception("El Postre que se introdujo por parámetro no existe.");
+//			}
+//		}
+//		System.out.println("Fin comprobar Postre");
+//		System.out.println("Inicio comprobar Bebida");
+//		if(idBebida != null)
+//		{
+//			String sql = "SELECT * \r\n" + 
+//					"    FROM PRODUCTOS, PRODUCTO_RESTAURANTE\r\n" + 
+//					"    WHERE PRODUCTOS.ID = PRODUCTO_RESTAURANTE.ID_PROD AND PRODUCTOS.ID = " + idBebida +" AND PRODUCTO_RESTAURANTE.ID_REST = " + idRestaurante;
+//			PreparedStatement st = conn.prepareStatement(sql);
+//			recursos.add(st);
+//			ResultSet rs = st.executeQuery();
+//			if(rs.next())
+//			{
+//				if(!rs.getString("CATEGORIA").equals(Producto.BEBIDA))
+//				{
+//					throw new Exception("El producto en el campo de Bebida NO es una Bebida, intentar con otro producto.");
+//				}
+//			}
+//			else
+//			{
+//				throw new Exception("La Bebida que se introdujo por parámetro no existe.");
+//			}
+//		}
+//		System.out.println("Fin comprobar Bebida");
+//		System.out.println("Inicio comprobar Acompañamiento");
+//		if(idAcompaniamiento != null)
+//		{
+//			String sql = "SELECT * \r\n" + 
+//					"    FROM PRODUCTOS, PRODUCTO_RESTAURANTE\r\n" + 
+//					"    WHERE PRODUCTOS.ID = PRODUCTO_RESTAURANTE.ID_PROD AND PRODUCTOS.ID = " + idAcompaniamiento +" AND PRODUCTO_RESTAURANTE.ID_REST = " + idRestaurante;
+//			PreparedStatement st = conn.prepareStatement(sql);
+//			recursos.add(st);
+//			ResultSet rs = st.executeQuery();
+//			if(rs.next())
+//			{
+//				if(!rs.getString("CATEGORIA").equals(Producto.ACOMPANIAMIENTO))
+//				{
+//					throw new Exception("El producto en el campo de Acompañamiento NO es un Acompañamiento, intentar con otro producto.");
+//				}
+//			}
+//			else
+//			{
+//				throw new Exception("El Acompañamieno que se introdujo por parámetro no existe.");
+//			}
+//		}
+//		System.out.println("Fin comprobar Acompañamiento.");
 		System.out.println("Generando SQL");
-		Long idMenu = getSiguienteIdMenu();
-		String sqlInsertarMenu = "INSERT INTO MENUS (ID, NAME, ID_ENTRADA, ID_PLATOFUERTE, ID_POSTRE, ID_BEBIDA, ID_RESTAURANTE, ID_ACOMPANIAMIENTO)\r\n" + 
-				"    VALUES(" + idMenu + ", '" + menu.getName() + "', " + idEntrada + ", " + idPlatoFuerte + ", " + idBebida + ", " + idPostre + ", " + idRestaurante + ", " + idAcompaniamiento + ")";
+//		Long idMenu = getSiguienteIdMenu();
+		Long idMenu = menu.getId();
+		String sqlInsertarMenu = "INSERT INTO MENUS (ID, NAME, ID_RESTAURANTE, PRECIO, ID_ENTRADA, ID_PLATOFUERTE, ID_POSTRE, ID_BEBIDA, ID_ACOMPANIAMIENTO)\r\n" + 
+				"    VALUES(" + idMenu + ", '" + menu.getName() + "', " + idRestaurante + ", " + precio + ", " + idEntrada + ", " + idPlatoFuerte + ", " + idBebida + ", " + idPostre + ", " + idAcompaniamiento + ")";
 		System.out.println("SQL: " + sqlInsertarMenu);
 		PreparedStatement stmtMenu = conn.prepareStatement(sqlInsertarMenu);
 		recursos.add(stmtMenu);
@@ -298,8 +320,9 @@ public class DAOTablaRestaurantes {
 		}
 		TipoComida tipo = new TipoComida(rsTipos.getLong("ID"), rsTipos.getString("NAME"));
 		//OBTENER SIGUIENTES ID'S DISPONIBLES.
-		Long idRestaurante = getSiguienteIdRestaurante();
-		Long idRepresentante = getSiguienteIdRepresentante();
+//		Long idRestaurante = getSiguienteIdRestaurante();
+		Long idRestaurante = restaurante.getId();
+//		Long idRepresentante = getSiguienteIdRepresentante();
 		//AGREGAR RESTAURANTE.
 		String sqlRestaurante = "INSERT INTO RESTAURANTES (ID, NAME, PRECIO, ID_TIPO, ID_ZONA, PAGINA_WEB)\r\n" + 
 				"    VALUES (" + idRestaurante + ", '"+ restaurante.getName() + "', " + restaurante.getPrecio() + ", " + restaurante.getTipoRestaurante().getId()+ ", " + idZona + " , '" + restaurante.getPagina() + "')";
@@ -309,17 +332,17 @@ public class DAOTablaRestaurantes {
 		prepStmtRestaurante.executeQuery();
 		System.out.println("POST INSERT RESTAURANTES");
 		//AGREGAR REPRESENTANTE.
-		String sqlRepresentante = "INSERT INTO REPRESENTANTES (ID, NAME, PASSWORD) VALUES (" + idRepresentante + ", '" +representante.getName() + "', '" + representante.getContrasenia() + "')";
-		PreparedStatement prepStmtRepresentante= conn.prepareStatement(sqlRepresentante);
-		recursos.add(prepStmtRepresentante);
-		prepStmtRepresentante.executeQuery();
-		
-		String sqlRelacion = "INSERT INTO REPRESENTA (ID_RESTAURANTE, ID_REPRESENTANTE )VALUES (" + idRestaurante + ", " + idRepresentante + ")";
-		PreparedStatement prepStmtRelacion= conn.prepareStatement(sqlRelacion);
-		recursos.add(prepStmtRelacion);
-		prepStmtRelacion.executeQuery();
-		
-		System.out.println("POST INSERT REPRESENTANTES");
+//		String sqlRepresentante = "INSERT INTO REPRESENTANTES (ID, NAME, PASSWORD) VALUES (" + idRepresentante + ", '" +representante.getName() + "', '" + representante.getContrasenia() + "')";
+//		PreparedStatement prepStmtRepresentante= conn.prepareStatement(sqlRepresentante);
+//		recursos.add(prepStmtRepresentante);
+//		prepStmtRepresentante.executeQuery();
+//		
+//		String sqlRelacion = "INSERT INTO REPRESENTA (ID_RESTAURANTE, ID_REPRESENTANTE )VALUES (" + idRestaurante + ", " + idRepresentante + ")";
+//		PreparedStatement prepStmtRelacion= conn.prepareStatement(sqlRelacion);
+//		recursos.add(prepStmtRelacion);
+//		prepStmtRelacion.executeQuery();
+//		
+//		System.out.println("POST INSERT REPRESENTANTES");
 		restaurante.setId(idRestaurante);
 		restaurante.setTipoRestaurante(tipo);
 		return restaurante;

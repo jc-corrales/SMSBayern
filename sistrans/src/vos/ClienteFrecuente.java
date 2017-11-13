@@ -45,7 +45,7 @@ public class ClienteFrecuente extends Cliente
 	 */
 	public ClienteFrecuente(@JsonProperty(value = "preferencias")List<ProductoBase> preferencias, 
 			@JsonProperty(value="contrasenia")String contrasenia,@JsonProperty(value="id")Long id, 
-			@JsonProperty(value = "mesa")Integer mesa, 
+			@JsonProperty(value = "mesa")Long mesa, 
 			@JsonProperty(value = "nombre")String nombre,
 			@JsonProperty(value = "ordenes") List<Orden> ordenes)
 	{

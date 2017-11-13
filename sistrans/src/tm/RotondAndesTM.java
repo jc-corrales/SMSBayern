@@ -26,6 +26,7 @@ import dao.DAOTablaIngredientes;
 import dao.DAOTablaPedidos;
 import dao.DAOTablaProductos;
 import dao.DAOTablaRestaurantes;
+import dao.DAOTablaUsuarios;
 import dao.DAOTablaZonas;
 import vos.Cliente;
 import vos.ClienteFrecuente;
@@ -165,7 +166,7 @@ public class RotondAndesTM {
 		return clientes; 
 	}
 
-	public Cliente darCliente(Long id) throws SQLException {
+	public Cliente darCliente(Long id) throws SQLException, Exception {
 		Cliente res;
 		DAOTablaClientes dao = new DAOTablaClientes(); 
 		try {
@@ -406,26 +407,39 @@ public class RotondAndesTM {
 			}
 		}
 	}
-
+	//---------------------------------------------------	
+	//	Requerimiento: RF8
+	//---------------------------------------------------
+	/**
+	 * MÈtodo que Registra un Producto como preferido por un cliente.
+	 * @param id Long, ID del cliente.
+	 * @param password String, ContraseÒa del cliente.
+	 * @param idProd Long, ID del producto a registrar.
+	 * @return
+	 * @throws SQLException
+	 * @throws Exception
+	 */
 	public ClienteFrecuente agregarPreferenciaClienteFrecuente(Long id, String password, Long idProd) throws SQLException, Exception {
 		ClienteFrecuente cliente = null;
+		DAOTablaUsuarios daoUsuarios = new DAOTablaUsuarios();
 		DAOTablaClientesFrecuentes dao = new DAOTablaClientesFrecuentes();
 		DAOTablaProductos daoPref = new DAOTablaProductos();
 		try {
 			this.conn = darConexion();
+			daoUsuarios.setConn(conn);
 			dao.setConn(conn);
 			System.out.println(id);
 			System.out.println(idProd);
 			System.out.println(password);
 			//Verificar Cliente
-			if(!dao.verficarCliente(id, password)) 
+			if(!daoUsuarios.verficarUsuarioClienteFrecuente(id, password)) 
 				throw new Exception("Clave invalida");
 			//fin Verificacion		
 
 			dao.registrarPreferencia(id, idProd);
 
 			//INICIO AGREGAR PREFERENCIAS A ENIDAD CLIENTEFRECUENTE
-			cliente = dao.darClienteFrecuente(id);
+			cliente = daoUsuarios.darClienteFrecuente(id);
 			daoPref.setConn(conn);
 			cliente.setPreferencias(daoPref.darPreferencias(id));
 
@@ -439,7 +453,9 @@ public class RotondAndesTM {
 			throw e;
 		}finally {
 			try {
+				daoPref.cerrarRecursos();
 				dao.cerrarRecursos();
+				daoUsuarios.cerrarRecursos();
 				if(this.conn!=null)
 					this.conn.close();
 			} catch (SQLException exception) {
@@ -590,6 +606,9 @@ public class RotondAndesTM {
 		}
 		return productos; 
 	}
+	//---------------------------------------------------	
+	//	Requerimiento: RF7
+	//---------------------------------------------------
 	/**
 	 * M√©todo para agregar una Zona a RotondAndes
 	 * @param zona Zona, toda la informaci√≥n de la zona a agregar.
@@ -915,14 +934,36 @@ public class RotondAndesTM {
 	 * @throws SQLException
 	 * @throws Exception
 	 */
-	public void registrarProductosEquivalentes(Long idRestaurante, Long idProducto1, Long idProducto2)throws SQLException, Exception
+	public void registrarProductosEquivalentes(Long idRestaurante, Long idProducto1, Long idProducto2, Long idRepresentante, String password)throws SQLException, Exception
 	{
 		DAOTablaProductos daoProductos = new DAOTablaProductos();
+		DAOTablaUsuarios daoUsuarios = new DAOTablaUsuarios();
 		try {
 			this.conn = darConexion();
 			daoProductos.setConn(conn);
+			daoUsuarios.setConn(conn);
+			if(!daoUsuarios.verficarUsuarioRepresentante(idRepresentante, password, idRestaurante))
+			{
+				throw new Exception("Error en la verificaciÛn del Representante");
+			}
+			Producto producto1 = daoProductos.darProducto(idProducto1, idRestaurante);
+			Producto producto2 = daoProductos.darProducto(idProducto2, idRestaurante);
+			if(producto1 == null)
+			{
+				throw new Exception("El Restaurante con ID: " + idRestaurante + " no ofrece el producto con ID: " + idProducto1);
+			}
+			if(producto2 == null)
+			{
+				throw new Exception("El Restaurante con ID: " + idRestaurante + " no ofrece el producto con ID: " + idProducto2);
+			}
+			if(!producto1.getCategoria().equals(producto2.getCategoria()))
+			{
+				throw new Exception("Los productos son incompatibles para ser equivalentes, categorÌa incorrecta.");
+			}
+			conn.setAutoCommit(false);
+			System.out.println("Isolation level: " + conn.getTransactionIsolation());;
 			daoProductos.registrarEquivalenciaDeProductos(idRestaurante, idProducto1, idProducto2);
-			
+			conn.setAutoCommit(true);
 		}catch (SQLException e) {
 			System.err.println("SQLException:" + e.getMessage());
 			e.printStackTrace();
@@ -933,6 +974,7 @@ public class RotondAndesTM {
 			throw e;
 		}finally {
 			try {
+				daoUsuarios.cerrarRecursos();
 				daoProductos.cerrarRecursos();
 				if(this.conn!=null)
 					this.conn.close();
@@ -943,7 +985,9 @@ public class RotondAndesTM {
 			}
 		}
 	}
-	
+	//---------------------------------------------------	
+	//	Requerimiento: RF5
+	//---------------------------------------------------
 	/**
 	 * M√©todo que agrega un nuevo Ingrediente a RotondAndes. Los ingredientes se comparten entre los restaurantes.
 	 * @param ingrediente Ingrediente, toda la informaci√≥n respecto al Ingrediente.
@@ -1079,6 +1123,10 @@ public class RotondAndesTM {
 	// */
 	
 	//public 
+	
+	//---------------------------------------------------	
+	//	Requerimiento: RF6
+	//---------------------------------------------------
   /**
 	 * M√©todo que agregar un Men√∫ para un Restaurante.
 	 * Al menos uno de los par√°metros debe ser no nulo y el restaurante debe ofrecer los productos
@@ -1100,26 +1148,60 @@ public class RotondAndesTM {
 		try {
 			this.conn = darConexion();
 			daoRestaurantes.setConn(conn);
-			
+			Producto entrada;
+			Producto platoFuerte;
+			Producto postre;
+			Producto bebida;
+			Producto acompaniamiento;
 			if(menu.getEntrada() != null)
 			{
 				menu.setEntrada(darProducto(menu.getEntrada().getId(), idRestaurante));
+				entrada = darProducto(menu.getEntrada().getId(), idRestaurante);
+				if(entrada == null)
+				{
+					throw new Exception("El Restaurante con ID: " + idRestaurante + " no sirve la Entrada con ID: " + menu.getEntrada().getId());
+				}
+				menu.setEntrada(entrada);
 			}
 			if(menu.getPlatoFuerte() != null)
 			{
 				menu.setPlatoFuerte(darProducto(menu.getPlatoFuerte().getId(), idRestaurante));
+				platoFuerte = darProducto(menu.getPlatoFuerte().getId(), idRestaurante);
+				if(platoFuerte == null)
+				{
+					throw new Exception("El Restaurante con ID: " + idRestaurante + " no sirve el Plato Fuerte con ID: " + menu.getPlatoFuerte().getId());
+				}
+				menu.setPlatoFuerte(platoFuerte);
 			}
 			if(menu.getPostre()!= null)
 			{
 				menu.setPostre(darProducto(menu.getPostre().getId(), idRestaurante));
+				postre = darProducto(menu.getPostre().getId(), idRestaurante);
+				if(postre == null)
+				{
+					throw new Exception("El Restaurante con ID: " + idRestaurante + " no sirve el Postre con ID: " + menu.getPostre().getId());
+				}
+				menu.setPostre(postre);
 			}
 			if(menu.getBebida() != null)
 			{
 				menu.setBebida(darProducto(menu.getBebida().getId(), idRestaurante));
+				bebida = darProducto(menu.getBebida().getId(), idRestaurante);
+				if(bebida == null)
+				{
+					throw new Exception("El Restaurante con ID: " + idRestaurante + " no sirve la Bebida con ID: " + menu.getBebida().getId());
+				}
+				menu.setBebida(bebida);
 			}
 			if(menu.getAcompaniamiento() != null)
 			{
 				menu.setAcompaniamiento(darProducto(menu.getAcompaniamiento().getId(), idRestaurante));
+				acompaniamiento = darProducto(menu.getAcompaniamiento().getId(), idRestaurante);
+				if(acompaniamiento == null)
+				{
+					throw new Exception("El Restaurante con ID: " + idRestaurante + " no sirve el acompaÒamiento con ID: " + menu.getAcompaniamiento().getId());
+				}
+				menu.setAcompaniamiento(acompaniamiento);
 			}
 			respuesta = daoRestaurantes.registrarMenu(idRestaurante, menu);
 		}catch (SQLException e) {
@@ -1143,7 +1225,9 @@ public class RotondAndesTM {
 		}
 		return respuesta;
 	}
-	
+	//---------------------------------------------------	
+	//	Requerimiento: RF3
+	//---------------------------------------------------
 	/**
 	 * M√©todo que regitra un Restaurante en la base de datos.
 	 * @param restaurante Restaurante, informaci√≥n del Restaurante.
@@ -1158,9 +1242,11 @@ public class RotondAndesTM {
 	{
 		Restaurante respuesta;
 		DAOTablaRestaurantes daoRestaurantes = new DAOTablaRestaurantes();
+		DAOTablaUsuarios daoUsuarios = new DAOTablaUsuarios();
 		try {
 			this.conn = darConexion();
 			daoRestaurantes.setConn(conn);
+			daoUsuarios.setConn(conn);
 			Zona zona = darZona(idZona);
 			if(zona == null)
 			{
@@ -1168,6 +1254,7 @@ public class RotondAndesTM {
 			}
 			respuesta = daoRestaurantes.registrarRestaurante(restaurante, representante, zona.getId());
 			
+			daoUsuarios.registrarRepresentante(representante);
 		}catch (SQLException e) {
 			System.err.println("SQLException:" + e.getMessage());
 			e.printStackTrace();
@@ -1178,6 +1265,7 @@ public class RotondAndesTM {
 			throw e;
 		}finally {
 			try {
+				daoUsuarios.cerrarRecursos();
 				daoRestaurantes.cerrarRecursos();
 				if(this.conn!=null)
 					this.conn.close();
@@ -1198,11 +1286,11 @@ public class RotondAndesTM {
 	 */
 	public ClienteFrecuente registrarClienteFrecuente(ClienteFrecuente cliente) throws SQLException, Exception
 	{
-		DAOTablaClientesFrecuentes daoClientesFrecuentes = new DAOTablaClientesFrecuentes();
+		DAOTablaUsuarios daoUsuarios = new DAOTablaUsuarios();
 		try {
 			this.conn = darConexion();
-			daoClientesFrecuentes.setConn(conn);
-			cliente = daoClientesFrecuentes.agregarClienteFrecuente(cliente);
+			daoUsuarios.setConn(conn);
+			cliente = daoUsuarios.registrarClienteFrecuente(cliente);
 			
 		}catch (SQLException e) {
 			System.err.println("SQLException:" + e.getMessage());
@@ -1214,7 +1302,48 @@ public class RotondAndesTM {
 			throw e;
 		}finally {
 			try {
-				daoClientesFrecuentes.cerrarRecursos();
+				daoUsuarios.cerrarRecursos();
+				if(this.conn!=null)
+					this.conn.close();
+			} catch (SQLException exception) {
+				System.err.println("SQLException closing resources:" + exception.getMessage());
+				exception.printStackTrace();
+				throw exception;
+			}
+		}
+		return cliente;
+	}
+	//---------------------------------------------------	
+	//	Requerimiento: RF2
+	//---------------------------------------------------
+	/**
+	 * MÈtodo que agrega un Cliente.
+	 * @param cliente ClienteFrecuente, informaci√≥n del cliente a agregar.
+	 * @return ClienteFrecuente, informaci√≥n del cliente agregado.
+	 * @throws SQLException
+	 * @throws Exception
+	 */
+	public Cliente registrarCliente(Cliente cliente) throws SQLException, Exception
+	{
+		DAOTablaUsuarios daoUsuarios = new DAOTablaUsuarios();
+		try {
+			this.conn = darConexion();
+			conn.setAutoCommit(false);
+			daoUsuarios.setConn(conn);
+			cliente = daoUsuarios.registrarCliente(cliente);
+			
+		}catch (SQLException e) {
+			System.err.println("SQLException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		} catch (Exception e) {
+			System.err.println("GeneralException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		}finally {
+			try {
+				daoUsuarios.cerrarRecursos();
+				conn.setAutoCommit(true);
 				if(this.conn!=null)
 					this.conn.close();
 			} catch (SQLException exception) {
@@ -1227,19 +1356,22 @@ public class RotondAndesTM {
 	}
 	
 	/**
-	 * M√©todo que agrega un Cliente.
-	 * @param cliente ClienteFrecuente, informaci√≥n del cliente a agregar.
-	 * @return ClienteFrecuente, informaci√≥n del cliente agregado.
+	 * MÈtodo que agrega un Administrador.
+	 * @param id Long, ID del Administrador.
+	 * @param password String, contraseÒa del Administrador.
+	 * @return Boolean, Booleano que determina si se agregÛ exitosamente el Administrador o no.
 	 * @throws SQLException
 	 * @throws Exception
 	 */
-	public Cliente registrarCliente(Cliente cliente) throws SQLException, Exception
+	public Boolean registrarAdministrador(Long id, String password) throws SQLException, Exception
 	{
-		DAOTablaClientes daoClientes = new DAOTablaClientes();
+		Boolean respuesta = false;
+		DAOTablaUsuarios daoUsuarios = new DAOTablaUsuarios();
 		try {
 			this.conn = darConexion();
-			daoClientes.setConn(conn);
-			cliente = daoClientes.agregarCliente(cliente);
+			conn.setAutoCommit(false);
+			daoUsuarios.setConn(conn);
+			respuesta = daoUsuarios.registrarAdministrador(id, password);
 			
 		}catch (SQLException e) {
 			System.err.println("SQLException:" + e.getMessage());
@@ -1251,7 +1383,8 @@ public class RotondAndesTM {
 			throw e;
 		}finally {
 			try {
-				daoClientes.cerrarRecursos();
+				daoUsuarios.cerrarRecursos();
+				conn.setAutoCommit(true);
 				if(this.conn!=null)
 					this.conn.close();
 			} catch (SQLException exception) {
@@ -1260,7 +1393,7 @@ public class RotondAndesTM {
 				throw exception;
 			}
 		}
-		return cliente;
+		return respuesta;
 	}
 	/**
 	 * MÈtodo que da el o los Productos m·s ofrecidos en RotondAndes.

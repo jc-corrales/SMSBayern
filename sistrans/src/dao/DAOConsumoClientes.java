@@ -57,11 +57,10 @@ public class DAOConsumoClientes
 	public List<ConsumoCliente> getConsumoClientes()throws SQLException, Exception
 	{
 		System.out.println("ENTRO A METODO CONSUMO");
-		String sql = "SELECT ID_CLIENTE, ID_PRODUCTO, CANTIDADORDENADOS\r\n" + 
-				"    FROM (SELECT ID_CLIENTE, ID_PRODUCTO, COUNT(ID) AS CANTIDADORDENADOS FROM PEDIDOS\r\n" + 
-				"    WHERE SERVIDO = 1\r\n" + 
-				"    GROUP BY ID_CLIENTE, ID_PRODUCTO) TABLA\r\n" + 
-				"    LEFT JOIN PRODUCTOS PRODUCTO ON TABLA.ID_PRODUCTO = PRODUCTO.ID";
+		String sql = "SELECT ID_CLIENTE, ID_PRODUCTO, COUNT(PEDIDOS.ID) AS CANTIDADORDENADOS\r\n" + 
+				"FROM PEDIDOS JOIN ORDENES ON Pedidos.Id_Orden = ORDENES.ID\r\n" + 
+				"WHERE SERVIDO = 1\r\n" + 
+				"GROUP BY ID_CLIENTE, ID_PRODUCTO";
 		System.out.println(sql);
 		PreparedStatement prepStmt = conn.prepareStatement(sql);
 		recursos.add(prepStmt);
@@ -107,11 +106,10 @@ public class DAOConsumoClientes
 	public List<ConsumoCliente> getConsumoUnCliente(Long idCliente)throws SQLException, Exception
 	{
 		System.out.println("ENTRO A METODO CONSUMO");
-		String sql = "SELECT ID_CLIENTE, ID_PRODUCTO, CANTIDADORDENADOS\r\n" + 
-				"    FROM (SELECT ID_CLIENTE, ID_PRODUCTO, COUNT(ID) AS CANTIDADORDENADOS FROM PEDIDOS\r\n" + 
-				"    WHERE SERVIDO = 1 AND ID_CLIENTE = " + idCliente + "\r\n" + 
-				"    GROUP BY ID_CLIENTE, ID_PRODUCTO) TABLA\r\n" + 
-				"    LEFT JOIN PRODUCTOS PRODUCTO ON TABLA.ID_PRODUCTO = PRODUCTO.ID";
+		String sql = "SELECT ID_CLIENTE, ID_PRODUCTO, COUNT(PEDIDOS.ID) AS CANTIDADORDENADOS\r\n" + 
+				"FROM PEDIDOS JOIN ORDENES ON Pedidos.Id_Orden = ORDENES.ID\r\n" + 
+				"WHERE SERVIDO = 1 AND ID_CLIENTE = " + idCliente + "\r\n" + 
+				"GROUP BY ID_CLIENTE, ID_PRODUCTO";
 		System.out.println(sql);
 		PreparedStatement prepStmt = conn.prepareStatement(sql);
 		recursos.add(prepStmt);

@@ -26,7 +26,7 @@ public class Cliente
 	 * Mesa asignada del cliente;
 	 */
 	@JsonProperty(value = "mesa")
-	private Integer mesa;
+	private Long mesa;
 	/**
 	 * Nombre del cliente.
 	 */
@@ -47,7 +47,7 @@ public class Cliente
 	 * @param nombre
 	 */
 	public Cliente(@JsonProperty(value="id")Long id, 
-			@JsonProperty(value = "mesa")Integer mesa, 
+			@JsonProperty(value = "mesa")Long mesa, 
 			@JsonProperty(value = "nombre")String nombre,
 			@JsonProperty(value = "ordenes") List<Orden> ordenes)
 	{
@@ -76,7 +76,7 @@ public class Cliente
 	 * Método que obtiene la mesa asignada a este cliente.
 	 * @return String, mesa del cliente.
 	 */
-	public Integer getMesa()
+	public Long getMesa()
 	{
 		return this.mesa;
 	}
@@ -84,7 +84,7 @@ public class Cliente
 	 * Método que establece la mesa de este cliente.
 	 * @param mesa
 	 */
-	public void setMesa(Integer mesa)
+	public void setMesa(Long mesa)
 	{
 		this.mesa = mesa;
 	}

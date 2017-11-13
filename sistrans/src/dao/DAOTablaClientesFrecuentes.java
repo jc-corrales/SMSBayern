@@ -89,6 +89,8 @@ public class DAOTablaClientesFrecuentes {
 		ResultSet rs = prepStmt.executeQuery();
 		if(rs.next()) {
 			String pass = rs.getString("PASSWORD");
+			System.out.println("ConstraseñaRESOURCE: " +password);
+			System.out.println("ConstraseñaORACLE: " +pass);
 			if(pass.equals(password))
 				return true;
 		}
@@ -116,7 +118,7 @@ public class DAOTablaClientesFrecuentes {
 			cliente = new ClienteFrecuente();
 			cliente.setId(rs.getLong("ID"));
 			cliente.setNombre(rs.getString("NAME"));
-			cliente.setMesa(rs.getInt("MESA"));
+			cliente.setMesa(rs.getLong("MESA"));
 			cliente.setContrasenia(rs.getString("PASSWORD"));
 			
 		}
