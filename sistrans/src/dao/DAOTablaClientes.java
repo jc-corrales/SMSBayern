@@ -64,8 +64,9 @@ public class DAOTablaClientes {
 			{
 				Long idOrden = rsOrden.getLong("ID");
 				Double costoTotalOrden = rsOrden.getDouble("COSTOTOTAL");
+				Boolean esConfirmada = rsOrden.getBoolean("ES_CONFIRMADA");
 				List<Pedido> pedidos = getPedidosPorClienteSegunOrden(idOrden);
-				ordenes.add( new Orden(idOrden, costoTotalOrden, pedidos ,null));
+				ordenes.add( new Orden(idOrden, costoTotalOrden, pedidos ,null, esConfirmada));
 			}
 			
 			clientes.add(new Cliente(id, mesa, name, ordenes));
@@ -96,7 +97,8 @@ public class DAOTablaClientes {
 			{
 				Long idOrden = rsOrden.getLong("ID");
 				Double costoTotalOrden = rsOrden.getDouble("COSTOTOTAL");
-				ordenes.add( new Orden(idOrden, costoTotalOrden, null ,null));
+				Boolean esConfirmada = rsOrden.getBoolean("ES_CONFIRMADA");
+				ordenes.add( new Orden(idOrden, costoTotalOrden, null ,null, esConfirmada));
 			}
 			
 			
@@ -136,7 +138,8 @@ public class DAOTablaClientes {
 			Long idOrden = rsOrden.getLong("ID");
 			Double costoTotalOrden = rsOrden.getDouble("COSTOTOTAL");
 			List<Pedido> pedidos = getPedidosPorClienteSegunOrden(idOrden);
-			ordenes.add( new Orden(idOrden, costoTotalOrden, pedidos ,null));
+			Boolean esConfirmada = rsOrden.getBoolean("ES_CONFIRMADA");
+			ordenes.add( new Orden(idOrden, costoTotalOrden, pedidos ,null, esConfirmada));
 		}
 		clientePorId.setOrdenes(ordenes);
 		return clientePorId;
@@ -161,6 +164,7 @@ public class DAOTablaClientes {
 			Date fecha = rs.getDate("FECHA");
 			Long idProducto = rs.getLong("ID_PRODUCTO");
 			Boolean servido = true;
+			Long idRestaurante = rs.getLong("ID_RESTAURANTE");
 			if(rs.getInt("SERVIDO") == 0)
 			{
 				servido = false;
@@ -184,7 +188,7 @@ public class DAOTablaClientes {
 				
 				producto = new Producto(idProducto, nombre, descripcionEspaniol, descripcionIngles, costoDeProduccion, null, precio, null, categoria, null, null);
 			}
-			Pedido pedido = new Pedido(id, producto, null, servido);
+			Pedido pedido = new Pedido(id, producto, null, servido, idRestaurante);
 			respuesta.add(pedido);
 		}
 		return respuesta;

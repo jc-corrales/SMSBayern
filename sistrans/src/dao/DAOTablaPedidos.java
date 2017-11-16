@@ -5,9 +5,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Date;
 
 import vos.Cliente;
 import vos.EstadisticasPedidos;
@@ -81,11 +83,12 @@ public class DAOTablaPedidos {
 	 * @throws SQLException
 	 * @throws Exception
 	 */
-	public Pedido registrarPedido(Cliente cliente, Producto producto, Long idOrden, Long idRest) throws SQLException, Exception{
+	public Pedido registrarPedido(Producto producto, Long idOrden, Long idRest) throws SQLException, Exception{
 //		System.out.println("Entro metodo registrarPedido");
 		Long id =  darIdMax();	
 		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 		LocalDateTime localDate = LocalDateTime.now();
+		Date fecha = Date.from(localDate.atZone(ZoneId.systemDefault()).toInstant());
 //		System.out.println("pre sql 1");
 		String sqlRestaurante = "SELECT * FROM PRODUCTO_RESTAURANTE WHERE ID_PROD = " + producto.getId() + " AND ID_REST = " + idRest;
 //		System.out.println(sqlRestaurante);
@@ -115,9 +118,8 @@ public class DAOTablaPedidos {
 		
 
 		System.out.println("Pre SQL");
-		String sql = "INSERT INTO PEDIDOS (ID, ID_CLIENTE, ID_PRODUCTO, FECHA, SERVIDO, ID_ORDEN, ID_RESTAURANTE) VALUES (";
+		String sql = "INSERT INTO PEDIDOS (ID, ID_PRODUCTO, FECHA, SERVIDO, ID_ORDEN, ID_RESTAURANTE) VALUES (";
 		sql += id + ", ";
-		sql += cliente.getId() + ", ";
 		sql += producto.getId() + ", ";
 		sql += "TIMESTAMP '" + dtf.format(localDate) + "', 0, ";
 		sql += idOrden + ", ";
@@ -128,7 +130,7 @@ public class DAOTablaPedidos {
 		prepStmt.executeQuery();
 		System.out.println("post ejecucción sql 2");
 		
-		return new Pedido(id, cliente, producto, localDate, false);
+		return new Pedido(id, producto, fecha, false, idRest);
 	}
 
 	/**
@@ -264,6 +266,7 @@ public class DAOTablaPedidos {
 			throw new Exception("No se puede cancelar el Pedido con ID: " + id + " debido a que ya ha sido entregado.");
 		}		
 		
+		Long idOrden =rs.getLong("ID_ORDEN");
 		String sqlEliminador = "DELETE \r\n" + 
 				"    FROM PEDIDOS \r\n" + 
 				"    WHERE ID = " + id;
@@ -278,49 +281,195 @@ public class DAOTablaPedidos {
 		PreparedStatement prepStmtUpdater= conn.prepareStatement(sqlUpdater);
 		recursos.add(prepStmtUpdater);
 		prepStmtUpdater.executeQuery();
+		System.out.println("PRE SQL");
+		String sqlProductoPrice = "SELECT PRECIO FROM PRODUCTO_RESTAURANTE WHERE ID_PROD = " + rs.getLong("ID_PRODUCTO") + " AND ID_REST = " + rs.getLong("ID_RESTAURANTE");
+		PreparedStatement prepStmtProductoPrice= conn.prepareStatement(sqlProductoPrice);
+		recursos.add(prepStmtProductoPrice);
+		ResultSet rsPrice = prepStmtProductoPrice.executeQuery();
+		System.out.println("POST SQL");
+		rsPrice.next();
+		Double valor = -rsPrice.getDouble("PRECIO");
+		updateCostoTotalOrden(idOrden, valor);
+		System.out.println("POST UPDATE");
 		conn.setAutoCommit(true);
 	}
+//	/**
+//	 * Método que obtiene el ID de la siguiente Orden.
+//	 * @return
+//	 * @throws SQLException
+//	 * @throws Exception
+//	 */
+//	public Long getSiguienteIdOrden()throws SQLException, Exception
+//	{
+//		String sql = "SELECT * FROM ORDENES\r\n" + 
+//				"    WHERE ROWNUM = 1\r\n" + 
+//				"    ORDER BY ID DESC";
+//		PreparedStatement prepStmt= conn.prepareStatement(sql);
+//		recursos.add(prepStmt);
+//		ResultSet rs = prepStmt.executeQuery();
+//		if(rs.next())
+//		{
+//			return rs.getLong("ID") + 1;
+//		}
+//		else
+//		{
+//			return (long) 1;
+//		}
+//	}
+	
+//	public Orden registrarUnPedido(Cliente cliente, Producto producto, Long idRestProd, Long idOrden)throws SQLException, Exception
+//	{
+//		List<Pedido> pedidos = new ArrayList<Pedido>();
+//		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+//		LocalDateTime localDate = LocalDateTime.now();
+//		Orden orden = new Orden(idOrden, producto.getPrecio(), null, cliente);
+//		
+//		String sql = "INSERT INTO ORDENES (ID, ID_CLIENTE, COSTOTOTAL, FECHA)\r\n" + 
+//				" VALUES (" + orden.getId() + ", " + orden.getCliente().getId() + ", " + orden.getCostoTotal() + ", TIMESTAMP '" + dtf.format(localDate) + "')";
+//		PreparedStatement prepStmt= conn.prepareStatement(sql);
+//		recursos.add(prepStmt);
+//		prepStmt.executeQuery();
+//		
+//		Pedido pedido = registrarPedido(cliente, producto, orden.getId(), idRestProd);
+//		pedidos.add(pedido);
+//		orden.setPedidosOrdenados(pedidos);
+//		return orden;
+//	}
 	/**
-	 * Método que obtiene el ID de la siguiente Orden.
-	 * @return
+	 * Método que indica si a una orden se le pueden agregar más Pedidos o no.
+	 * Si la orden no ha sido confirmada, se pueden agregar Pedidos
+	 * Si la orden ha sido confirmada, no se pueden agregar pedidos.
+	 * @param idOrden Long, ID de la Orden.
+	 * @return Boolean, Booleano que determina si la orden puede recibir pedidos o no.
 	 * @throws SQLException
 	 * @throws Exception
 	 */
-	public Long getSiguienteIdOrden()throws SQLException, Exception
+	public Boolean getEstatusOrden(Long idOrden) throws SQLException, Exception
 	{
-		String sql = "SELECT * FROM ORDENES\r\n" + 
-				"    WHERE ROWNUM = 1\r\n" + 
-				"    ORDER BY ID DESC";
+		Boolean respuesta = false;
+		String sql = "SELECT * FROM ORDENES WHERE ID = " + idOrden;
 		PreparedStatement prepStmt= conn.prepareStatement(sql);
 		recursos.add(prepStmt);
 		ResultSet rs = prepStmt.executeQuery();
 		if(rs.next())
 		{
-			return rs.getLong("ID") + 1;
+			if(!rs.getBoolean("ES_CONFIRMADA"))
+			{
+				respuesta = true;
+			}
 		}
 		else
 		{
-			return (long) 1;
+			throw new Exception("La Orden con ID: " + idOrden + " no existe");
 		}
+		return respuesta;
 	}
 	
-	public Orden registrarUnPedido(Cliente cliente, Producto producto, Long idRestProd)throws SQLException, Exception
+	/**
+	 * Método que Registra una nueva Orden vacía en el sistema.
+	 * @param orden Orden, información de la Orden a agregar.
+	 * @return Orden, Orden agregada.
+	 * @throws SQLException
+	 * @throws Exception
+	 */
+	public Orden registrarNuevaOrden(Orden orden) throws SQLException, Exception
 	{
-		List<Pedido> pedidos = new ArrayList<Pedido>();
+		System.out.println("Entro a metodo registrar orden");
 		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-		LocalDateTime localDate = LocalDateTime.now();
-		Orden orden = new Orden(getSiguienteIdOrden(), producto.getPrecio(), null, cliente);
-		
-		String sql = "INSERT INTO ORDENES (ID, ID_CLIENTE, COSTOTOTAL, FECHA)\r\n" + 
-				" VALUES (" + orden.getId() + ", " + orden.getCliente().getId() + ", " + orden.getCostoTotal() + ", TIMESTAMP '" + dtf.format(localDate) + "')";
+		LocalDateTime localDate = LocalDateTime.now();		
+		String sql = "INSERT INTO ORDENES (ID, ID_CLIENTE, COSTOTOTAL, FECHA, ES_CONFIRMADA) VALUES (" + orden.getId() + ", " + orden.getCliente().getId() +", " + 0 + ", TIMESTAMP '" + dtf.format(localDate) + "', " + 0 + ")";
 		PreparedStatement prepStmt= conn.prepareStatement(sql);
+		System.out.println("SQL: " +sql);
 		recursos.add(prepStmt);
 		prepStmt.executeQuery();
+		orden.setEsConfirmada(false);
+		orden.setPedidosOrdenados(new ArrayList<Pedido>());
+		return orden;
+	}
+	/**
+	 * Método que entrega toda la información de una Orden según su ID.
+	 * @param idOrden Long, ID de la Orden a obtener.
+	 * @return Orden, toda la información de la Orden con sus Pedidos respectivos.
+	 * @throws SQLException
+	 * @throws Exception
+	 */
+	public Orden obtenerOrden(Long idOrden)throws SQLException, Exception
+	{
+		String sql = "SELECT * FROM ORDENES WHERE ID = " + idOrden;
+		PreparedStatement prepStmt= conn.prepareStatement(sql);
+		recursos.add(prepStmt);
+		ResultSet rs = prepStmt.executeQuery();
+		if(!rs.next())
+		{
+			throw new Exception("No existe la Orden con ID: " + idOrden);
+		}
+		Long id = rs.getLong("ID");
 		
-		Pedido pedido = registrarPedido(cliente, producto, orden.getId(), idRestProd);
-		pedidos.add(pedido);
-		orden.setPedidosOrdenados(pedidos);
+		Cliente cliente = new Cliente();
+		cliente.setId(rs.getLong("ID_CLIENTE"));
+		Boolean esConfirmada = rs.getBoolean("ES_CONFIRMADA");
+		Double costoTotal = rs.getDouble("COSTOTOTAL");
+		Orden orden = new Orden(id, costoTotal, obtenerPedidosDeOrden(idOrden), cliente, esConfirmada);
 		return orden;
 	}
 	
+	/**
+	 * Método que devuelve toda la lista de Pedidos para una Orden.
+	 * @param idOrden Long, ID de la Orden cuyos pedidos se quieren obtener.
+	 * @return List<Pedido>, Lista de Pedidos de una Orden.
+	 * @throws SQLException
+	 * @throws Exception
+	 */
+	public List<Pedido> obtenerPedidosDeOrden(Long idOrden)throws SQLException, Exception
+	{
+		List<Pedido> respuesta = new ArrayList<Pedido>();
+		String sql = "SELECT * FROM PEDIDOS WHERE ID_ORDEN = " + idOrden;
+		PreparedStatement prepStmt= conn.prepareStatement(sql);
+		recursos.add(prepStmt);
+		ResultSet rs = prepStmt.executeQuery();
+		
+		while(rs.next())
+		{
+			Long id = rs.getLong("ID");
+			Date fecha = rs.getDate("FECHA");
+			Producto producto = new Producto();
+			producto.setId(rs.getLong("ID_PRODUCTO"));
+			Boolean servido = rs.getBoolean("SERVIDO");
+			Long idRestaurante = rs.getLong("ID_RESTAURANTE");
+			Pedido pedido = new Pedido(id, producto, fecha, servido, idRestaurante);
+			respuesta.add(pedido);
+		}
+		return respuesta;
+	}
+	/**
+	 * Método que confirma una Orden, haciendo que ya no se le puedan agregar más pedidos. Aunque si se pueden cancelar.
+	 * @param idOrden Long, ID de la Orden a confirmar.
+	 * @return Boolean, Booleano que indica si el procedimiento fue exitoso o no.	
+	 * @throws SQLException
+	 * @throws Exception
+	 */
+	public Boolean confirmarOrden(Long idOrden) throws SQLException, Exception{
+		String sql = "UPDATE ORDENES SET ES_CONFIRMADA = 1 WHERE ID = " + idOrden;
+		PreparedStatement prepStmt = conn.prepareStatement(sql);
+		recursos.add(prepStmt);
+		prepStmt.executeQuery();
+		return true;
+	}
+	
+	/**
+	 * Método para actualizar el costo de una Orden según los cambios que se presenten.
+	 * Nuevo Pedido.
+	 * Cancelación de Pedido.
+	 * @param idOrden Long, ID de la Orden.
+	 * @param valor Double, valor a Modificar la orden, puede ser negativo.
+	 * @throws SQLException
+	 * @throws Exception
+	 */
+	public void updateCostoTotalOrden(Long idOrden, Double valor)throws SQLException, Exception
+	{		
+		String sql2 = "UPDATE ORDENES SET COSTOTOTAL = COSTOTOTAL + " + valor + " WHERE ID = " + idOrden;
+		PreparedStatement prepStmt2 = conn.prepareStatement(sql2);
+		recursos.add(prepStmt2);
+		prepStmt2.executeQuery();
+	}
 }

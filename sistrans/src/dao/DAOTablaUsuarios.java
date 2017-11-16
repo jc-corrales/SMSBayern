@@ -177,7 +177,7 @@ public class DAOTablaUsuarios
 		{
 			throw new Exception("El Cliente no existe.");
 		}
-		if(rs.getString("ROL").equals(CLIENTE))
+		if(!rs.getString("ROL").equals(CLIENTE) && !rs.getString("ROL").equals(CLIENTEFRECUENTE))
 		{
 			throw new Exception("El usuario no es un Cliente.");
 		}

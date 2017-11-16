@@ -38,18 +38,28 @@ public class Orden
 	@JsonProperty(value = "cliente")
 	private Cliente cliente;
 	/**
+	 * Atributo que determina si la orden ha sido confirmada o no.
+	 */
+	@JsonProperty(value = "esConfirmada")
+	private Boolean esConfirmada;
+	/**
 	 * Método constructor de la clase OrdenVos.
 	 * @param id
 	 * @param costoTotal
 	 * @param productosOrdenados
 	 * @param cliente
 	 */
-	public Orden(@JsonProperty(value = "id")Long id, @JsonProperty(value = "costoTotal") Double costoTotal, @JsonProperty(value = "productosOrdenados")List<Pedido> pedidosOrdenados, @JsonProperty(value = "cliente")Cliente cliente)
+	public Orden(@JsonProperty(value = "id")Long id,
+			@JsonProperty(value = "costoTotal") Double costoTotal,
+			@JsonProperty(value = "productosOrdenados")List<Pedido> pedidosOrdenados,
+			@JsonProperty(value = "cliente")Cliente cliente,
+			@JsonProperty(value = "esConfirmada")Boolean esConfirmada)
 	{
 		this.id = id;
 		this.costoTotal = costoTotal;
 		this.pedidosOrdenados = pedidosOrdenados;
 		this.cliente = cliente;
+		this.esConfirmada = esConfirmada;
 	}
 	/**
 	 * Método que obtiene el ID de este cliente frecuente.
@@ -76,10 +86,18 @@ public class Orden
 		return this.costoTotal;
 	}
 	/**
+	 * Método que establece el costo total de esta orden.
+	 * @param costoTotal Double, costo total de esta orden.
+	 */
+	public void setCostoTotal(Double costoTotal)
+	{
+		this.costoTotal = costoTotal;
+	}
+	/**
 	 * Método que obtiene la lista de productos ordenados de esta orden.
 	 * @return List<ProductoVos>, Lista de productos Ordenados en esta orden.
 	 */
-	public List<Pedido> getProductosOrdenados()
+	public List<Pedido> getPedidosOrdenados()
 	{
 		return this.pedidosOrdenados;
 	}
@@ -106,5 +124,21 @@ public class Orden
 	public void setCliente(Cliente cliente)
 	{
 		this.cliente = cliente;
+	}
+	/**
+	 * Método que devuelve el estado de confirmación de la Orden.
+	 * @return Boolean, Booleano que determina si la Orden ha sido confirmada o no.
+	 */
+	public Boolean getEsConfirmada()
+	{
+		return this.esConfirmada;
+	}
+	/**
+	 * Método que establece el estado de confirmación de la Orden.
+	 * @param esConfirmada Boolean, Booleano que determina si la Orden ha sido confirmada o no.
+	 */
+	public void setEsConfirmada(Boolean esConfirmada)
+	{
+		this.esConfirmada = esConfirmada;
 	}
 }

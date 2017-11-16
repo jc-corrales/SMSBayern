@@ -1,6 +1,6 @@
 package vos;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 import org.codehaus.jackson.annotate.*;
 
 public class Pedido {
@@ -23,14 +23,18 @@ public class Pedido {
 	 * Atributo que contiene la fecha de este pedido.
 	 */
 	@JsonProperty(value = "fecha")
-	private LocalDateTime fecha;
+	private Date fecha;
 	
 	/**
 	 * Atributo que contiene si este pedido ya ha sido servido o no.
 	 */
 	@JsonProperty(value = "servido")
 	private Boolean servido;
-	
+	/**
+	 * Atributo que contiene el ID del Restaurante al que está asignado el Pedido.
+	 */
+	@JsonProperty(value = "restaurante")
+	private Long idRestaurante;
 
 	/**
 	 * Método constructor de la clase Pedido.
@@ -44,14 +48,16 @@ public class Pedido {
 	public Pedido(@JsonProperty(value = "id") Long id, 
 //			@JsonProperty(value = "cliente") Cliente cliente, 
 			@JsonProperty(value = "producto") Producto producto,
-			@JsonProperty(value = "fecha") LocalDateTime fecha,
-			@JsonProperty(value = "servido") Boolean servido
+			@JsonProperty(value = "fecha") Date fecha,
+			@JsonProperty(value = "servido") Boolean servido,
+			@JsonProperty(value = "idRestaurante") Long idRestaurante
 			) {
 		this.id = id;
 //		this.cliente = cliente;
 		this.producto = producto;
 		this.fecha = fecha; 
 		this.servido = servido;
+		this.idRestaurante = idRestaurante;
 	}
 	/**
 	 * Método que obtiene el ID del pedido.
@@ -85,7 +91,7 @@ public class Pedido {
 	 * Método que obtiene la fecha de este Pedido.
 	 * @return LocalDateTime, fecha del Pedido.
 	 */
-	public LocalDateTime getFecha() {
+	public Date getFecha() {
 		return this.fecha;
 	}
 	/**
@@ -113,7 +119,7 @@ public class Pedido {
 	 * Método que establece la fecha de este Pedido.
 	 * @param fecha LocalDateTime, nueva fecha de este Pedido.
 	 */
-	public void setFecha(LocalDateTime fecha) {
+	public void setFecha(Date fecha) {
 		this.fecha = fecha; 
 	}
 	/**
@@ -124,7 +130,19 @@ public class Pedido {
 		this.servido = servido; 
 	}
 	/**
-	 * Método que obtiene el Restaurante de este pedido.
-	 * @return Restaurante.
+	 * Método que entrega el ID del Restaurante Dueño de este Pedido.
+	 * @return Long, ID del Restaurante dueño de este Pedido.
 	 */
+	public Long getIdRestaurante()
+	{
+		return this.idRestaurante;
+	}
+	/**
+	 * Método que establece el ID del Restaurante dueño de este Pedido.
+	 * @param idRestaurante Long, ID del Restaurante dueño de este Pedido.
+	 */
+	public void setIdRestaurante(Long idRestaurante)
+	{
+		this.idRestaurante = idRestaurante;
+	}
 }

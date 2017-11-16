@@ -466,24 +466,126 @@ public class RotondAndesTM {
 		}
 		return cliente;
 	}
+//	/**
+//	 * M√©todo que emite una Orden con un s√≥lo Pedido.
+//	 * @param id Long, ID del cliente que hace el pedido.
+//	 * @param idProd Long, ID del producto que se pide.
+//	 * @param idRestProd Long, ID del restaurante due√±o del producto que se pide.
+//	 * @return Orden, Orden con toda la informaci√≥n del Pedido.
+//	 * @throws SQLException
+//	 * @throws Exception
+//	 */
+//	public Orden agregarUnaOrdenDeUnPedido(Long id, Long idProd, Long idRestProd) throws SQLException, Exception {
+//		Orden res = null;
+//		DAOTablaPedidos dao = new DAOTablaPedidos();
+//		try {
+//			this.conn = darConexion();
+//			dao.setConn(conn);
+//			Cliente cliente = darCliente(id);
+//			Producto producto = darProducto(idProd, idRestProd);
+//			res = dao.registrarUnPedido(cliente, producto, idRestProd);
+//		}catch (SQLException e) {
+//			System.err.println("SQLException:" + e.getMessage());
+//			e.printStackTrace();
+//			throw e;
+//		} catch (Exception e) {
+//			System.err.println("GeneralException:" + e.getMessage());
+//			e.printStackTrace();
+//			throw e;
+//		}finally {
+//			try {
+//				dao.cerrarRecursos();
+//				if(this.conn!=null)
+//					this.conn.close();
+//			} catch (SQLException exception) {
+//				System.err.println("SQLException closing resources:" + exception.getMessage());
+//				exception.printStackTrace();
+//				throw exception;
+//			}
+//		}
+//		return res;
+//
+//	}
+	//---------------------------------------------------	
+	//	Requerimiento: RF9 Parte 1
+	//---------------------------------------------------
 	/**
-	 * M√©todo que emite una Orden con un s√≥lo Pedido.
-	 * @param id Long, ID del cliente que hace el pedido.
-	 * @param idProd Long, ID del producto que se pide.
-	 * @param idRestProd Long, ID del restaurante due√±o del producto que se pide.
-	 * @return Orden, Orden con toda la informaci√≥n del Pedido.
+	 * MÈtodo que crea una Orden a nombre de un Cliente o Cliente Frecuente.
+	 * @param orden Orden, InformaciÛn de la Orden a crear.
+	 * @return Orden, La Orden recientemente creada.
 	 * @throws SQLException
 	 * @throws Exception
 	 */
-	public Orden agregarUnaOrdenDeUnPedido(Long id, Long idProd, Long idRestProd) throws SQLException, Exception {
-		Orden res = null;
+	public Orden registrarNuevaOrden(Orden orden)throws SQLException, Exception
+	{
 		DAOTablaPedidos dao = new DAOTablaPedidos();
+		DAOTablaUsuarios daoUsuarios = new DAOTablaUsuarios();
 		try {
 			this.conn = darConexion();
 			dao.setConn(conn);
-			Cliente cliente = darCliente(id);
+			daoUsuarios.setConn(conn);
+			//TODO Verificar Cliente
+			daoUsuarios.verficarUsuarioCliente(orden.getCliente().getId());
+			orden = dao.registrarNuevaOrden(orden);
+		}catch (SQLException e) {
+			System.err.println("SQLException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		} catch (Exception e) {
+			System.err.println("GeneralException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		}finally {
+			try {
+				daoUsuarios.cerrarRecursos();
+				dao.cerrarRecursos();
+				if(this.conn!=null)
+					this.conn.close();
+			} catch (SQLException exception) {
+				System.err.println("SQLException closing resources:" + exception.getMessage());
+				exception.printStackTrace();
+				throw exception;
+			}
+		}
+		return orden;
+	}
+	//---------------------------------------------------	
+	//	Requerimiento: RF9 Parte 2
+	//---------------------------------------------------
+	/**
+	 * MÈtodo para registrar un Pedido a una Orden.
+	 * @param id Long, ID del Cliente.
+	 * @param idProd Long, ID del Producto a Ordenar.
+	 * @param idRestProd Long, ID del Restaurante al cual ordenar el Producto.
+	 * @param idOrden Long, ID de la Orden que contendr· el Pedido.
+	 * @return Pedido, toda la informaciÛn del Pedido.
+	 * @throws SQLException
+	 * @throws Exception
+	 */
+	public Pedido registrarPedido(Long id, Long idProd, Long idRestProd, Long idOrden) throws SQLException, Exception {
+		Pedido res = null;
+		DAOTablaPedidos dao = new DAOTablaPedidos();
+		DAOTablaUsuarios daoUsuarios = new DAOTablaUsuarios();
+		try {
+			this.conn = darConexion();
+			dao.setConn(conn);
+			if(!dao.getEstatusOrden(idOrden))
+			{
+				throw new Exception("La Orden con ID: " + idOrden + " ya ha sido confirmada y no puede recibir nuevos Pedidos.");
+			}
+			Orden orden = dao.obtenerOrden(idOrden);
+			if(!orden.getCliente().getId().equals(id))
+			{
+				throw new Exception("La Orden con ID: " + idOrden + " no est· a nombre de este cliente.");
+			}
+			daoUsuarios.setConn(conn);
+			if(!daoUsuarios.verficarUsuarioCliente(id))
+			{
+				throw new Exception ("Informacion de Cliente invalida.");
+			}
 			Producto producto = darProducto(idProd, idRestProd);
-			res = dao.registrarUnPedido(cliente, producto, idRestProd);
+			res = dao.registrarPedido(producto, idOrden, idRestProd);
+			dao.updateCostoTotalOrden(idOrden, res.getProducto().getPrecio());
 		}catch (SQLException e) {
 			System.err.println("SQLException:" + e.getMessage());
 			e.printStackTrace();
@@ -506,8 +608,70 @@ public class RotondAndesTM {
 		return res;
 
 	}
-
-	public void despacharPedido(Long idPed) throws SQLException, Exception {
+	//---------------------------------------------------	
+	//	Requerimiento: RF9 Parte 3
+	//---------------------------------------------------
+	/**
+	 * MÈtodo para Confirmar una Orden.
+	 * @param idOrden Long, ID de la Orden a confirmar.
+	 * @param idCliente Long, ID del cliente dueÒo de la Orden.
+	 * @return Boolean, Booleano que determina si la transacciÛn fue exitosa o no.
+	 * @throws SQLException
+	 * @throws Exception
+	 */
+	public Boolean confirmarOrden(Long idOrden, Long idCliente) throws SQLException, Exception
+	{
+		Boolean respuesta = false;
+		DAOTablaUsuarios daoUsuarios = new DAOTablaUsuarios();
+		DAOTablaPedidos dao = new DAOTablaPedidos();
+		try {
+			this.conn = darConexion();
+			dao.setConn(conn);
+			daoUsuarios.setConn(conn);
+			if(!daoUsuarios.verficarUsuarioCliente(idCliente))
+			{
+				throw new Exception("El Cliente es incorrecto");
+			}
+			Orden orden = dao.obtenerOrden(idOrden);
+			if(!orden.getCliente().getId().equals(idCliente)) {
+				throw new Exception("El Cliente con ID: " + idCliente + " no es dueÒo de la orden con ID: " + idOrden);
+			}
+			respuesta = dao.confirmarOrden(idOrden);
+		}catch (SQLException e) {
+			System.err.println("SQLException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		} catch (Exception e) {
+			System.err.println("GeneralException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		}finally {
+			try {
+				daoUsuarios.cerrarRecursos();
+				dao.cerrarRecursos();
+				if(this.conn!=null)
+					this.conn.close();
+			} catch (SQLException exception) {
+				System.err.println("SQLException closing resources:" + exception.getMessage());
+				exception.printStackTrace();
+				throw exception;
+			}
+		}
+		return respuesta;
+	}
+	
+	
+	//---------------------------------------------------	
+	//	Requerimiento: RF10
+	//---------------------------------------------------
+	/**
+	 * MÈtodo que marca un Pedido como entregado.
+	 * @param idPed Long, ID del Pedido a marcar como Entregado.
+	 * @throws SQLException
+	 * @throws Exception
+	 */
+	public void despacharPedido(Long idPed) throws SQLException, Exception
+	{
 		DAOTablaPedidos dao = new DAOTablaPedidos();
 		try {
 			this.conn = darConexion();
@@ -533,7 +697,6 @@ public class RotondAndesTM {
 				throw exception;
 			}
 		}
-
 	}
 
 	public List<Producto> darProductos() throws SQLException, Exception {
@@ -854,6 +1017,9 @@ public class RotondAndesTM {
 		}
 		return respuesta;
 	}
+	//---------------------------------------------------	
+	//	Requerimiento: RF17
+	//---------------------------------------------------
 	/**
 	 * M√©todo que cancela un Pedido ordenado. El Pedido debe no estar servido para que sea v√°lido.
 	 * @param idPedido ID del pedido a cancelar.
@@ -867,7 +1033,6 @@ public class RotondAndesTM {
 			this.conn = darConexion();
 			daoPedidos.setConn(conn);
 			daoPedidos.cancelarPedido(idPedido);
-			
 		}catch (SQLException e) {
 			System.err.println("SQLException:" + e.getMessage());
 			e.printStackTrace();
