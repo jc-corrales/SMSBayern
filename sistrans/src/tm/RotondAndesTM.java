@@ -521,6 +521,7 @@ public class RotondAndesTM {
 		DAOTablaPedidos dao = new DAOTablaPedidos();
 		DAOTablaUsuarios daoUsuarios = new DAOTablaUsuarios();
 		try {
+			conn.setAutoCommit(false);
 			this.conn = darConexion();
 			dao.setConn(conn);
 			daoUsuarios.setConn(conn);
@@ -537,6 +538,7 @@ public class RotondAndesTM {
 			throw e;
 		}finally {
 			try {
+				conn.setAutoCommit(true);
 				daoUsuarios.cerrarRecursos();
 				dao.cerrarRecursos();
 				if(this.conn!=null)
@@ -783,6 +785,7 @@ public class RotondAndesTM {
 
 		DAOTablaZonas dao = new DAOTablaZonas();
 		try {
+			conn.setAutoCommit(false);
 			this.conn = darConexion();
 			dao.setConn(conn);	
 
@@ -798,6 +801,7 @@ public class RotondAndesTM {
 			throw e;
 		}finally {
 			try {
+				conn.setAutoCommit(true);
 				dao.cerrarRecursos();
 				if(this.conn!=null)
 					this.conn.close();
@@ -1066,6 +1070,7 @@ public class RotondAndesTM {
 		Producto respuesta;
 		DAOTablaProductos daoProductos = new DAOTablaProductos();
 		try {
+			conn.setAutoCommit(false);
 			this.conn = darConexion();
 			daoProductos.setConn(conn);
 			respuesta = daoProductos.agregarProductoSinEquivalencias(idRestaurante, producto);
@@ -1080,6 +1085,7 @@ public class RotondAndesTM {
 			throw e;
 		}finally {
 			try {
+				conn.setAutoCommit(true);
 				daoProductos.cerrarRecursos();
 				if(this.conn!=null)
 					this.conn.close();
@@ -1104,6 +1110,7 @@ public class RotondAndesTM {
 		DAOTablaProductos daoProductos = new DAOTablaProductos();
 		DAOTablaUsuarios daoUsuarios = new DAOTablaUsuarios();
 		try {
+			conn.setAutoCommit(false);
 			this.conn = darConexion();
 			daoProductos.setConn(conn);
 			daoUsuarios.setConn(conn);
@@ -1139,6 +1146,7 @@ public class RotondAndesTM {
 			throw e;
 		}finally {
 			try {
+				conn.setAutoCommit(true);
 				daoUsuarios.cerrarRecursos();
 				daoProductos.cerrarRecursos();
 				if(this.conn!=null)
@@ -1311,6 +1319,7 @@ public class RotondAndesTM {
 		Menu respuesta;
 		DAOTablaRestaurantes daoRestaurantes = new DAOTablaRestaurantes();
 		try {
+			conn.setAutoCommit(false);
 			this.conn = darConexion();
 			daoRestaurantes.setConn(conn);
 			Producto entrada;
@@ -1379,6 +1388,7 @@ public class RotondAndesTM {
 			throw e;
 		}finally {
 			try {
+				conn.setAutoCommit(true);
 				daoRestaurantes.cerrarRecursos();
 				if(this.conn!=null)
 					this.conn.close();
@@ -1409,6 +1419,7 @@ public class RotondAndesTM {
 		DAOTablaRestaurantes daoRestaurantes = new DAOTablaRestaurantes();
 		DAOTablaUsuarios daoUsuarios = new DAOTablaUsuarios();
 		try {
+			conn.setAutoCommit(false);
 			this.conn = darConexion();
 			daoRestaurantes.setConn(conn);
 			daoUsuarios.setConn(conn);
@@ -1430,6 +1441,7 @@ public class RotondAndesTM {
 			throw e;
 		}finally {
 			try {
+				conn.setAutoCommit(true);
 				daoUsuarios.cerrarRecursos();
 				daoRestaurantes.cerrarRecursos();
 				if(this.conn!=null)
@@ -1453,6 +1465,7 @@ public class RotondAndesTM {
 	{
 		DAOTablaUsuarios daoUsuarios = new DAOTablaUsuarios();
 		try {
+			conn.setAutoCommit(false);
 			this.conn = darConexion();
 			daoUsuarios.setConn(conn);
 			cliente = daoUsuarios.registrarClienteFrecuente(cliente);
@@ -1467,6 +1480,7 @@ public class RotondAndesTM {
 			throw e;
 		}finally {
 			try {
+				conn.setAutoCommit(true);
 				daoUsuarios.cerrarRecursos();
 				if(this.conn!=null)
 					this.conn.close();
@@ -1492,8 +1506,8 @@ public class RotondAndesTM {
 	{
 		DAOTablaUsuarios daoUsuarios = new DAOTablaUsuarios();
 		try {
-			this.conn = darConexion();
 			conn.setAutoCommit(false);
+			this.conn = darConexion();
 			daoUsuarios.setConn(conn);
 			cliente = daoUsuarios.registrarCliente(cliente);
 			
