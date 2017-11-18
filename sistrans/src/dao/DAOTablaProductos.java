@@ -211,8 +211,7 @@ public class DAOTablaProductos {
 	 */
 	public Producto agregarProductoSinEquivalencias(Long idRestaurante, Producto producto)throws SQLException, Exception
 	{
-		conn.setAutoCommit(false);
-		//Agregar información para el Producto base.
+		//Agregar informaci�n para el Producto base.
 		String sqlComprobar = "SELECT * FROM PRODUCTOS WHERE ID = " + producto.getId();
 		
 		PreparedStatement prepComprobar = conn.prepareStatement(sqlComprobar);
@@ -230,7 +229,7 @@ public class DAOTablaProductos {
 			prepStmt.executeQuery();
 		}
 
-		//Agregar información para Restaurante_Producto (Lo específico para el Restaurante)
+		//Agregar informaci�n para Restaurante_Producto (Lo específico para el Restaurante)
 		String sql2 = "INSERT INTO PRODUCTO_RESTAURANTE (ID_PROD, ID_REST, PRECIO, COSTO_PRODUCCION, CANTIDAD)\r\n" + 
 				"    VALUES (" + producto.getId()+", "+ idRestaurante +", "+ producto.getPrecio()+", "+producto.getCostoDeProduccion()+", "+producto.getCantidad()+")\r\n";
 		
@@ -258,9 +257,6 @@ public class DAOTablaProductos {
 //				prepStmt4.executeQuery();
 //			}
 //		}
-		
-		conn.commit();
-		conn.setAutoCommit(true);
 		return producto;
 	}
 

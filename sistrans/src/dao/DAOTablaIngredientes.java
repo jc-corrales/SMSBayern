@@ -94,14 +94,12 @@ public class DAOTablaIngredientes {
 	
 	public Ingrediente agregarIngredienteSinEquivalentes(Ingrediente ingrediente)throws SQLException, Exception
 	{
-		conn.setAutoCommit(false);
 		String sql = "INSERT INTO INGREDIENTES (ID, NAME, DESCRIPCION, DESCRIPTION, CANTIDAD_DISPONIBLE)\r\n" + 
 				"    VALUES(" + ingrediente.getId()+ ", '" + ingrediente.getName() + "', '" + ingrediente.getDescripcion() + "', '" + ingrediente.getdescription() + "', " + ingrediente.getCantidadDisponible() + ")";
 		PreparedStatement st = conn.prepareStatement(sql);
 		recursos.add(st);
 		st.executeQuery();
 		
-		conn.setAutoCommit(true);
 		return ingrediente;
 	}
 	

@@ -521,8 +521,8 @@ public class RotondAndesTM {
 		DAOTablaPedidos dao = new DAOTablaPedidos();
 		DAOTablaUsuarios daoUsuarios = new DAOTablaUsuarios();
 		try {
-			conn.setAutoCommit(false);
 			this.conn = darConexion();
+			conn.setAutoCommit(false);
 			dao.setConn(conn);
 			daoUsuarios.setConn(conn);
 			//TODO Verificar Cliente
@@ -571,6 +571,8 @@ public class RotondAndesTM {
 		try {
 			this.conn = darConexion();
 			dao.setConn(conn);
+			daoUsuarios.setConn(conn);
+//			conn.setAutoCommit(false);
 			if(!dao.getEstatusOrden(idOrden))
 			{
 				throw new Exception("La Orden con ID: " + idOrden + " ya ha sido confirmada y no puede recibir nuevos Pedidos.");
@@ -580,7 +582,7 @@ public class RotondAndesTM {
 			{
 				throw new Exception("La Orden con ID: " + idOrden + " no est· a nombre de este cliente.");
 			}
-			daoUsuarios.setConn(conn);
+			
 			if(!daoUsuarios.verficarUsuarioCliente(id))
 			{
 				throw new Exception ("Informacion de Cliente invalida.");
@@ -598,6 +600,8 @@ public class RotondAndesTM {
 			throw e;
 		}finally {
 			try {
+//				conn.setAutoCommit(true);
+				daoUsuarios.cerrarRecursos();
 				dao.cerrarRecursos();
 				if(this.conn!=null)
 					this.conn.close();
@@ -785,10 +789,10 @@ public class RotondAndesTM {
 
 		DAOTablaZonas dao = new DAOTablaZonas();
 		try {
-			conn.setAutoCommit(false);
 			this.conn = darConexion();
+			conn.setAutoCommit(false);
 			dao.setConn(conn);	
-
+			
 			dao.addZona(zona);
 
 		}catch (SQLException e) {
@@ -1035,8 +1039,10 @@ public class RotondAndesTM {
 		DAOTablaPedidos daoPedidos = new DAOTablaPedidos();
 		try {
 			this.conn = darConexion();
+			conn.setAutoCommit(false);
 			daoPedidos.setConn(conn);
 			daoPedidos.cancelarPedido(idPedido);
+			conn.commit();
 		}catch (SQLException e) {
 			System.err.println("SQLException:" + e.getMessage());
 			e.printStackTrace();
@@ -1047,7 +1053,7 @@ public class RotondAndesTM {
 			throw e;
 		}finally {
 			try {
-
+				conn.setAutoCommit(true);
 				daoPedidos.cerrarRecursos();
 				if(this.conn!=null)
 					this.conn.close();
@@ -1058,6 +1064,9 @@ public class RotondAndesTM {
 			}
 		}
 	}
+	//---------------------------------------------------	
+	//	Requerimiento: RF4
+	//---------------------------------------------------
 	/**
 	 * M√©todo para agregar un nuevo producto sin sus equivalencias.
 	 * @param idRestaurante Long, ID del restaurante due√±o de este producto.
@@ -1070,11 +1079,11 @@ public class RotondAndesTM {
 		Producto respuesta;
 		DAOTablaProductos daoProductos = new DAOTablaProductos();
 		try {
-			conn.setAutoCommit(false);
 			this.conn = darConexion();
+			conn.setAutoCommit(false);
 			daoProductos.setConn(conn);
 			respuesta = daoProductos.agregarProductoSinEquivalencias(idRestaurante, producto);
-			
+			conn.commit();
 		}catch (SQLException e) {
 			System.err.println("SQLException:" + e.getMessage());
 			e.printStackTrace();
@@ -1110,10 +1119,10 @@ public class RotondAndesTM {
 		DAOTablaProductos daoProductos = new DAOTablaProductos();
 		DAOTablaUsuarios daoUsuarios = new DAOTablaUsuarios();
 		try {
-			conn.setAutoCommit(false);
 			this.conn = darConexion();
 			daoProductos.setConn(conn);
 			daoUsuarios.setConn(conn);
+			conn.setAutoCommit(false);
 			if(!daoUsuarios.verficarUsuarioRepresentante(idRepresentante, password, idRestaurante))
 			{
 				throw new Exception("Error en la verificaciÛn del Representante");
@@ -1175,8 +1184,9 @@ public class RotondAndesTM {
 		try {
 			this.conn = darConexion();
 			daoIngredientes.setConn(conn);
+			conn.setAutoCommit(false);
 			respuesta = daoIngredientes.agregarIngredienteSinEquivalentes(ingrediente);
-			
+			conn.commit();
 		}catch (SQLException e) {
 			System.err.println("SQLException:" + e.getMessage());
 			e.printStackTrace();
@@ -1187,6 +1197,7 @@ public class RotondAndesTM {
 			throw e;
 		}finally {
 			try {
+				conn.setAutoCommit(true);
 				daoIngredientes.cerrarRecursos();
 				if(this.conn!=null)
 					this.conn.close();
@@ -1319,8 +1330,8 @@ public class RotondAndesTM {
 		Menu respuesta;
 		DAOTablaRestaurantes daoRestaurantes = new DAOTablaRestaurantes();
 		try {
-			conn.setAutoCommit(false);
 			this.conn = darConexion();
+//			conn.setAutoCommit(false);
 			daoRestaurantes.setConn(conn);
 			Producto entrada;
 			Producto platoFuerte;
@@ -1378,6 +1389,7 @@ public class RotondAndesTM {
 				menu.setAcompaniamiento(acompaniamiento);
 			}
 			respuesta = daoRestaurantes.registrarMenu(idRestaurante, menu);
+//			conn.commit();
 		}catch (SQLException e) {
 			System.err.println("SQLException:" + e.getMessage());
 			e.printStackTrace();
@@ -1388,7 +1400,7 @@ public class RotondAndesTM {
 			throw e;
 		}finally {
 			try {
-				conn.setAutoCommit(true);
+//				conn.setAutoCommit(true);
 				daoRestaurantes.cerrarRecursos();
 				if(this.conn!=null)
 					this.conn.close();
@@ -1419,7 +1431,7 @@ public class RotondAndesTM {
 		DAOTablaRestaurantes daoRestaurantes = new DAOTablaRestaurantes();
 		DAOTablaUsuarios daoUsuarios = new DAOTablaUsuarios();
 		try {
-			conn.setAutoCommit(false);
+//			conn.setAutoCommit(false);
 			this.conn = darConexion();
 			daoRestaurantes.setConn(conn);
 			daoUsuarios.setConn(conn);
@@ -1441,7 +1453,7 @@ public class RotondAndesTM {
 			throw e;
 		}finally {
 			try {
-				conn.setAutoCommit(true);
+//				conn.setAutoCommit(true);
 				daoUsuarios.cerrarRecursos();
 				daoRestaurantes.cerrarRecursos();
 				if(this.conn!=null)
@@ -1454,6 +1466,9 @@ public class RotondAndesTM {
 		}
 		return respuesta;
 	}
+	//---------------------------------------------------	
+	//	Requerimiento: RF2
+	//---------------------------------------------------
 	/**
 	 * M√©todo que agrega un Cliente Frecuente.
 	 * @param cliente ClienteFrecuente, informaci√≥n del cliente a agregar.
@@ -1465,11 +1480,11 @@ public class RotondAndesTM {
 	{
 		DAOTablaUsuarios daoUsuarios = new DAOTablaUsuarios();
 		try {
-			conn.setAutoCommit(false);
 			this.conn = darConexion();
+			conn.setAutoCommit(false);
 			daoUsuarios.setConn(conn);
 			cliente = daoUsuarios.registrarClienteFrecuente(cliente);
-			
+			conn.commit();
 		}catch (SQLException e) {
 			System.err.println("SQLException:" + e.getMessage());
 			e.printStackTrace();
@@ -1493,11 +1508,11 @@ public class RotondAndesTM {
 		return cliente;
 	}
 	//---------------------------------------------------	
-	//	Requerimiento: RF2
+	//	Requerimiento: RF1
 	//---------------------------------------------------
 	/**
 	 * MÈtodo que agrega un Cliente.
-	 * @param cliente ClienteFrecuente, informaci√≥n del cliente a agregar.
+	 * @param cliente Cliente, informaciÛn del cliente a agregar.
 	 * @return ClienteFrecuente, informaci√≥n del cliente agregado.
 	 * @throws SQLException
 	 * @throws Exception
@@ -1506,11 +1521,11 @@ public class RotondAndesTM {
 	{
 		DAOTablaUsuarios daoUsuarios = new DAOTablaUsuarios();
 		try {
-			conn.setAutoCommit(false);
 			this.conn = darConexion();
+			conn.setAutoCommit(false);
 			daoUsuarios.setConn(conn);
 			cliente = daoUsuarios.registrarCliente(cliente);
-			
+			conn.commit();
 		}catch (SQLException e) {
 			System.err.println("SQLException:" + e.getMessage());
 			e.printStackTrace();
@@ -1551,7 +1566,7 @@ public class RotondAndesTM {
 			conn.setAutoCommit(false);
 			daoUsuarios.setConn(conn);
 			respuesta = daoUsuarios.registrarAdministrador(id, password);
-			
+			conn.commit();
 		}catch (SQLException e) {
 			System.err.println("SQLException:" + e.getMessage());
 			e.printStackTrace();
@@ -1562,8 +1577,8 @@ public class RotondAndesTM {
 			throw e;
 		}finally {
 			try {
-				daoUsuarios.cerrarRecursos();
 				conn.setAutoCommit(true);
+				daoUsuarios.cerrarRecursos();
 				if(this.conn!=null)
 					this.conn.close();
 			} catch (SQLException exception) {

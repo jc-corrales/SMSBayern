@@ -44,7 +44,8 @@ public class ClienteFrecuente extends Cliente
 	 * @param nombre String, nombre del cliente.
 	 */
 	public ClienteFrecuente(@JsonProperty(value = "preferencias")List<ProductoBase> preferencias, 
-			@JsonProperty(value="contrasenia")String contrasenia,@JsonProperty(value="id")Long id, 
+			@JsonProperty(value="contrasenia")String contrasenia,
+			@JsonProperty(value="id")Long id, 
 			@JsonProperty(value = "mesa")Long mesa, 
 			@JsonProperty(value = "nombre")String nombre,
 			@JsonProperty(value = "ordenes") List<Orden> ordenes)
