@@ -22,6 +22,7 @@ import vos.ClienteFrecuente;
 import vos.ConsumoCliente;
 import vos.Orden;
 import vos.Pedido;
+import vos.PedidoDeMenu;
 
 
 
@@ -36,7 +37,8 @@ public class ClienteResorce {
 	@XmlRootElement
 	public static class RequestBody {
 	    @XmlElement public Long idProd;
-	    @XmlElement public Long idRestProd;
+	    @XmlElement public Long idRestaurante;
+	    @XmlElement public Long idMenu;
 	}
 	
 	
@@ -61,10 +63,32 @@ public class ClienteResorce {
 	@POST
 	@Path("{id: \\d+}/ordenes/{idOrden: \\d+}/pedidos")
 	@Produces( { MediaType.APPLICATION_JSON } )
-	public Response agregarPedido(@PathParam("id") Long id, @PathParam("idOrden")Long idOrden, RequestBody request) {
+	public Response agregarPedidoProducto(@PathParam("id") Long id, @PathParam("idOrden")Long idOrden, RequestBody request) {
 		RotondAndesTM tm = new RotondAndesTM(getPath());
 		try {
-			Pedido pedido = tm.registrarPedido(id, request.idProd, request.idRestProd, idOrden);
+			Pedido pedido = tm.registrarPedido(id, request.idProd, request.idRestaurante, idOrden);
+			 
+			return Response.status( 200 ).entity( pedido ).build();	
+		}catch( Exception e )
+		{
+			return Response.status( 500 ).entity( doErrorMessage( e ) ).build( );
+		}
+	}
+	
+	/**
+	 * Método que ordena un Pedido de Menú, asignándolo a una Orden previamente existente.
+	 * @param id Long, ID del cliente.
+	 * @param idOrden Long, ID de la Orden a la cual asignar el Pedido.
+	 * @param request RequestBody
+	 * @return Pedido, información del Pedido recientemente creado.
+	 */
+	@POST
+	@Path("{id: \\d+}/ordenes/{idOrden: \\d+}/menus")
+	@Produces( { MediaType.APPLICATION_JSON } )
+	public Response agregarPedidoMenu(@PathParam("id") Long id, @PathParam("idOrden")Long idOrden, RequestBody request) {
+		RotondAndesTM tm = new RotondAndesTM(getPath());
+		try {
+			PedidoDeMenu pedido = tm.registrarPedidoMenu(id, request.idMenu, request.idRestaurante, idOrden);
 			 
 			return Response.status( 200 ).entity( pedido ).build();	
 		}catch( Exception e )

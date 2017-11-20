@@ -449,4 +449,67 @@ public class DAOTablaProductos {
 		}
 		return ids;
 	}
+	
+	/**
+	 * Método que obtiene un Menú con sus productos.
+	 * @param id Long, ID del Menú.
+	 * @param idRest Long, ID del Restaurante.
+	 * @return Menu, Información del Menú.
+	 * @throws SQLException
+	 * @throws Exception
+	 */
+	public Menu darMenu(Long id, Long idRest) throws SQLException, Exception
+	{
+
+		String sqlMenuPorId = "SELECT * FROM MENUS WHERE ID = " + id + " AND ID_RESTAURANTE = " + idRest; 
+		PreparedStatement stMenuPorId = conn.prepareStatement(sqlMenuPorId);
+		recursos.add(stMenuPorId);
+		ResultSet rs = stMenuPorId.executeQuery();
+		if(!rs.next())
+		{
+			throw new Exception("El menú con ID: " + id + " y que pertenece al Restaurante con ID: " + idRest + " no existe.");
+		}
+		String name = rs.getString("NAME");
+		String descripcion = rs.getString("DESCRIPCION");
+		String description = rs.getString("DESCRIPTION");
+		Double precio = rs.getDouble("PRECIO");
+		Long idEntrada = rs.getLong("ID_ENTRADA");
+		Long idPlatoFuerte = rs.getLong("ID_PLATOFUERTE");
+		Long idPostre = rs.getLong("ID_POSTRE");
+		Long idBebida = rs.getLong("ID_BEBIDA");
+		Long idAcompaniamiento = rs.getLong("ID_ACOMPANIAMIENTO");
+		Producto entrada = null;
+		Producto platoFuerte = null;
+		Producto postre = null;
+		Producto bebida = null;
+		Producto acompaniamiento = null;
+		Double costoProduccion = (double) 0;
+		if(idEntrada != null)
+		{
+			entrada = darProducto(rs.getLong("ID_ENTRADA"),idRest);
+			costoProduccion += entrada.getCostoDeProduccion();
+		}
+		if(idPlatoFuerte != null)
+		{
+			platoFuerte = darProducto(idPlatoFuerte,idRest);
+			costoProduccion += platoFuerte.getCostoDeProduccion();
+		}
+		if(idPostre != null)
+		{
+			postre = darProducto(idPostre,idRest);
+			costoProduccion += postre.getCostoDeProduccion();
+		}
+		if(idBebida != null)
+		{
+			bebida = darProducto(idBebida,idRest);
+			costoProduccion += bebida.getCostoDeProduccion();
+		}
+		if(idAcompaniamiento != null)
+		{
+			acompaniamiento = darProducto(idAcompaniamiento,idRest);
+			costoProduccion += acompaniamiento.getCostoDeProduccion();
+		}
+		Menu menu = new Menu(idRest, name, costoProduccion, descripcion, description, precio, entrada, platoFuerte, bebida, postre, acompaniamiento);
+		return menu;
+	}
 }

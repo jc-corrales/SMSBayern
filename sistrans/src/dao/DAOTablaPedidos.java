@@ -13,10 +13,13 @@ import java.util.Date;
 
 import vos.Cliente;
 import vos.EstadisticasPedidos;
+import vos.Menu;
 import vos.Orden;
 import vos.Pedido;
+import vos.PedidoDeMenu;
 import vos.Producto;
 import vos.Restaurante;
+import vos.TipoComida;
 
 public class DAOTablaPedidos {
 	/**
@@ -57,13 +60,29 @@ public class DAOTablaPedidos {
 	}
 
 	/**
-	 * 
-	 * @return Long
+	 * Método que obtiene el siguiente ID en la tabla Pedidos.
+	 * @return Long ID siguiente disponible.
 	 * @throws SQLException
 	 * @throws Exception
 	 */
-	public Long darIdMax() throws SQLException, Exception {
+	public Long darIdPedidosMax() throws SQLException, Exception {
 		String sql = "SELECT * FROM PEDIDOS WHERE ROWNUM = 1 ORDER BY ID DESC";
+
+		PreparedStatement prepStmt = conn.prepareStatement(sql);
+		recursos.add(prepStmt);
+		ResultSet rs = prepStmt.executeQuery();
+		if(rs.next())
+			return rs.getLong("ID") + 1;
+		return 0L;
+	}
+	/**
+	 * Método que obtiene el siguiente ID en la tabla Menus_Pedidos.
+	 * @return Long, ID siguiente disponible.
+	 * @throws SQLException
+	 * @throws Exception
+	 */
+	public Long darIdPedidosMenuMax() throws SQLException, Exception {
+		String sql = "SELECT * FROM MENUS_PEDIDOS WHERE ROWNUM = 1 ORDER BY ID DESC";
 
 		PreparedStatement prepStmt = conn.prepareStatement(sql);
 		recursos.add(prepStmt);
@@ -85,7 +104,7 @@ public class DAOTablaPedidos {
 	 */
 	public Pedido registrarPedido(Producto producto, Long idOrden, Long idRest) throws SQLException, Exception{
 //		System.out.println("Entro metodo registrarPedido");
-		Long id =  darIdMax();	
+		Long id =  darIdPedidosMax();	
 		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 		LocalDateTime localDate = LocalDateTime.now();
 		Date fecha = Date.from(localDate.atZone(ZoneId.systemDefault()).toInstant());
@@ -132,7 +151,45 @@ public class DAOTablaPedidos {
 		
 		return new Pedido(id, producto, fecha, false, idRest);
 	}
-
+	/**
+	 * Método que registra el Pedido de un Menú
+	 * @param id Long, ID del Pedido de Menú a registrar.
+	 * @param menu Menu, Información del Menú a registrar.
+	 * @param idOrden Long, ID de la Orden bajo la cual va a estar asignado este Pedido.
+	 * @return PedidoDeMenu, Información del Pedido de Menu efectuado.
+	 * @throws SQLException
+	 * @throws Exception
+	 */
+	public PedidoDeMenu registrarPedidoMenu(Menu menu, Long idOrden, Long idRestaurante) throws SQLException, Exception
+	{
+		String sql = "INSERT INTO MENUS_PEDIDOS (ID, IDMENU, IDORDEN) VALUES (" + darIdPedidosMenuMax() + ", " + menu.getId() + ", " + idOrden + ")";
+		PreparedStatement prepStmt= conn.prepareStatement(sql);
+		System.out.println("SQL: " +sql);
+		recursos.add(prepStmt);
+		prepStmt.executeQuery();
+		PedidoDeMenu pedido = new PedidoDeMenu(idOrden, menu);
+		if(menu.getAcompaniamiento() != null)
+		{
+			registrarPedido(menu.getAcompaniamiento(), idOrden, idRestaurante);
+		}
+		if(menu.getEntrada() != null)
+		{
+			registrarPedido(menu.getEntrada(), idOrden, idRestaurante);
+		}
+		if(menu.getPlatoFuerte() != null)
+		{
+			registrarPedido(menu.getPlatoFuerte(), idOrden, idRestaurante);
+		}
+		if(menu.getPostre() != null)
+		{
+			registrarPedido(menu.getPostre(), idOrden, idRestaurante);
+		}
+		if(menu.getBebida() != null)
+		{
+			registrarPedido(menu.getBebida(), idOrden, idRestaurante);
+		}
+		return pedido;
+	}
 	/**
 	 * Método que despacha un pedido.
 	 * @param idPed ID del Pedido a despachar.
@@ -409,7 +466,7 @@ public class DAOTablaPedidos {
 		cliente.setId(rs.getLong("ID_CLIENTE"));
 		Boolean esConfirmada = rs.getBoolean("ES_CONFIRMADA");
 		Double costoTotal = rs.getDouble("COSTOTOTAL");
-		Orden orden = new Orden(id, costoTotal, obtenerPedidosDeOrden(idOrden), cliente, esConfirmada);
+		Orden orden = new Orden(id, costoTotal, obtenerProductosPedidosDeOrden(idOrden), cliente, esConfirmada, obtenerMenusPedidosDeOrden(idOrden));
 		return orden;
 	}
 	
@@ -420,7 +477,7 @@ public class DAOTablaPedidos {
 	 * @throws SQLException
 	 * @throws Exception
 	 */
-	public List<Pedido> obtenerPedidosDeOrden(Long idOrden)throws SQLException, Exception
+	public List<Pedido> obtenerProductosPedidosDeOrden(Long idOrden)throws SQLException, Exception
 	{
 		List<Pedido> respuesta = new ArrayList<Pedido>();
 		String sql = "SELECT * FROM PEDIDOS WHERE ID_ORDEN = " + idOrden;
@@ -441,6 +498,46 @@ public class DAOTablaPedidos {
 		}
 		return respuesta;
 	}
+	
+	/**
+	 * Método que obtiene los Menús Pedidos en una Orden dado el ID de la ORden.
+	 * @param idOrden Long, ID de la Orden.
+	 * @return List<PedidoDeMenu>, Lista con los menús Pedidos en esta Orden.
+	 * @throws SQLException
+	 * @throws Exception
+	 */
+	public List<PedidoDeMenu> obtenerMenusPedidosDeOrden(Long idOrden)throws SQLException, Exception
+	{
+		List<PedidoDeMenu> respuesta = new ArrayList<PedidoDeMenu>();
+		String sql = "SELECT * \r\n" + 
+				"    FROM MENUS, MENUS_PEDIDOS\r\n" + 
+				"    WHERE MENUS.ID = Menus_Pedidos.Idmenu AND MENUS_PEDIDOS.IDORDEN = " + idOrden;
+		PreparedStatement prepStmt= conn.prepareStatement(sql);
+		recursos.add(prepStmt);
+		ResultSet rs = prepStmt.executeQuery();
+		
+		while(rs.next())
+		{
+			Long id = rs.getLong("ID");
+			Long idRestaurante = rs.getLong("ID_RESTAURANTE");
+			String name = rs.getString("NAME");
+			String descripcion = rs.getString("Descripcion");
+			String description = rs.getString("Description");
+			Double precio = rs.getDouble("PRECIO");
+			Producto entrada = darProducto(rs.getLong("ID_ENTRADA"), idRestaurante);
+			Producto platoFuerte = darProducto(rs.getLong("ID_PLATOFUERTE"), idRestaurante);
+			Producto postre = darProducto(rs.getLong("ID_POSTRE"), idRestaurante);
+			Producto bebida = darProducto(rs.getLong("ID_BEBIDA"), idRestaurante);
+			Producto acompaniamiento = darProducto(rs.getLong("ID_ACOMPANIAMIENTO"), idRestaurante);
+			Double costoProduccion = (entrada.getCostoDeProduccion() + platoFuerte.getCostoDeProduccion() + postre.getCostoDeProduccion() + bebida.getCostoDeProduccion() + acompaniamiento.getCostoDeProduccion());
+			Menu menu = new Menu(idRestaurante, name, costoProduccion, descripcion, description, precio, entrada, platoFuerte, bebida, postre, acompaniamiento);
+			PedidoDeMenu pedido = new PedidoDeMenu(id, menu);
+			respuesta.add(pedido);
+		}
+		return respuesta;
+	}
+	
+	
 	/**
 	 * Método que confirma una Orden, haciendo que ya no se le puedan agregar más pedidos. Aunque si se pueden cancelar.
 	 * @param idOrden Long, ID de la Orden a confirmar.
@@ -472,4 +569,40 @@ public class DAOTablaPedidos {
 		recursos.add(prepStmt2);
 		prepStmt2.executeQuery();
 	}
+	
+	public Producto darProducto(Long id, Long idRest) throws SQLException, Exception {
+		Producto producto = new Producto();
+
+		String sqlProductoPorId = "SELECT * FROM PRODUCTOS, PRODUCTO_RESTAURANTE WHERE ID_PROD = ID AND ID_PROD = " + id + " AND ID_REST =" + idRest; 
+		PreparedStatement stProductoPorId = conn.prepareStatement(sqlProductoPorId);
+		recursos.add(stProductoPorId);
+		ResultSet rs = stProductoPorId.executeQuery();
+		
+		String sqlTipos= "SELECT * FROM TIPOS TIPOS, TIPOPRODUCTO RELACION\r\n" + 
+				"    WHERE Relacion.Id_Prod = " + id + " AND RELACION.ID_TIPO = TIPOS.ID"; 
+		PreparedStatement stTipos = conn.prepareStatement(sqlTipos);
+		recursos.add(stTipos);
+		ResultSet rsTipos = stTipos.executeQuery();
+		List<TipoComida> tipos = new ArrayList<TipoComida>();
+		while(rsTipos.next())
+		{
+			tipos.add(new TipoComida(rsTipos.getLong("ID"), rsTipos.getString("NAME")));
+		}
+		
+		if (rs.next()) {
+			producto.setId(rs.getLong("ID"));
+			producto.setNombre(rs.getString("NAME"));
+			producto.setDescripcionEspaniol(rs.getString("DESCRIPCION"));
+			producto.setDescripcionIngles(rs.getString("DESCRIPTION"));
+			producto.setCategoria(rs.getString("CATEGORIA"));
+			producto.setCostoDeProduccion(rs.getDouble("COSTO_PRODUCCION"));
+			producto.setPrecio(rs.getDouble("PRECIO"));
+			producto.setProductosEquivalentes(null);
+			producto.setCantidad(rs.getInt("CANTIDAD"));
+			producto.setTiposComida(tipos);
+			return producto;
+		}
+		return null;
+	}
+	
 }

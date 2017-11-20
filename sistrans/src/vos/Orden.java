@@ -33,6 +33,16 @@ public class Orden
 	@JsonProperty(value = "pedidosOrdenados")
 	private List<Pedido> pedidosOrdenados;
 	/**
+	 * Atributo que contiene los menús ordenados.
+	 * Nota: Este atributo solo contiene el hecho de que el menú
+	 * designado fue ordenado, pero no tiene en cuenta los productos
+	 * del menu y eso, cuando se ordena un menú, se registra que el
+	 * menú fue ordenado, y luego se emiten pedidos para cada
+	 * uno de los productos del menú.
+	 */
+	@JsonProperty(value = "menusOrdenados")
+	private List<PedidoDeMenu> menusOrdenados;
+	/**
 	 * Atributo que contiene el cliente dueño de esta orden.
 	 */
 	@JsonProperty(value = "cliente")
@@ -53,13 +63,15 @@ public class Orden
 			@JsonProperty(value = "costoTotal") Double costoTotal,
 			@JsonProperty(value = "productosOrdenados")List<Pedido> pedidosOrdenados,
 			@JsonProperty(value = "cliente")Cliente cliente,
-			@JsonProperty(value = "esConfirmada")Boolean esConfirmada)
+			@JsonProperty(value = "esConfirmada")Boolean esConfirmada,
+			@JsonProperty(value = "menusOrdenados")List<PedidoDeMenu> menusOrdenados )
 	{
 		this.id = id;
 		this.costoTotal = costoTotal;
 		this.pedidosOrdenados = pedidosOrdenados;
 		this.cliente = cliente;
 		this.esConfirmada = esConfirmada;
+		this.menusOrdenados = menusOrdenados;
 	}
 	/**
 	 * Método que obtiene el ID de este cliente frecuente.
@@ -140,5 +152,21 @@ public class Orden
 	public void setEsConfirmada(Boolean esConfirmada)
 	{
 		this.esConfirmada = esConfirmada;
+	}
+	/**
+	 * Método que obtiene los menús que han sido ordenados.
+	 * @return List<PedidoDeMenu>, lista de pedidos de menús ordenados.
+	 */
+	public List<PedidoDeMenu> getMenusOrdenados()
+	{
+		return menusOrdenados;
+	}
+	/**
+	 * Método que establece los menús que han sido ordenados.
+	 * @param menusOrdenados List<PedidoDeMenu>, nueva lista de pedidos de menús ordenados.
+	 */
+	public void setMenusOrdenados(List<PedidoDeMenu> menusOrdenados)
+	{
+		this.menusOrdenados = menusOrdenados;
 	}
 }

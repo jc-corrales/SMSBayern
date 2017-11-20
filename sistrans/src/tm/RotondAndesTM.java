@@ -38,6 +38,7 @@ import vos.IngredientesSimilares;
 import vos.Menu;
 import vos.Orden;
 import vos.Pedido;
+import vos.PedidoDeMenu;
 import vos.Producto;
 import vos.Representante;
 import vos.Restaurante;
@@ -208,6 +209,81 @@ public class RotondAndesTM {
 			daoIng.setConn(conn);
 			res.setIngredientes(daoIng.darIngredientesProducto(id));
 			System.out.println(" POST-SETINGREDIENTES ingredientes: " + res.getIngredientes().size());
+
+		}catch (SQLException e) {
+			System.err.println("SQLException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		} catch (Exception e) {
+			System.err.println("GeneralException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		} 
+		finally {
+			try {
+				daoProd.cerrarRecursos();
+				daoIng.cerrarRecursos();
+				if(this.conn!=null)
+					this.conn.close();
+			} catch (SQLException exception) {
+				System.err.println("SQLException closing resources:" + exception.getMessage());
+				exception.printStackTrace();
+				throw exception;
+			}
+		}
+
+		return res;
+	}
+	/**
+	 * Método que obtiene un Menú según su ID y el ID del Restaurante dueño.
+	 * @param id Long, ID del producto.
+	 * @param idRest Long, ID del restaurante.
+	 * @return Menu
+	 * @throws SQLException
+	 * @throws Exception
+	 */
+	public Menu darMenu(Long id, Long idRest) throws SQLException, Exception {
+		Menu res;
+		DAOTablaProductos daoProd = new DAOTablaProductos(); 
+		DAOTablaIngredientes daoIng = new DAOTablaIngredientes();
+		try {
+			this.conn = darConexion();
+			daoProd.setConn(conn);
+			res = daoProd.darMenu(id, idRest);
+
+			//INICIO DE LA SEGUNDA PARTE DE LA TRANSACCION
+			daoIng.setConn(conn);
+			if(res.getEntrada() != null)
+			{
+				Producto entrada = res.getAcompaniamiento();
+				entrada.setIngredientes(daoIng.darIngredientesProducto(entrada.getId()));
+				res.setEntrada(entrada);
+			}
+			if(res.getPlatoFuerte() != null)
+			{
+				Producto platoFuerte = res.getAcompaniamiento();
+				platoFuerte.setIngredientes(daoIng.darIngredientesProducto(platoFuerte.getId()));
+				res.setPlatoFuerte(platoFuerte);
+			}
+			if(res.getPostre() != null)
+			{
+				Producto postre = res.getAcompaniamiento();
+				postre.setIngredientes(daoIng.darIngredientesProducto(postre.getId()));
+				res.setPostre(postre);
+			}
+			if(res.getBebida() != null)
+			{
+				Producto bebida = res.getAcompaniamiento();
+				bebida.setIngredientes(daoIng.darIngredientesProducto(bebida.getId()));
+				res.setBebida(bebida);
+			}
+			if(res.getAcompaniamiento() != null)
+			{
+				Producto acompaniamiento = res.getAcompaniamiento();
+				acompaniamiento.setIngredientes(daoIng.darIngredientesProducto(acompaniamiento.getId()));
+				res.setAcompaniamiento(acompaniamiento);
+			}
+			System.out.println("POST Agregar Ingredientes a Productos de Menu.");
 
 		}catch (SQLException e) {
 			System.err.println("SQLException:" + e.getMessage());
@@ -552,7 +628,7 @@ public class RotondAndesTM {
 		return orden;
 	}
 	//---------------------------------------------------	
-	//	Requerimiento: RF9 Parte 2
+	//	Requerimiento: RF9 Parte 2A
 	//---------------------------------------------------
 	/**
 	 * Método para registrar un Pedido a una Orden.
@@ -612,7 +688,69 @@ public class RotondAndesTM {
 			}
 		}
 		return res;
-
+	}
+	//---------------------------------------------------	
+	//	Requerimiento: RF9 Parte 2B
+	//---------------------------------------------------
+	/**
+	 * Método que Registra el Pedido de un Menú.
+	 * @param id Long, ID del Cliente.
+	 * @param idPedido Long, ID del pedido.
+	 * @param idMenu Long, ID del Menú a registar.
+	 * @param idRestMenu Long, ID del Restaurante dueño del menú.
+	 * @param idOrden Long, ID de la Orden a la cual se va a asignar el Pedido.
+	 * @return PedidoDeMenu
+	 * @throws SQLException
+	 * @throws Exception
+	 */
+	public PedidoDeMenu registrarPedidoMenu(Long idCliente, Long idMenu, Long idRestMenu, Long idOrden) throws SQLException, Exception {
+		PedidoDeMenu res = null;
+		DAOTablaPedidos dao = new DAOTablaPedidos();
+		DAOTablaUsuarios daoUsuarios = new DAOTablaUsuarios();
+		try {
+			this.conn = darConexion();
+			dao.setConn(conn);
+			daoUsuarios.setConn(conn);
+//			conn.setAutoCommit(false);
+			if(!dao.getEstatusOrden(idOrden))
+			{
+				throw new Exception("La Orden con ID: " + idOrden + " ya ha sido confirmada y no puede recibir nuevos Pedidos.");
+			}
+			Orden orden = dao.obtenerOrden(idOrden);
+			if(!orden.getCliente().getId().equals(idCliente))
+			{
+				throw new Exception("La Orden con ID: " + idOrden + " no está a nombre de este cliente.");
+			}
+			
+			if(!daoUsuarios.verficarUsuarioCliente(idCliente))
+			{
+				throw new Exception ("Informacion de Cliente invalida.");
+			}
+			Menu menu = darMenu(idOrden, idRestMenu);
+			res = dao.registrarPedidoMenu(menu, idOrden, idRestMenu);
+			dao.updateCostoTotalOrden(idOrden, menu.getPrecio());
+		}catch (SQLException e) {
+			System.err.println("SQLException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		} catch (Exception e) {
+			System.err.println("GeneralException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		}finally {
+			try {
+//				conn.setAutoCommit(true);
+				daoUsuarios.cerrarRecursos();
+				dao.cerrarRecursos();
+				if(this.conn!=null)
+					this.conn.close();
+			} catch (SQLException exception) {
+				System.err.println("SQLException closing resources:" + exception.getMessage());
+				exception.printStackTrace();
+				throw exception;
+			}
+		}
+		return res;
 	}
 	//---------------------------------------------------	
 	//	Requerimiento: RF9 Parte 3
@@ -832,10 +970,6 @@ public class RotondAndesTM {
 			daoZona.setConn(conn);
 			zona = daoZona.darZona(id);
 			System.out.println("after dao ------> " + zona.getId() + " || " + zona.getNombre());
-			if(zona == null)
-			{
-				throw new Exception("NO EXISTE LA ZONA");
-			}
 			//AGREGACIÃ“N DE RESTAURANTES A ZONA
 
 			daoRes.setConn(conn);

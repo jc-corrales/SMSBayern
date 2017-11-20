@@ -6,9 +6,6 @@ import org.codehaus.jackson.annotate.JsonProperty;
 
 public class ProductoBase
 {	
-	
-
-	
 	/**
 	 * Id del producto.
 	 */

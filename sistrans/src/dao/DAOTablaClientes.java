@@ -11,9 +11,12 @@ import java.util.List;
 
 import vos.Cliente;
 import vos.ClienteFrecuente;
+import vos.Menu;
 import vos.Orden;
 import vos.Pedido;
+import vos.PedidoDeMenu;
 import vos.Producto;
+import vos.TipoComida;
 
 public class DAOTablaClientes {
 
@@ -66,7 +69,8 @@ public class DAOTablaClientes {
 				Double costoTotalOrden = rsOrden.getDouble("COSTOTOTAL");
 				Boolean esConfirmada = rsOrden.getBoolean("ES_CONFIRMADA");
 				List<Pedido> pedidos = getPedidosPorClienteSegunOrden(idOrden);
-				ordenes.add( new Orden(idOrden, costoTotalOrden, pedidos ,null, esConfirmada));
+				List<PedidoDeMenu> menusPedidos = obtenerMenusPedidosDeOrden(idOrden);
+				ordenes.add( new Orden(idOrden, costoTotalOrden, pedidos ,null, esConfirmada, menusPedidos));
 			}
 			
 			clientes.add(new Cliente(id, mesa, name, ordenes));
@@ -98,7 +102,7 @@ public class DAOTablaClientes {
 				Long idOrden = rsOrden.getLong("ID");
 				Double costoTotalOrden = rsOrden.getDouble("COSTOTOTAL");
 				Boolean esConfirmada = rsOrden.getBoolean("ES_CONFIRMADA");
-				ordenes.add( new Orden(idOrden, costoTotalOrden, null ,null, esConfirmada));
+				ordenes.add( new Orden(idOrden, costoTotalOrden, null ,null, esConfirmada, null));
 			}
 			
 			
@@ -139,7 +143,8 @@ public class DAOTablaClientes {
 			Double costoTotalOrden = rsOrden.getDouble("COSTOTOTAL");
 			List<Pedido> pedidos = getPedidosPorClienteSegunOrden(idOrden);
 			Boolean esConfirmada = rsOrden.getBoolean("ES_CONFIRMADA");
-			ordenes.add( new Orden(idOrden, costoTotalOrden, pedidos ,null, esConfirmada));
+			List<PedidoDeMenu> menusPedidos = obtenerMenusPedidosDeOrden(idOrden);
+			ordenes.add( new Orden(idOrden, costoTotalOrden, pedidos ,null, esConfirmada, menusPedidos));
 		}
 		clientePorId.setOrdenes(ordenes);
 		return clientePorId;
@@ -192,6 +197,79 @@ public class DAOTablaClientes {
 			respuesta.add(pedido);
 		}
 		return respuesta;
+	}
+	
+	/**
+	 * Método que obtiene los Menús Pedidos en una Orden dado el ID de la ORden.
+	 * @param idOrden Long, ID de la Orden.
+	 * @return List<PedidoDeMenu>, Lista con los menús Pedidos en esta Orden.
+	 * @throws SQLException
+	 * @throws Exception
+	 */
+	private List<PedidoDeMenu> obtenerMenusPedidosDeOrden(Long idOrden)throws SQLException, Exception
+	{
+		List<PedidoDeMenu> respuesta = new ArrayList<PedidoDeMenu>();
+		String sql = "SELECT * \r\n" + 
+				"    FROM MENUS, MENUS_PEDIDOS\r\n" + 
+				"    WHERE MENUS.ID = Menus_Pedidos.Idmenu AND MENUS_PEDIDOS.IDORDEN = " + idOrden;
+		PreparedStatement prepStmt= conn.prepareStatement(sql);
+		recursos.add(prepStmt);
+		ResultSet rs = prepStmt.executeQuery();
+		
+		while(rs.next())
+		{
+			Long id = rs.getLong("ID");
+			Long idRestaurante = rs.getLong("ID_RESTAURANTE");
+			String name = rs.getString("NAME");
+			String descripcion = rs.getString("Descripcion");
+			String description = rs.getString("Description");
+			Double precio = rs.getDouble("PRECIO");
+			Producto entrada = darProducto(rs.getLong("ID_ENTRADA"), idRestaurante);
+			Producto platoFuerte = darProducto(rs.getLong("ID_PLATOFUERTE"), idRestaurante);
+			Producto postre = darProducto(rs.getLong("ID_POSTRE"), idRestaurante);
+			Producto bebida = darProducto(rs.getLong("ID_BEBIDA"), idRestaurante);
+			Producto acompaniamiento = darProducto(rs.getLong("ID_ACOMPANIAMIENTO"), idRestaurante);
+			Double costoProduccion = (entrada.getCostoDeProduccion() + platoFuerte.getCostoDeProduccion() + postre.getCostoDeProduccion() + bebida.getCostoDeProduccion() + acompaniamiento.getCostoDeProduccion());
+			Menu menu = new Menu(idRestaurante, name, costoProduccion, descripcion, description, precio, entrada, platoFuerte, bebida, postre, acompaniamiento);
+			PedidoDeMenu pedido = new PedidoDeMenu(id, menu);
+			respuesta.add(pedido);
+		}
+		return respuesta;
+	}
+	
+	private Producto darProducto(Long id, Long idRest) throws SQLException, Exception {
+		Producto producto = new Producto();
+
+		String sqlProductoPorId = "SELECT * FROM PRODUCTOS, PRODUCTO_RESTAURANTE WHERE ID_PROD = ID AND ID_PROD = " + id + " AND ID_REST =" + idRest; 
+		PreparedStatement stProductoPorId = conn.prepareStatement(sqlProductoPorId);
+		recursos.add(stProductoPorId);
+		ResultSet rs = stProductoPorId.executeQuery();
+		
+		String sqlTipos= "SELECT * FROM TIPOS TIPOS, TIPOPRODUCTO RELACION\r\n" + 
+				"    WHERE Relacion.Id_Prod = " + id + " AND RELACION.ID_TIPO = TIPOS.ID"; 
+		PreparedStatement stTipos = conn.prepareStatement(sqlTipos);
+		recursos.add(stTipos);
+		ResultSet rsTipos = stTipos.executeQuery();
+		List<TipoComida> tipos = new ArrayList<TipoComida>();
+		while(rsTipos.next())
+		{
+			tipos.add(new TipoComida(rsTipos.getLong("ID"), rsTipos.getString("NAME")));
+		}
+		
+		if (rs.next()) {
+			producto.setId(rs.getLong("ID"));
+			producto.setNombre(rs.getString("NAME"));
+			producto.setDescripcionEspaniol(rs.getString("DESCRIPCION"));
+			producto.setDescripcionIngles(rs.getString("DESCRIPTION"));
+			producto.setCategoria(rs.getString("CATEGORIA"));
+			producto.setCostoDeProduccion(rs.getDouble("COSTO_PRODUCCION"));
+			producto.setPrecio(rs.getDouble("PRECIO"));
+			producto.setProductosEquivalentes(null);
+			producto.setCantidad(rs.getInt("CANTIDAD"));
+			producto.setTiposComida(tipos);
+			return producto;
+		}
+		return null;
 	}
 //	/**
 //	 * Método que obtiene el ID del sigueinte Cliente.
