@@ -23,7 +23,7 @@ public class Restaurante {
 	/**
 	 * Atributo que contiene la URL de la página web del Restaurante.
 	 */
-	@JsonProperty(value="paginaWeb")
+	@JsonProperty(value="pagina")
 	private String pagina;
 
 	/**
@@ -53,7 +53,7 @@ public class Restaurante {
 	 */
 	public Restaurante(@JsonProperty(value="id") Long id, 
 			@JsonProperty(value="name") String name, 
-			@JsonProperty(value="paginaWeb") String pagina,
+			@JsonProperty(value="pagina") String pagina,
 			@JsonProperty(value = "productos")List<Producto> productos,
 			@JsonProperty(value = "tipo")TipoComida tipo,
 			@JsonProperty(value = "precio")Double precio

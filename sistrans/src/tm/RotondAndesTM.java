@@ -40,6 +40,7 @@ import vos.Orden;
 import vos.Pedido;
 import vos.PedidoDeMenu;
 import vos.Producto;
+import vos.RegistroVentas;
 import vos.Representante;
 import vos.Restaurante;
 import vos.Zona;
@@ -1799,5 +1800,145 @@ public class RotondAndesTM {
 			}
 		}
 		return productos;
+	}
+	
+	/**
+	 * Método que da el o los Productos más ofrecidos en RotondAndes.
+	 * @return List<Producto>, Lista de Productos más ofrecidos.
+	 * @throws SQLException
+	 * @throws Exception
+	 */
+	public Boolean establecerRegistroVentas(Long id, String password, String fecha, String dia) throws SQLException, Exception
+	{
+		DAOConsumoClientes dao = new DAOConsumoClientes();
+		DAOTablaUsuarios daoUsuarios = new DAOTablaUsuarios();
+		try {
+			this.conn = darConexion();
+			daoUsuarios.setConn(conn);
+			if(!daoUsuarios.verficarUsuarioAdministrador(id, password))
+			{
+				throw new Exception("Error en validar las credenciales del usuario con ID: " + id);
+			}
+			daoUsuarios.cerrarRecursos();
+			dao.setConn(conn);
+			dao.setRegistroVentas(fecha, dia);
+			conn.commit();
+		}catch (SQLException e) {
+			System.err.println("SQLException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		} catch (Exception e) {
+			System.err.println("GeneralException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		}finally {
+			try {
+				daoUsuarios.cerrarRecursos();
+				dao.cerrarRecursos();
+				if(this.conn!=null)
+					this.conn.close();
+			} catch (SQLException exception) {
+				System.err.println("SQLException closing resources:" + exception.getMessage());
+				exception.printStackTrace();
+				throw exception;
+			}
+		}
+		return true;
+	}
+	/**
+	 * Método que da el Registro de Ventas de la Semana.
+	 * @return List<RegistroVentas> Lista de Registro de Ventas.
+	 * @throws SQLException
+	 * @throws Exception
+	 */
+	public List<RegistroVentas> obtenerRegistroVentas() throws SQLException, Exception
+	{
+		List<RegistroVentas> lista = null;
+		DAOConsumoClientes dao = new DAOConsumoClientes();
+//		DAOTablaUsuarios daoUsuarios = new DAOTablaUsuarios();
+		try {
+			this.conn = darConexion();
+//			daoUsuarios.setConn(conn);
+//			if(!daoUsuarios.verficarUsuarioAdministrador(id, password))
+//			{
+//				throw new Exception("Error en validar las credenciales del usuario con ID: " + id);
+//			}
+//			daoUsuarios.cerrarRecursos();
+			dao.setConn(conn);
+			lista = dao.getRegistroVentas();
+			for(int i = 0; i < lista.size(); i++)
+			{
+				Long idRestMas = lista.get(i).getRestauranteMasFrecuentado().getId();
+				Long idRestMenos = lista.get(i).getRestauranteMenosFrecuentado().getId();
+				Restaurante restauranteMasFrecuentado = darRestaurante(idRestMas, false);
+				Restaurante restauranteMenosFrecuentado = darRestaurante(idRestMenos, false);
+				lista.get(i).setRestauranteMasFrecuentado(restauranteMasFrecuentado);
+				lista.get(i).setRestauranteMenosFrecuentado(restauranteMenosFrecuentado);
+			}
+		}catch (SQLException e) {
+			System.err.println("SQLException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		} catch (Exception e) {
+			System.err.println("GeneralException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		}finally {
+			try {
+//				daoUsuarios.cerrarRecursos();
+				dao.cerrarRecursos();
+				if(this.conn!=null)
+					this.conn.close();
+			} catch (SQLException exception) {
+				System.err.println("SQLException closing resources:" + exception.getMessage());
+				exception.printStackTrace();
+				throw exception;
+			}
+		}
+		return lista;
+	}
+	
+	/**
+	 * Método que obtiene la información de un Restaurante.
+	 * @param idRestaurante Long, ID del Restaurante
+	 * @return Restaurante, Toda la información de un Restaurante.
+	 * @throws SQLException
+	 * @throws Exception
+	 */
+	public Restaurante darRestaurante(Long idRestaurante, Boolean deseaProductos) throws SQLException, Exception
+	{
+		Restaurante respuesta = null;
+		DAOTablaRestaurantes dao = new DAOTablaRestaurantes();
+		try {
+			this.conn = darConexion();
+			dao.setConn(conn);
+			
+			respuesta = dao.obtenerRestaurante(idRestaurante);
+			if(deseaProductos)
+			{
+				Integer integer = 1;
+				String idRest = idRestaurante + "";
+				respuesta.setProductos(darProductosPor(integer, idRest));
+			}
+		}catch (SQLException e) {
+			System.err.println("SQLException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		} catch (Exception e) {
+			System.err.println("GeneralException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		}finally {
+			try {
+				dao.cerrarRecursos();
+				if(this.conn!=null)
+					this.conn.close();
+			} catch (SQLException exception) {
+				System.err.println("SQLException closing resources:" + exception.getMessage());
+				exception.printStackTrace();
+				throw exception;
+			}
+		}
+		return respuesta;
 	}
 }
