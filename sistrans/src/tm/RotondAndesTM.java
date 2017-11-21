@@ -16,6 +16,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 
@@ -1800,4 +1801,54 @@ public class RotondAndesTM {
 		}
 		return productos;
 	}
+	
+	//---------------------------------------------------	
+		//	Requerimiento: RFC9
+		//---------------------------------------------------
+
+		/**
+		 *Métoodo que llama al RFC9 que retorna los clientes que al menos hayan pedido un producto de un restaurante dado con un rango de fechas dado. 
+		 * RFC9 Consultar consumo en Rotondandes
+		 * @param idRestaurante id del restaurante determinado
+		 * @param fecha1 fecha inicial
+		 * @param fecha2 fecha final
+		 * @param orderBy como decea el usuario organizar los resultados
+		 * @param groupBy como decea el usuario agrupar los resultados
+		 * @param idUsuario el idUsuario para autorización
+		 * @param contraseniaa la contraseña del usuario para autorización
+		 * @return Clientes
+		 * @throws Exception 
+		 */
+
+		public List<Cliente> getClientesConMin1ConsumoEnRangoFechasEnRestaurante(Long idRestaurante, Date fecha1, Date fecha2, String orderBy, String groupBy, Long idUsuario, String contrasenia) throws Exception
+		{
+			DAOTablaClientes daoCli = new DAOTablaClientes(); 
+			return daoCli.getClientesConMin1ConsumoEnRangoFechasEnRestaurante(idRestaurante, fecha1, fecha2, orderBy, groupBy, idUsuario, contrasenia);
+		}
+
+		//---------------------------------------------------	
+		//	Requerimiento: RFC10
+		//---------------------------------------------------
+
+		/**
+		 *Métoodo que llama al RFC9 que retorna los clientes que al menos hayan pedido un producto de un restaurante dado con un rango de fechas dado. 
+		 * RFC10 Consultar consumo en Rotondandes
+		 * @param idRestaurante id del restaurante determinado
+		 * @param fecha1 fecha inicial
+		 * @param fecha2 fecha final
+		 * @param orderBy como decea el usuario organizar los resultados
+		 * @param groupBy como decea el usuario agrupar los resultados
+		 * @param idUsuario el idUsuario para autorización
+		 * @param contraseniaa la contraseña del usuario para autorización
+		 * @return Clientes
+		 * @throws Exception 
+		 */
+
+		public List<Cliente> getClientesConNOMin1ConsumoEnRangoFechasEnRestaurante(Long idRestaurante, Date fecha1, Date fecha2, String orderBy, String groupBy, Long idUsuario, String contrasenia) throws Exception
+		{
+			DAOTablaClientes daoCli = new DAOTablaClientes(); 
+			return daoCli.getClientesConNOMin1ConsumoEnRangoFechasEnRestaurante(idRestaurante, fecha1, fecha2, orderBy, groupBy, idUsuario, contrasenia);
+		}
+
+	
 }

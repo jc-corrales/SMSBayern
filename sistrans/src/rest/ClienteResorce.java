@@ -1,5 +1,6 @@
 package rest;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.ServletContext;
@@ -176,4 +177,70 @@ public class ClienteResorce {
 			return Response.status( 500 ).entity( doErrorMessage( e ) ).build( );
 		}
 	}
+	
+	//---------------------------------------------------	
+		//	Requerimiento: RFC9
+		//---------------------------------------------------
+		
+		/**
+		 * Métdodo que recibe una lista de clientes de RotondAndes
+		 * @param idRestaurante id del restaurante determinado
+		 * @param fecha1 fecha inicial
+		 * @param fecha2 fecha final
+		 * @param orderBy como decea el usuario organizar los resultados
+		 * @param groupBy como decea el usuario agrupar los resultados
+		 * @param idUsuario el idUsuario para autorización
+		 * @param contraseniaa la contraseña del usuario para autorización
+		 * @return Clientes
+		 * @throws Exception 
+		 */
+		
+		@GET
+		@Path("{idRestaurante: \\d+}/{fecha1: \\\\d+}/{fecha2: \\\\d+}/{orderBy: \\\\d+}/{groupBy: \\\\d+}/{idUsuario: \\\\d+}/{contrasenia: \\\\d+}/")
+		@Produces( { MediaType.APPLICATION_JSON } )
+		public Response getClientesConsumoMinimoRestFechas(@PathParam("id") Long idRestaurante, Date fecha1, Date fecha2, String orderBy, String groupBy, Long idUsuario, String contrasenia) 
+		{
+			RotondAndesTM tm = new RotondAndesTM(getPath());
+			try {
+				List<Cliente> respuesta = tm.getClientesConMin1ConsumoEnRangoFechasEnRestaurante(idRestaurante, fecha1, fecha2,  orderBy,  groupBy,  idUsuario,  contrasenia);
+				return Response.status( 200 ).entity( respuesta ).build( );		
+			}catch( Exception e )
+			{
+				return Response.status( 500 ).entity( doErrorMessage( e ) ).build( );
+			}
+		}
+		
+		
+		//---------------------------------------------------	
+		//	Requerimiento: RFC10
+		//---------------------------------------------------
+		
+		/**
+		 * Métdodo que recibe una lista de clientes de RotondAndes
+		 * @param idRestaurante id del restaurante determinado
+		 * @param fecha1 fecha inicial
+		 * @param fecha2 fecha final
+		 * @param orderBy como decea el usuario organizar los resultados
+		 * @param groupBy como decea el usuario agrupar los resultados
+		 * @param idUsuario el idUsuario para autorización
+		 * @param contraseniaa la contraseña del usuario para autorización
+		 * @return Clientes
+		 * @throws Exception 
+		 */
+		
+		@GET
+		@Path("{idRestaurante: \\d+}/{fecha1: \\\\d+}/{fecha2: \\\\d+}/{orderBy: \\\\d+}/{groupBy: \\\\d+}/{idUsuario: \\\\d+}/{contrasenia: \\\\d+}/")
+		@Produces( { MediaType.APPLICATION_JSON } )
+		public Response getClientesNOConsumoMinimoRestFechas(@PathParam("id") Long idRestaurante, Date fecha1, Date fecha2, String orderBy, String groupBy, Long idUsuario, String contrasenia) 
+		{
+			RotondAndesTM tm = new RotondAndesTM(getPath());
+			try {
+				List<Cliente> respuesta = tm.getClientesConMin1ConsumoEnRangoFechasEnRestaurante(idRestaurante, fecha1, fecha2,  orderBy,  groupBy,  idUsuario,  contrasenia);
+				return Response.status( 200 ).entity( respuesta ).build( );		
+			}catch( Exception e )
+			{
+				return Response.status( 500 ).entity( doErrorMessage( e ) ).build( );
+			}
+		}
+
 }

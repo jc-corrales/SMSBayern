@@ -24,6 +24,8 @@ public class DAOTablaClientes {
 
 	private Connection conn;
 
+	private DAOTablaUsuarios tablaUsuarios;
+	
 	public DAOTablaClientes() {
 		recursos = new ArrayList<Object>();
 	}
@@ -271,6 +273,87 @@ public class DAOTablaClientes {
 		}
 		return null;
 	}
+	
+	/**
+	 * RFC9 Consultar consumo en Rotondandes
+	 * @param idRestaurante id del restaurante determinado
+	 * @param fecha1 fecha inicial
+	 * @param fecha2 fecha final
+	 * @param orderBy como decea el usuario organizar los resultados
+	 * @param groupBy como decea el usuario agrupar los resultados
+	 * @param idUsuario el idUsuario para autorización
+	 * @param contraseniaa la contraseña del usuario para autorización
+	 * @return Clientes
+	 * @throws Exception 
+	 */
+	
+	public List<Cliente> getClientesConMin1ConsumoEnRangoFechasEnRestaurante(Long idRestaurante, Date fecha1, Date fecha2, String orderBy, String groupBy, Long idUsuario, String contrasenia) throws Exception
+	{
+		List<Cliente> resp = new ArrayList<Cliente>();
+		if(idUsuario == idRestaurante || !tablaUsuarios.verficarUsuarioAdministrador(idUsuario, contrasenia))
+		{
+			resp = null;
+		}
+		else
+		{
+		String sql = "SELECT CLIENTES.ID, CLIENTES.NAME, CLIENTES.IDMESA FROM (SELECT * FROM CLIENTES, (SELECT * FROM PEDIDOS, ORDENES WHERE PEDIDOS.ID_ORDEN = ORDENES.ID) WHERE CLIENTES.ID = ORDENES.ID_CLIENTE), (SELECT * FROM PRODUCTO_RESTAURANTE, (SELECT * FROM RESTAURANTES WHERE RESTAURANTES.ID =" + idRestaurante +  ") WHERE RESTAURANTES.ID = PRODUCTO_RESTAURANTE.ID_REST) WHERE PEDIDOS.ID_PRODUCTO = PRODUCTO_RESTAURANTE.ID_PROD AND ORDENES.FECHA BETWEEN" + fecha1 +"AND" +fecha2+ " ORDER BY"+orderBy+" GROUP BY"+groupBy+";";
+		PreparedStatement stmt= conn.prepareStatement(sql);
+		recursos.add(stmt);
+		ResultSet rs = stmt.executeQuery();
+		List<Cliente> resp2 = new ArrayList<Cliente>();
+		while(rs.next())
+		{
+			Long id = rs.getLong("ID");
+			String nombre = rs.getString("NAME");
+			Long idMesa = rs.getLong("IDMESA");
+			
+			resp.add(new Cliente(id, idMesa,nombre, null));
+			resp = resp2;
+		}
+		}
+		return resp;
+	}
+	
+	/**
+	 * RFC10 Consultar consumo en Rotondandes
+	 * @param idRestaurante id del restaurante determinado
+	 * @param fecha1 fecha inicial
+	 * @param fecha2 fecha final
+	 * @param orderBy como decea el usuario organizar los resultados
+	 * @param groupBy como decea el usuario agrupar los resultados
+	 * @param idUsuario el idUsuario para autorización
+	 * @param contraseniaa la contraseña del usuario para autorización
+	 * @return Clientes
+	 * @throws Exception 
+	 */
+	
+	public List<Cliente> getClientesConNOMin1ConsumoEnRangoFechasEnRestaurante(Long idRestaurante, Date fecha1, Date fecha2, String orderBy, String groupBy, Long idUsuario, String contrasenia) throws Exception
+	{
+		List<Cliente> resp = new ArrayList<Cliente>();
+		if(idUsuario == idRestaurante || !tablaUsuarios.verficarUsuarioAdministrador(idUsuario, contrasenia))
+		{
+			resp = null;
+		}
+		else
+		{
+		String sql = "SELECT CLIENTES.ID, CLIENTES.NAME, CLIENTES.IDMESA FROM (SELECT * FROM CLIENTES, (SELECT * FROM PEDIDOS, ORDENES WHERE PEDIDOS.ID_ORDEN = ORDENES.ID) WHERE CLIENTES.ID = ORDENES.ID_CLIENTE), (SELECT * FROM PRODUCTO_RESTAURANTE, (SELECT * FROM RESTAURANTES WHERE RESTAURANTES.ID =" + idRestaurante +  ") WHERE RESTAURANTES.ID = PRODUCTO_RESTAURANTE.ID_REST) WHERE PEDIDOS.ID_PRODUCTO <> PRODUCTO_RESTAURANTE.ID_PROD AND ORDENES.FECHA BETWEEN" + fecha1 +"AND" +fecha2+ " ORDER BY"+orderBy+" GROUP BY"+groupBy+";";
+		PreparedStatement stmt= conn.prepareStatement(sql);
+		recursos.add(stmt);
+		ResultSet rs = stmt.executeQuery();
+		List<Cliente> resp2 = new ArrayList<Cliente>();
+		while(rs.next())
+		{
+			Long id = rs.getLong("ID");
+			String nombre = rs.getString("NAME");
+			Long idMesa = rs.getLong("IDMESA");
+			
+			resp.add(new Cliente(id, idMesa,nombre, null));
+			resp = resp2;
+		}
+		}
+		return resp;
+	}
+
 //	/**
 //	 * Método que obtiene el ID del sigueinte Cliente.
 //	 * @return Long, siguiente ID de Clientes en la base de datos.
