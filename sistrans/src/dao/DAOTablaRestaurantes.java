@@ -347,4 +347,31 @@ public class DAOTablaRestaurantes {
 		restaurante.setTipoRestaurante(tipo);
 		return restaurante;
 	}
+	/**
+	 * Método que obtiene la información básica de un Restaurante dado un ID.
+	 * @param id Long, ID del Restaurante
+	 * @return Restaurante, Información básica de un Restaurante.
+	 * @throws SQLException
+	 * @throws Exception
+	 */
+	public Restaurante obtenerRestaurante(Long id) throws SQLException, Exception
+	{
+		String sql = "SELECT R.ID, R.NAME, R.PRECIO, R.PAGINA_WEB, T.ID AS IDTIPO, T.NAME AS NAMETIPO\r\n" + 
+				"    FROM RESTAURANTES R, TIPOS T WHERE T.ID = R.ID_TIPO AND R.ID = " + id;
+		PreparedStatement st = conn.prepareStatement(sql);
+		recursos.add(st);
+		ResultSet rs = st.executeQuery();
+		Restaurante restaurante = null;
+		if (rs.next())
+		{
+			String name = rs.getString("NAME");
+			String pagina = rs.getString("PAGINA_WEB");
+			Double precio = rs.getDouble("PRECIO");
+			TipoComida tipo = new TipoComida(rs.getLong("IDTIPO"), rs.getString("NAMETIPO"));
+			List<Producto> productos = new ArrayList<Producto>();
+			restaurante = new Restaurante(id, name, pagina, productos, tipo, precio);
+		}
+		
+		return restaurante;
+	}
 }

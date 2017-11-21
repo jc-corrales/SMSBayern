@@ -269,7 +269,7 @@ public class DAOTablaUsuarios
 		if(rs.next()) {
 			if(!rs.getString("ROL").equals(ADMIN))
 			{
-				throw new Exception("El usuario no es un Cliente Frecuente.");
+				throw new Exception("El usuario no es un Administrador.");
 			}
 			String pass = rs.getString("PASSWORD");
 			System.out.println("ConstraseñaRESOURCE: " +password);

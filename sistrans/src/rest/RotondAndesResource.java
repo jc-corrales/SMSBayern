@@ -1,5 +1,6 @@
 package rest;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.ServletContext;
@@ -22,6 +23,7 @@ import vos.ClienteFrecuente;
 import vos.ConsumoCliente;
 import vos.EstadisticasPedidos;
 import vos.Producto;
+import vos.RegistroVentas;
 //import vos.ProductoBase;
 import vos.Representante;
 import vos.Restaurante;
@@ -35,6 +37,8 @@ public class RotondAndesResource {
 	    @XmlElement String nombreAdmin;
 	    @XmlElement Long idAdmin;
 	    @XmlElement String passwordAdmin;
+	    @XmlElement String fecha;
+	    @XmlElement String dia;
 	}
 	
 	
@@ -205,6 +209,43 @@ public class RotondAndesResource {
 		try {
 			Boolean res = tm.registrarAdministrador(entrada.idAdmin, entrada.passwordAdmin);
 			return Response.status( 200 ).entity( res ).build();	
+		}catch( Exception e )
+		{
+			return Response.status( 500 ).entity( doErrorMessage( e ) ).build( );
+		}
+	}
+	/**
+	 * Método que establece el Registro de Ventas para un día específico.
+	 * @param entrada
+	 * @return
+	 */
+	@POST
+	@Path("registroVentas")
+	@Consumes({ MediaType.APPLICATION_JSON })
+	@Produces({ MediaType.APPLICATION_JSON })
+	public Response establecerRegistroVentas(RequestBody entrada) {
+		RotondAndesTM tm = new RotondAndesTM(getPath());
+		try {
+			Boolean res = tm.establecerRegistroVentas(entrada.idAdmin, entrada.passwordAdmin, entrada.fecha, entrada.dia);
+			return Response.status( 200 ).entity( res ).build();	
+		}catch( Exception e )
+		{
+			return Response.status( 500 ).entity( doErrorMessage( e ) ).build( );
+		}
+	}
+	
+	/**
+	 * Método que los Registros de Ventas de la semana
+	 * @return Response.
+	 */
+	@GET
+	@Path("registroVentas")
+	@Produces( { MediaType.APPLICATION_JSON } )
+	public Response getRegistrosVentas() {
+		RotondAndesTM tm = new RotondAndesTM(getPath());
+		try {
+			List<RegistroVentas> respuesta = tm.obtenerRegistroVentas();
+			return Response.status( 200 ).entity( respuesta ).build( );		
 		}catch( Exception e )
 		{
 			return Response.status( 500 ).entity( doErrorMessage( e ) ).build( );
