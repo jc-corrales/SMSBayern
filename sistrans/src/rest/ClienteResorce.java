@@ -242,5 +242,33 @@ public class ClienteResorce {
 				return Response.status( 500 ).entity( doErrorMessage( e ) ).build( );
 			}
 		}
+		
+		//---------------------------------------------------	
+		//	Requerimiento: RF12
+		//---------------------------------------------------
+
+		/**
+		 * RFC12 Consultar los buenos clientes
+		 * @param String tipo
+		 * @param Long idUsuario
+		 * @param String contrasenia
+		 * @resp List<Cliente> de un tipo dado
+		 * 1.5 SMDLV = 1.5 * 737.717 = 1106.5755
+		 */
+		@GET
+		@Path("{tipo: \\\\d+}/{idUsuario: \\\\d+}/{contrasenia: \\\\d+}/")
+		@Produces( { MediaType.APPLICATION_JSON } )
+		public Response getBuenosClientesTipo(@PathParam("tipo") String tipo, @PathParam("idUsuario") Long idUsuario, @PathParam("contrasenia") String contrasenia) 
+		{
+			RotondAndesTM tm = new RotondAndesTM(getPath());
+			try {
+				List<Cliente> respuesta = tm.getBuenosClientesTipo(tipo, idUsuario, contrasenia);
+				return Response.status( 200 ).entity( respuesta ).build( );		
+			}catch( Exception e )
+			{
+				return Response.status( 500 ).entity( doErrorMessage( e ) ).build( );
+			}
+		}
+
 
 }
