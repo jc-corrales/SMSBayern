@@ -9,6 +9,17 @@
 	"item": [
 		{
 			"name": "Agregar Restaurante",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;"
+						]
+					}
+				}
+			],
 			"request": {
 				"url": "http://localhost:8080/RotondAndes/rest/admin/restaurantes/idZona/25",
 				"method": "POST",
@@ -21,7 +32,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\"name\" : \"Guillermo\", \"contrasenia\" : \"oweijfhpwe\", \"restaurante\" : {\"name\" : \"nuevoRestaurante\", \"pagina\" : \"www.lol.com.co\", \"tipo\" : {\"id\": 4}, \"precio\" : 10000.0}}"
+					"raw": "{\"id\" : 41, \"name\" : \"Guillermo\", \"contrasenia\" : \"oweijfhpwe\", \"restaurante\" : {\"id\" : 41, \"name\" : \"nuevoRestaurante\", \"pagina\" : \"www.lol.com.co\", \"tipo\" : {\"id\": 4}, \"precio\" : 10000.0}}"
 				},
 				"description": ""
 			},

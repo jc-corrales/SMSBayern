@@ -16,7 +16,7 @@ import javax.ws.rs.core.Response;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-
+import rest.RotondAndesResource.RequestBodyUnConsumo;
 import tm.RotondAndesTM;
 import vos.Cliente;
 import vos.ClienteFrecuente;
@@ -40,6 +40,10 @@ public class ClienteResorce {
 	    @XmlElement public Long idProd;
 	    @XmlElement public Long idRestaurante;
 	    @XmlElement public Long idMenu;
+	    @XmlElement public String criterioDeBusqueda;
+	    @XmlElement public String ordenDeBusqueda;
+	    @XmlElement public String fecha1;
+	    @XmlElement public String fecha2;
 	}
 	
 	
@@ -196,13 +200,33 @@ public class ClienteResorce {
 		 */
 		
 		@GET
-		@Path("{idRestaurante: \\d+}/{fecha1: \\\\d+}/{fecha2: \\\\d+}/{orderBy: \\\\d+}/{groupBy: \\\\d+}/{idUsuario: \\\\d+}/{contrasenia: \\\\d+}/")
+		@Path("{id: \\d+}/{fecha1: \\d+}/{fecha2: \\d+}/{orderBy: \\d+}/{groupBy: \\d+}/{idUsuario: \\d+}/{contrasenia: \\d+}")
 		@Produces( { MediaType.APPLICATION_JSON } )
-		public Response getClientesConsumoMinimoRestFechas(@PathParam("id") Long idRestaurante, Date fecha1, Date fecha2, String orderBy, String groupBy, Long idUsuario, String contrasenia) 
+		public Response getClientesConsumoMinimoRestFechas(@PathParam("id") Long idRestaurante, RequestBody request) 
 		{
 			RotondAndesTM tm = new RotondAndesTM(getPath());
 			try {
-				List<Cliente> respuesta = tm.getClientesConMin1ConsumoEnRangoFechasEnRestaurante(idRestaurante, fecha1, fecha2,  orderBy,  groupBy,  idUsuario,  contrasenia);
+				List<Cliente> respuesta = tm.getClientesConMinUnConsumoEnRangoFechasPorRestaurante(idRestaurante, fecha1, fecha2, criterio, orderBy)
+				return Response.status( 200 ).entity( respuesta ).build( );		
+			}catch( Exception e )
+			{
+				return Response.status( 500 ).entity( doErrorMessage( e ) ).build( );
+			}
+		}
+		
+		/**
+		 * Método que obtiene los Clientes que han realizado al menos un consumo en un Restaurante dado.
+		 * @param request RequestBodyUnConsumo
+		 * @return
+		 */
+		@POST
+		@Path("{idCliente: \\d+}/consumoMinimoClientes/")
+		@Produces( { MediaType.APPLICATION_JSON } )
+		public Response getClientesConsumoMinimoRestFechas(@PathParam("idCliente") Long clienteId, RequestBodyUnConsumo request) 
+		{
+			RotondAndesTM tm = new RotondAndesTM(getPath());
+			try {
+				List<Cliente> respuesta = tm.getClienteConMinUnConsumoEnRangoFechasPorRestaurante(clienteId, request.idRestaurante, request.fecha1, request.fecha2, request.criterioDeBusqueda, request.ordenDeBusqueda);
 				return Response.status( 200 ).entity( respuesta ).build( );		
 			}catch( Exception e )
 			{

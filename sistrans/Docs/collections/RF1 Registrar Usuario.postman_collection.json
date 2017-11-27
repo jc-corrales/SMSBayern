@@ -1,0 +1,104 @@
+{
+	"variables": [],
+	"info": {
+		"name": "RF1 Registrar Usuario",
+		"_postman_id": "2807f098-ef9d-18be-a8dd-ffef5ccb6077",
+		"description": "Hay 2 tipos de Usuario para registrar:\nCliente normal (no Frecuente).\nAdministrador",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Registrar Cliente NO Frecuente 2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "http://localhost:8080/RotondAndes/rest/clientes",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"id\": 141, \"nombre\" : \"francisco\", \"mesa\" : 505}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Registrar Cliente NO Frecuente",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "http://localhost:8080/RotondAndes/rest/clientes",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"id\": 152, \"mesa\" : 50, \"nombre\" : \"Alejandro\"}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Registrar un Administrador",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "http://localhost:8080/RotondAndes/rest/admin",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"nombreAdmin\" : \"Miguel Angel\", \"idAdmin\" : 500, \"passwordAdmin\": \"lshfvlosdhlo\"}"
+				},
+				"description": ""
+			},
+			"response": []
+		}
+	]
+}

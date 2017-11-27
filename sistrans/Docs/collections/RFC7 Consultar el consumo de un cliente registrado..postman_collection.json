@@ -30,7 +30,7 @@
 			"response": []
 		},
 		{
-			"name": "Consultar consumo de un cliente, ID = 7",
+			"name": "Consultar consumo de un cliente, ID = 107",
 			"event": [
 				{
 					"listen": "test",
@@ -43,7 +43,7 @@
 				}
 			],
 			"request": {
-				"url": "http://localhost:8080/RotondAndes/rest/clientes/7/consumo",
+				"url": "http://localhost:8080/RotondAndes/rest/clientes/107/consumo",
 				"method": "GET",
 				"header": [],
 				"body": {},
@@ -65,7 +65,7 @@
 				}
 			],
 			"request": {
-				"url": "http://localhost:8080/RotondAndes/rest/admin/consumo/7",
+				"url": "http://localhost:8080/RotondAndes/rest/admin/consumo/107",
 				"method": "GET",
 				"header": [],
 				"body": {},

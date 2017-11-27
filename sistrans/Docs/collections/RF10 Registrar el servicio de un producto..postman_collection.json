@@ -9,6 +9,17 @@
 	"item": [
 		{
 			"name": "http://localhost:8080/RotondAndes/rest/restaurantes/1/pedidos/17",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;"
+						]
+					}
+				}
+			],
 			"request": {
 				"url": "http://localhost:8080/RotondAndes/rest/restaurantes/1/pedidos/17",
 				"method": "POST",

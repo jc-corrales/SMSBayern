@@ -28,6 +28,17 @@
 				"description": ""
 			},
 			"response": []
+		},
+		{
+			"name": "Consultar cliente 107",
+			"request": {
+				"url": "http://localhost:8080/RotondAndes/rest/admin/clientes/107",
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": ""
+			},
+			"response": []
 		}
 	]
 }

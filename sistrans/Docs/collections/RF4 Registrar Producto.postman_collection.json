@@ -1,7 +1,7 @@
 {
 	"variables": [],
 	"info": {
-		"name": "RF 4 Registrar Producto",
+		"name": "RF4 Registrar Producto",
 		"_postman_id": "4d28110f-8455-4ab4-637d-8cd635f876a6",
 		"description": "",
 		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
@@ -40,6 +40,17 @@
 		},
 		{
 			"name": "Registrar producto con ID: 100 para el Restaurante 4. (El base ya existe).",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;"
+						]
+					}
+				}
+			],
 			"request": {
 				"url": "http://localhost:8080/RotondAndes/rest/restaurantes/4",
 				"method": "POST",
@@ -60,6 +71,17 @@
 		},
 		{
 			"name": "Registrar producto con ID: 101, totalmente nuevo, para el Restaurante con ID: 4",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;"
+						]
+					}
+				}
+			],
 			"request": {
 				"url": "http://localhost:8080/RotondAndes/rest/restaurantes/4",
 				"method": "POST",

@@ -8,7 +8,7 @@
 	},
 	"item": [
 		{
-			"name": "RFC5 Obtener los Productos más ofrecidos",
+			"name": "RFC4 Obtener los Productos más ofrecidos",
 			"request": {
 				"url": "http://localhost:8080/RotondAndes/rest/productos/masOfrecidos",
 				"method": "GET",

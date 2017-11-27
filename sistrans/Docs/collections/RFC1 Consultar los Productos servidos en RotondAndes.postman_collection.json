@@ -45,6 +45,17 @@
 				"description": ""
 			},
 			"response": []
+		},
+		{
+			"name": "consultar un producto",
+			"request": {
+				"url": "http://localhost:8080/RotondAndes/rest/restaurantes/12/productos/31",
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": ""
+			},
+			"response": []
 		}
 	]
 }

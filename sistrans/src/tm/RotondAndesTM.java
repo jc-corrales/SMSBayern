@@ -1959,13 +1959,89 @@ public class RotondAndesTM {
 	 * @return Clientes
 	 * @throws Exception 
 	 */
-
-	public List<Cliente> getClientesConMin1ConsumoEnRangoFechasEnRestaurante(Long idRestaurante, Date fecha1, Date fecha2, String orderBy, String groupBy, Long idUsuario, String contrasenia) throws Exception
+	public List<Cliente> getClientesConMinUnConsumoEnRangoFechasPorRestaurante(Long idRestaurante, String fecha1, String fecha2, Integer criterio, String orderBy) throws Exception
 	{
-		DAOTablaClientes daoCli = new DAOTablaClientes(); 
-		return daoCli.getClientesConMin1ConsumoEnRangoFechasEnRestaurante(idRestaurante, fecha1, fecha2, orderBy, groupBy, idUsuario, contrasenia);
+		DAOTablaClientes dao = new DAOTablaClientes(); 
+		List<Cliente> clientes = new ArrayList<Cliente>();
+		try {
+			this.conn = darConexion();
+			dao.setConn(conn);
+			clientes = dao.getClientesConMinUnConsumoEnRangoFechasPorRestaurante(idRestaurante, fecha1, fecha2, criterio, orderBy);
+			for(int i = 0; i < clientes.size(); i++)
+			{
+				Long idCliente = clientes.get(i).getId();
+				Cliente clienteCompleto = dao.darClienteSinOrdenes(idCliente);
+				clientes.set(i, clienteCompleto);
+			}
+		}catch (SQLException e) {
+			System.err.println("SQLException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		} catch (Exception e) {
+			System.err.println("GeneralException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		}finally {
+			try {
+				dao.cerrarRecursos();
+				if(this.conn!=null)
+					this.conn.close();
+			} catch (SQLException exception) {
+				System.err.println("SQLException closing resources:" + exception.getMessage());
+				exception.printStackTrace();
+				throw exception;
+			}
+		}
+		return clientes;
 	}
 
+	/**
+	 * Método que obtiene si un cliente ha consumido un producto de un Restaurante dado por ID
+	 * en un rango de fechas.
+	 * @param idCliente
+	 * @param idRestaurante
+	 * @param fecha1
+	 * @param fecha2
+	 * @param criterio
+	 * @param orderBy
+	 * @return
+	 * @throws Exception
+	 */
+	public List<Cliente> getClienteConMinUnConsumoEnRangoFechasPorRestaurante(Long idCliente, Long idRestaurante, String fecha1, String fecha2, Integer criterio, String orderBy) throws Exception
+	{
+		DAOTablaClientes dao = new DAOTablaClientes(); 
+		List<Cliente> clientes = new ArrayList<Cliente>();
+		try {
+			this.conn = darConexion();
+			dao.setConn(conn);
+			clientes = dao.getClienteConMinUnConsumoEnRangoFechasPorRestaurante(idCliente, idRestaurante, fecha1, fecha2, criterio, orderBy);
+			for(int i = 0; i < clientes.size(); i++)
+			{
+				Long idClienteTemp = clientes.get(i).getId();
+				Cliente clienteCompleto = dao.darClienteSinOrdenes(idClienteTemp);
+				clientes.set(i, clienteCompleto);
+			}
+		}catch (SQLException e) {
+			System.err.println("SQLException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		} catch (Exception e) {
+			System.err.println("GeneralException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		}finally {
+			try {
+				dao.cerrarRecursos();
+				if(this.conn!=null)
+					this.conn.close();
+			} catch (SQLException exception) {
+				System.err.println("SQLException closing resources:" + exception.getMessage());
+				exception.printStackTrace();
+				throw exception;
+			}
+		}
+		return clientes;
+	}
 	//---------------------------------------------------	
 	//	Requerimiento: RFC10
 	//---------------------------------------------------

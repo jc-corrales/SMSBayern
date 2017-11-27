@@ -8,18 +8,38 @@
 	},
 	"item": [
 		{
-			"name": "Restaurante 1, registrar equivalencia entre producto 1 y 7",
+			"name": "Restaurante 1, registrar equivalencia entre producto 34 y 54",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;"
+						]
+					}
+				}
+			],
 			"request": {
-				"url": "http://localhost:8080/RotondAndes/rest/restaurantes/1/producto1/1/producto2/7",
+				"url": "http://localhost:8080/RotondAndes/rest/restaurantes/1/producto1/34/producto2/54",
 				"method": "POST",
-				"header": [],
-				"body": {},
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"idRepresentante\" : 1, \"passwordRepresentante\" : \"vergerghR\"}"
+				},
 				"description": ""
 			},
 			"response": []
 		},
 		{
-			"name": "Restaurante 1, registrar equivalencia productos 1 y 7 de nuevo (error)",
+			"name": "Restaurante 1, registrar equivalencia productos 1 y 5 (error)",
 			"event": [
 				{
 					"listen": "test",
@@ -32,10 +52,19 @@
 				}
 			],
 			"request": {
-				"url": "http://localhost:8080/RotondAndes/rest/restaurantes/1/producto1/1/producto2/7",
+				"url": "http://localhost:8080/RotondAndes/rest/restaurantes/1/producto1/1/producto2/5",
 				"method": "POST",
-				"header": [],
-				"body": {},
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"idRepresentante\" : 1, \"passwordRepresentante\" : \"vergerghR\"}"
+				},
 				"description": ""
 			},
 			"response": []

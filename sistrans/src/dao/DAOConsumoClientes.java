@@ -276,40 +276,49 @@ public class DAOConsumoClientes
 			recursos.add(prepStmt4);
 			ResultSet rs4 = prepStmt4.executeQuery();
 			
-			if(rs1.next())
+			Long productoMasConsumido = null;
+			Long productoMenosConsumido = null;
+			Long restauranteMasFrecuentado = null;
+			Long restauranteMenosFrecuentado = null;
+			try
 			{
-				
+				rs1.next();
+				restauranteMasFrecuentado = rs1.getLong("ID_RESTAURANTE");
 			}
-			else
+			catch(Exception e)
 			{
-				return ;
+				continue;
 			}
-			if(rs2.next())
+			try
 			{
-				
+				rs2.next();
+				restauranteMenosFrecuentado = rs2.getLong("ID_RESTAURANTE");
 			}
-			else
+			catch(Exception e)
 			{
-				return ;
+				continue;
 			}
-			if(rs3.next())
+			try
 			{
-				
+				rs3.next();
+				productoMasConsumido = rs3.getLong("ID_PRODUCTO");
 			}
-			else
+			catch(Exception e)
 			{
-				return ;
+				continue;
 			}
-			if(rs4.next())
+			try
 			{
-				
+				rs4.next();
+				productoMenosConsumido = rs4.getLong("ID_PRODUCTO");
 			}
-			else
+			catch(Exception e)
 			{
-				return ;
+				continue;
 			}
+			System.out.println(productoMenosConsumido.toString());
 			//SQL DE GUARDAR
-			String sql5 = "INSERT INTO REGISTROVENTAS(DIA, IDPRODUCTOMASVENDIDO, IDPRODUCTOMENOSVENDIDO, IDRESTAURANTEMASFRECUENTADO, IDRESTAURANTEMENOSFRECUENTADO) VALUES ('" + dia + "', " + rs3.getLong("ID_PRODUCTO") + ", " + rs4.getLong("ID_PRODUCTO") + ", " + rs1.getLong("ID_RESTAURANTE") + ", " + rs2.getLong("ID_RESTAURANTE") + ")";
+			String sql5 = "INSERT INTO REGISTROVENTAS(DIA, IDPRODUCTOMASVENDIDO, IDPRODUCTOMENOSVENDIDO, IDRESTAURANTEMASFRECUENTADO, IDRESTAURANTEMENOSFRECUENTADO) VALUES ('" + dia + "', " + productoMasConsumido + ", " + productoMenosConsumido + ", " + restauranteMasFrecuentado + ", " + restauranteMenosFrecuentado + ")";
 			System.out.println(sql5);
 			PreparedStatement prepStmt5 = conn.prepareStatement(sql5);
 			recursos.add(prepStmt5);

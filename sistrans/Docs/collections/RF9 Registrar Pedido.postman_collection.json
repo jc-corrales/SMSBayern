@@ -1,0 +1,126 @@
+{
+	"variables": [],
+	"info": {
+		"name": "RF9 Registrar Pedido",
+		"_postman_id": "a1914f29-1c1b-cb9b-72fd-4deda1699fcf",
+		"description": "Registra la solicitud de un producto por un comensal, de acuerdo con el enunciado. El registro es aceptado siempre y\r\ncuando se cumplan las condiciones disponibilidad por el restaurante que lo sirve. El registro del pedido incluye la fecha y\r\nhora de la solicitud, para efectos de seguimiento y análisis de la operación de RotondAndes. Asegure que este\r\nrequerimiento maneja correctamente el pedido de un menú. Esta operación es realizada por un usuario público no\r\nregistrado, aunque también puede ser realizada por un cliente de RotondAndes.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Parte 1, crear una Orden",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "http://localhost:8080/RotondAndes/rest/clientes/101/ordenes",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"id\" : 41}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Parte 2A, registrar un Pedido",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "http://localhost:8080/RotondAndes/rest/clientes/101/ordenes/1/pedidos",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"idProd\" : 7, \"idRestaurante\":1}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Parte 2B, registrar un pedido de un menú.",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "http://localhost:8080/RotondAndes/rest/clientes/101/ordenes/1/menus",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"idMenu\" : 1, \"idRestaurante\":1}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Parte 3, confirmar la Orden",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "http://localhost:8080/RotondAndes/rest/clientes/101/ordenes/41",
+				"method": "POST",
+				"header": [],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		}
+	]
+}

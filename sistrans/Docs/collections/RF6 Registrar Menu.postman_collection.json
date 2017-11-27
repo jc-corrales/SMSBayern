@@ -1,0 +1,73 @@
+{
+	"variables": [],
+	"info": {
+		"name": "RF6 Registrar Menu",
+		"_postman_id": "3c47f654-95fe-9962-18a9-12ed6129e394",
+		"description": "Registra la información básica de un menú, de acuerdo con el enunciado. Esta operación es realizada por un usuario\r\nrestaurante",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Registrar Menú",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "http://localhost:8080/RotondAndes/rest/restaurantes/1/menus",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"id\" : 2,  \"name\" : \"Menu Rico\", \"precio\" : 55550, \"entrada\" : {\"id\" : 7 }, \"platoFuerte\" : {\"id\": 34}, \"postre\" : {\"id\" : 1},\n\"bebida\" : {\"id\" : 70}, \"acompaniamiento\" : {\"id\" : 36}, \"descripcion\" : \"Un menu muy saludable\", \"description\" : \"a very healthy menu\"}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Registrar Menú copy",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "http://localhost:8080/RotondAndes/rest/restaurantes/1/menus",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"id\" : 3,  \"name\" : \"Menu Rico2\", \"precio\" : 55550, \"entrada\" : {\"id\" : 7 }, \"platoFuerte\" : {\"id\": 34}, \"postre\" : {\"id\" : 1},\n\"bebida\" : {\"id\" : 70}}"
+				},
+				"description": ""
+			},
+			"response": []
+		}
+	]
+}

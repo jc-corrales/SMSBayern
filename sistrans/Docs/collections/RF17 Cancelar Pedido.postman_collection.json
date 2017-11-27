@@ -30,7 +30,7 @@
 			"response": []
 		},
 		{
-			"name": "Delete Pedido 24 (servido)",
+			"name": "Delete Pedido 13 (servido)",
 			"event": [
 				{
 					"listen": "test",
@@ -43,7 +43,7 @@
 				}
 			],
 			"request": {
-				"url": "http://localhost:8080/RotondAndes/rest/pedidos/24",
+				"url": "http://localhost:8080/RotondAndes/rest/pedidos/13",
 				"method": "DELETE",
 				"header": [],
 				"body": {},

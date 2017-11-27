@@ -9,6 +9,17 @@
 	"item": [
 		{
 			"name": "Registrar un nuevo Cliente Frecuente.",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;"
+						]
+					}
+				}
+			],
 			"request": {
 				"url": "http://localhost:8080/RotondAndes/rest/admin/clientesFrecuentes",
 				"method": "POST",
@@ -21,7 +32,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\"mesa\" : 50, \"nombre\" : \"Alejandro\", \"contrasenia\" : \"ohiogldrg\"}"
+					"raw": "{\"id\": 151, \"mesa\" : 50, \"nombre\" : \"Alejandro\", \"contrasenia\" : \"ohiogldrg\"}"
 				},
 				"description": ""
 			},

@@ -1,0 +1,42 @@
+{
+	"variables": [],
+	"info": {
+		"name": "RF8 Registrar Preferencia de Cliente",
+		"_postman_id": "f8acda8e-c5e5-9a2b-fa6a-a22467252330",
+		"description": "Registra la información sobre una preferencia de un cliente, cambiando una preferencia registrada anteriormente,\r\nintroduciendo una nueva preferencia o quitando alguna previamente registrada. Esta operación es realizada por un usuario\r\ncliente de RotondAndes",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Agregar Preferencia de un Producto a un Cliente",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "http://localhost:8080/RotondAndes/rest/clientesFrecuentes/110/preferencias",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"password\" : \"supNLWqKhceo\", \"idProd\" : 1}"
+				},
+				"description": ""
+			},
+			"response": []
+		}
+	]
+}
