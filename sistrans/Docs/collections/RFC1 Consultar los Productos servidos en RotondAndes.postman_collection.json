@@ -9,14 +9,27 @@
 	"item": [
 		{
 			"name": "Consular un Producto",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"",
+							"tests[\"Response time is less than 800ms\"] = responseTime < 800;"
+						]
+					}
+				}
+			],
 			"request": {
 				"url": {
-					"raw": "http://localhost:8080/RotondAndes/rest/admin/productos?filtro=1&parametro=1",
+					"raw": "http://localhost:8081/RotondAndes/rest/admin/productos?filtro=1&parametro=1",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
-					"port": "8080",
+					"port": "8081",
 					"path": [
 						"RotondAndes",
 						"rest",
@@ -48,8 +61,21 @@
 		},
 		{
 			"name": "consultar un producto",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"",
+							"tests[\"Response time is less than 800ms\"] = responseTime < 800;"
+						]
+					}
+				}
+			],
 			"request": {
-				"url": "http://localhost:8080/RotondAndes/rest/restaurantes/12/productos/31",
+				"url": "http://localhost:8081/RotondAndes/rest/restaurantes/12/productos/31",
 				"method": "GET",
 				"header": [],
 				"body": {},

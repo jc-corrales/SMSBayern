@@ -21,7 +21,7 @@
 				}
 			],
 			"request": {
-				"url": "http://localhost:8080/RotondAndes/rest/restaurantes/1/producto1/34/producto2/54",
+				"url": "http://localhost:8081/RotondAndes/rest/restaurantes/1/producto1/34/producto2/54",
 				"method": "POST",
 				"header": [
 					{
@@ -52,7 +52,7 @@
 				}
 			],
 			"request": {
-				"url": "http://localhost:8080/RotondAndes/rest/restaurantes/1/producto1/1/producto2/5",
+				"url": "http://localhost:8081/RotondAndes/rest/restaurantes/1/producto1/1/producto2/5",
 				"method": "POST",
 				"header": [
 					{

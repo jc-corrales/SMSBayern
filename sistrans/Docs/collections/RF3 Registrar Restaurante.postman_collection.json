@@ -21,7 +21,7 @@
 				}
 			],
 			"request": {
-				"url": "http://localhost:8080/RotondAndes/rest/admin/restaurantes/idZona/25",
+				"url": "http://localhost:8081/RotondAndes/rest/admin/restaurantes/idZona/25",
 				"method": "POST",
 				"header": [
 					{

@@ -1,0 +1,64 @@
+{
+	"variables": [],
+	"info": {
+		"name": "RFC11 CONSULTAR FUNCIONAMIENTO ",
+		"_postman_id": "0d3e5ba9-3cf7-eda0-8adf-3e3fc7d7646e",
+		"description": "Muestra, para cada día de la semana, el producto más consumido, el producto menos consumido, el restaurante más\r\nfrecuentado y el restaurante menos frecuentado. Las respuestas deben ser sustentadas por el detalle de productos\r\nconsumidos y restaurantes frecuentados. Esta operación es realizada el gerente general de RotondAndes.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Registrar Ventas",
+			"request": {
+				"url": "http://localhost:8081/RotondAndes/rest/admin/registroVentas",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"passwordAdmin\" : \"lshfvlosdhlo\", \"idAdmin\" : 500, \"fecha\" : \"28/12/17\", \"dia\" : \"LUNES\"}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Obtener RegistroVentas",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"",
+							"tests[\"Response time is less than 800ms\"] = responseTime < 800;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "http://localhost:8081/RotondAndes/rest/admin/registroVentas",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"passwordAdmin\" : \"lshfvlosdhlo\", \"idAdmin\" : 500}"
+				},
+				"description": ""
+			},
+			"response": []
+		}
+	]
+}

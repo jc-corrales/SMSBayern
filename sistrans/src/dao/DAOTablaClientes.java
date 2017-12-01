@@ -414,7 +414,7 @@ public class DAOTablaClientes {
 	}
 	
 	/**
-	 * Método que obtiene una lista de clientes que han pedido al menos una vez
+	 * Método que obtiene una lista de un Cliente que ha pedido al menos una vez
 	 * un producto de un Restaurante específico.
 	 * @param idCliente Long, ID cliente.
 	 * @param idRestaurante Long, ID Restaurante.
@@ -471,7 +471,6 @@ public class DAOTablaClientes {
 				sql += "\n ORDER BY " + orderBy;
 			}
 		}
-		
 		PreparedStatement stmt= conn.prepareStatement(sql);
 		recursos.add(stmt);
 		ResultSet rs = stmt.executeQuery();
@@ -485,45 +484,165 @@ public class DAOTablaClientes {
 	}
 	
 	/**
-	 * RFC10 Consultar consumo en Rotondandes
-	 * @param idRestaurante id del restaurante determinado
-	 * @param fecha1 fecha inicial
-	 * @param fecha2 fecha final
-	 * @param orderBy como decea el usuario organizar los resultados
-	 * @param groupBy como decea el usuario agrupar los resultados
-	 * @param idUsuario el idUsuario para autorización
-	 * @param contraseniaa la contraseña del usuario para autorización
-	 * @return Clientes
-	 * @throws Exception 
+	 * Método que obtiene una lista de clientes que NO han pedido al menos una vez
+	 * un producto de un Restaurante específico.
+	 * @param idRestaurante Long, ID Restaurante.
+	 * @param fecha1 String, Fecha, formato: DD/MM/AA
+	 * @param fecha2 String, Fecha, formato: DD/MM/AA
+	 * @param criterio Integer, número que indica el criterio de búsqueda
+	 * @param orderBy String, Criterio de Orden.
+	 * @return List<Cliente>, Lista de Clientes que entran en el rango de búsqueda
+	 * @throws SQLException
+	 * @throws Exception
 	 */
-
-	public List<Cliente> getClientesConNOMin1ConsumoEnRangoFechasEnRestaurante(Long idRestaurante, Date fecha1, Date fecha2, String orderBy, String groupBy, Long idUsuario, String contrasenia) throws Exception
+	public List<Cliente> getClientesSinMinUnConsumoEnRangoFechasEnRestaurante(Long idRestaurante, String fecha1, String fecha2, Integer criterio, String orderBy)throws SQLException, Exception
 	{
-		List<Cliente> resp = new ArrayList<Cliente>();
-		if(idUsuario == idRestaurante || !tablaUsuarios.verficarUsuarioAdministrador(idUsuario, contrasenia))
+		List<Cliente> clientes = new ArrayList<Cliente>();
+		String sql = "";
+		if(criterio == null)
 		{
-			resp = null;
+			criterio = 0;
+		}
+		if(criterio.equals(CATEGORIA))
+		{
+			sql = "SELECT * \r\n" + 
+					"    FROM CLIENTES\r\n" + 
+					"    WHERE NOT CLIENTES.ID = ANY (SELECT ID_CLIENTE\r\n" + 
+					"        FROM ORDENES, PEDIDOS\r\n" + 
+					"        INNER JOIN PRODUCTOS ON PEDIDOS.ID_PRODUCTO = PRODUCTOS.ID \r\n" + 
+					"        WHERE ORDENES.ID = PEDIDOS.ID_ORDEN AND PEDIDOS.ID_RESTAURANTE = " + idRestaurante + " AND PEDIDOS.FECHA >= '" + fecha1 + " 01:00:00, 000000000 AM' AND  PEDIDOS.FECHA <='" + fecha2 + " 12:59:59, 000000000 PM'\r\n" + 
+					"        GROUP BY CATEGORIA, ID_CLIENTE";
+//			if(orderBy != null && (orderBy.equals("ID_CLIENTE") || orderBy.equals("NUMPEDIDOS")|| orderBy.equals("CATEGORIA")) )
+//			{
+//				sql += "\n ORDER BY " + orderBy;
+//			}
+			sql += ")";
+		}
+		else if(criterio.equals(PRODUCTO))
+		{
+			sql = "SELECT * \r\n" + 
+					"    FROM CLIENTES\r\n" + 
+					"    WHERE NOT CLIENTES.ID = ANY (SELECT ID_CLIENTE\r\n" + 
+					"        FROM ORDENES, PEDIDOS\r\n" + 
+					"        INNER JOIN PRODUCTOS ON PEDIDOS.ID_PRODUCTO = PRODUCTOS.ID \r\n" + 
+					"        WHERE ORDENES.ID = PEDIDOS.ID_ORDEN AND PEDIDOS.ID_RESTAURANTE = " + idRestaurante + " AND PEDIDOS.FECHA >= '" + fecha1 + " 01:00:00, 000000000 AM' AND  PEDIDOS.FECHA <='" + fecha2 + "12:59:59, 000000000 PM'\r\n" + 
+					"        GROUP BY PRODUCTOS.ID, ID_CLIENTE";
+//			if(orderBy != null && (orderBy.equals("ID_CLIENTE") || orderBy.equals("NUMPEDIDOS")|| orderBy.equals("IDPRODUCTO")) )
+//			{
+//				sql += "\n ORDER BY " + orderBy;
+//			}
+			sql += ")";
 		}
 		else
 		{
-			String sql = "SELECT CLIENTES.ID, CLIENTES.NAME, CLIENTES.IDMESA FROM (SELECT * FROM CLIENTES, (SELECT * FROM PEDIDOS, ORDENES WHERE PEDIDOS.ID_ORDEN = ORDENES.ID) WHERE CLIENTES.ID = ORDENES.ID_CLIENTE), (SELECT * FROM PRODUCTO_RESTAURANTE, (SELECT * FROM RESTAURANTES WHERE RESTAURANTES.ID =" + idRestaurante +  ") WHERE RESTAURANTES.ID = PRODUCTO_RESTAURANTE.ID_REST) WHERE PEDIDOS.ID_PRODUCTO <> PRODUCTO_RESTAURANTE.ID_PROD AND ORDENES.FECHA BETWEEN" + fecha1 +"AND" +fecha2+ " ORDER BY"+orderBy+" GROUP BY"+groupBy+";";
-			PreparedStatement stmt= conn.prepareStatement(sql);
-			recursos.add(stmt);
-			ResultSet rs = stmt.executeQuery();
-			List<Cliente> resp2 = new ArrayList<Cliente>();
-			while(rs.next())
-			{
-				Long id = rs.getLong("ID");
-				String nombre = rs.getString("NAME");
-				Long idMesa = rs.getLong("IDMESA");
-
-				resp.add(new Cliente(id, idMesa,nombre, null));
-				resp = resp2;
-			}
+			sql = "SELECT * \r\n" + 
+					"    FROM CLIENTES\r\n" + 
+					"    WHERE NOT CLIENTES.ID = ANY (SELECT ID_CLIENTE\r\n" + 
+					"        FROM ORDENES, PEDIDOS\r\n" + 
+					"        INNER JOIN PRODUCTOS ON PEDIDOS.ID_PRODUCTO = PRODUCTOS.ID \r\n" + 
+					"        WHERE ORDENES.ID = PEDIDOS.ID_ORDEN AND PEDIDOS.ID_RESTAURANTE = " + idRestaurante + " AND PEDIDOS.FECHA >= '" + fecha1 + " 01:00:00, 000000000 AM' AND  PEDIDOS.FECHA <='" + fecha2 + " 12:59:59, 000000000 PM'\r\n" + 
+					"        GROUP BY ID_CLIENTE";
+//			if(orderBy != null && (orderBy.equals("ID_CLIENTE") || orderBy.equals("NUMPEDIDOS")) )
+//			{
+//				sql += "\n ORDER BY " + orderBy;
+//			}
+			sql += ")";
 		}
-		return resp;
+		System.out.println(sql);
+		PreparedStatement stmt= conn.prepareStatement(sql);
+		recursos.add(stmt);
+		ResultSet rs = stmt.executeQuery();
+		while(rs.next())
+		{
+			
+			Cliente cliente = new Cliente(rs.getLong("ID"), null, null, null);
+			clientes.add(cliente);
+		}
+		return clientes;
 	}
-
+	
+	
+	/**
+	 * Método que obtiene una lista de un Cliente que NO ha pedido al menos una vez
+	 * un producto de un Restaurante específico.
+	 * @param idCliente Long, ID cliente.
+	 * @param idRestaurante Long, ID Restaurante.
+	 * @param fecha1 String, Fecha, formato: DD/MM/AA
+	 * @param fecha2 String, Fecha, formato: DD/MM/AA
+	 * @param criterio Integer, número que indica el criterio de búsqueda
+	 * @param orderBy String, Criterio de Orden.
+	 * @return List<Cliente>, Lista de Clientes que entran en el rango de búsqueda
+	 * @throws SQLException
+	 * @throws Exception
+	 */
+	public List<Cliente> getClienteSinMinUnConsumoEnRangoFechasPorRestaurante(Long idCliente, Long idRestaurante, String fecha1, String fecha2, Integer criterio, String orderBy)throws SQLException, Exception
+	{
+		List<Cliente> clientes = new ArrayList<Cliente>();
+		String sql = "";
+		if(criterio == null)
+		{
+			criterio = 0;
+		}
+		if(criterio.equals(CATEGORIA))
+		{
+			sql = "SELECT * \r\n" + 
+					"    FROM CLIENTES\r\n" + 
+					"    WHERE CLIENTES.ID = " + idCliente + " AND NOT CLIENTES.ID = ANY \r\n" + 
+					"    (SELECT ID_CLIENTE\r\n" + 
+					"        FROM ORDENES, PEDIDOS\r\n" + 
+					"        INNER JOIN PRODUCTOS ON PEDIDOS.ID_PRODUCTO = PRODUCTOS.ID \r\n" + 
+					"        WHERE ORDENES.ID = PEDIDOS.ID_ORDEN AND PEDIDOS.ID_RESTAURANTE = " + idRestaurante + " AND PEDIDOS.FECHA >= '" + fecha1 + " 01:00:00, 000000000 AM' AND  PEDIDOS.FECHA <='" + fecha2 + " 12:59:59, 000000000 PM'\r\n" + 
+					"        GROUP BY CATEGORIA, ID_CLIENTE";
+//			if(orderBy != null && (orderBy.equals("ID_CLIENTE") || orderBy.equals("NUMPEDIDOS")|| orderBy.equals("CATEGORIA")) )
+//			{
+//				sql += "\n ORDER BY " + orderBy;
+//			}
+			sql += ")";
+		}
+		else if(criterio.equals(PRODUCTO))
+		{
+			sql = "SELECT * \r\n" + 
+					"    FROM CLIENTES\r\n" + 
+					"    WHERE CLIENTES.ID = " + idCliente + " AND NOT CLIENTES.ID = ANY \r\n" + 
+					"    (SELECT ID_CLIENTE\r\n" + 
+					"        FROM ORDENES, PEDIDOS\r\n" + 
+					"        INNER JOIN PRODUCTOS ON PEDIDOS.ID_PRODUCTO = PRODUCTOS.ID \r\n" + 
+					"        WHERE ORDENES.ID = PEDIDOS.ID_ORDEN AND PEDIDOS.ID_RESTAURANTE = " + idRestaurante + " AND PEDIDOS.FECHA >= '" + fecha1 + " 01:00:00, 000000000 AM' AND  PEDIDOS.FECHA <='" + fecha2 + " 12:59:59, 000000000 PM'\r\n" + 
+					"        GROUP BY PRODUCTOS.ID, ID_CLIENTE";
+//			if(orderBy != null && (orderBy.equals("ID_CLIENTE") || orderBy.equals("NUMPEDIDOS")|| orderBy.equals("IDPRODUCTO")) )
+//			{
+//				sql += "\n ORDER BY " + orderBy;
+//			}
+			sql += ")";
+		}
+		else
+		{
+			sql = "SELECT * \r\n" + 
+					"	 FROM CLIENTES\r\n" + 
+					"	 WHERE CLIENTES.ID = " + idCliente + " AND NOT CLIENTES.ID = ANY\r\n" + 
+					"     	(SELECT ID_CLIENTE\r\n" + 
+					"       FROM ORDENES, PEDIDOS\r\n" + 
+					"       INNER JOIN PRODUCTOS ON PEDIDOS.ID_PRODUCTO = PRODUCTOS.ID \r\n" + 
+					"		WHERE ORDENES.ID = PEDIDOS.ID_ORDEN AND PEDIDOS.ID_RESTAURANTE = " + idRestaurante + " AND PEDIDOS.FECHA >= '" + fecha1 + " 01:00:00, 000000000 AM' AND  PEDIDOS.FECHA <='" + fecha2 + " 12:59:59, 000000000 PM'\r\n" + 
+					"		GROUP BY ID_CLIENTE";
+//			if(orderBy != null && (orderBy.equals("ID_CLIENTE") || orderBy.equals("NUMPEDIDOS")) )
+//			{
+//				sql += "\n ORDER BY " + orderBy;
+//			}
+			sql += ")";
+		}
+		System.out.println(sql);
+		PreparedStatement stmt= conn.prepareStatement(sql);
+		recursos.add(stmt);
+		ResultSet rs = stmt.executeQuery();
+		while(rs.next())
+		{
+			
+			Cliente cliente = new Cliente(rs.getLong("ID"), null, null, null);
+			clientes.add(cliente);
+		}
+		return clientes;
+	}
 	//---------------------------------------------------	
 	//	Requerimiento: RF12
 	//---------------------------------------------------

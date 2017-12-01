@@ -21,7 +21,7 @@
 				}
 			],
 			"request": {
-				"url": "http://localhost:8080/RotondAndes/rest/ingredientes",
+				"url": "http://localhost:8081/RotondAndes/rest/ingredientes",
 				"method": "POST",
 				"header": [
 					{

@@ -1,0 +1,290 @@
+{
+	"variables": [],
+	"info": {
+		"name": "RFC9. CONSULTAR CONSUMO EN ROTONDANDES",
+		"_postman_id": "57190ff6-5039-230f-2f24-41e905b14741",
+		"description": "Se quiere conocer la información de los usuarios que consumieron al menos un producto de un determinado restaurante\r\nen un rango de fechas. Los resultados deben ser clasificados según un criterio deseado por quien realiza la consulta. En\r\nla clasificación debe ofrecerse la posibilidad de agrupamiento y ordenamiento de las respuestas según los intereses del\r\nusuario que consulta como, por ejemplo, por los datos del cliente, por producto y por tipo de producto. Esta operación es\r\nrealizada por los usuarios restaurante y por el gerente general de RotondAndes.\r\nNOTA: Respetando la privacidad de los clientes, cuando un cliente restaurante hace esta consulta obtiene la información\r\nde su propia actividad, mientras que el administrador obtiene toda la información de cualquiera de los clientes. Ver RNF1.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Consultar todos los Clientes (Admin)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "http://localhost:8081/RotondAndes/rest/admin/consumoMinimoClientes",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"idRestaurante\" : 1, \"criterioDeBusqueda\" : 0, \"ordenDeBusqueda\" : \"ID_CLIENTE\", \"fecha1\" : \"10/10/17\", \"fecha2\" : \"20/12/17\"}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Consultar todos los Clientes por Categoría (Admin)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "http://localhost:8081/RotondAndes/rest/admin/consumoMinimoClientes",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"idRestaurante\" : 1, \"criterioDeBusqueda\" : 1, \"ordenDeBusqueda\" : \"ID_CLIENTE\", \"fecha1\" : \"10/10/17\", \"fecha2\" : \"20/12/17\"}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Consultar todos los Clientes por Producto (Admin)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "http://localhost:8081/RotondAndes/rest/admin/consumoMinimoClientes",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"idRestaurante\" : 1, \"criterioDeBusqueda\" : 2, \"ordenDeBusqueda\" : \"ID_CLIENTE\", \"fecha1\" : \"10/10/17\", \"fecha2\" : \"20/12/17\"}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Consultar cliente 107 (Admin)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "http://localhost:8081/RotondAndes/rest/admin/consumoMinimoClientes/107",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"idRestaurante\" : 1, \"criterioDeBusqueda\" : 0, \"ordenDeBusqueda\" : \"ID_CLIENTE\", \"fecha1\" : \"10/10/17\", \"fecha2\" : \"20/12/17\"}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Consultar cliente 107 por Categoría (Admin)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "http://localhost:8081/RotondAndes/rest/admin/consumoMinimoClientes/107",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"idRestaurante\" : 1, \"criterioDeBusqueda\" : 1, \"ordenDeBusqueda\" : \"ID_CLIENTE\", \"fecha1\" : \"10/10/17\", \"fecha2\" : \"20/12/17\"}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Consultar cliente 107 por Producto (Admin)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "http://localhost:8081/RotondAndes/rest/admin/consumoMinimoClientes/107",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"idRestaurante\" : 1, \"criterioDeBusqueda\" : 2, \"ordenDeBusqueda\" : \"ID_CLIENTE\", \"fecha1\" : \"10/10/17\", \"fecha2\" : \"20/12/17\"}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Consultar cliente 107 por Categoria copy",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "http://localhost:8081/RotondAndes/rest/clientes/107/consumoMinimoClientes",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"idRestaurante\" : 1, \"criterioDeBusqueda\" : 0, \"ordenDeBusqueda\" : \"ID_CLIENTE\", \"fecha1\" : \"10/10/17\", \"fecha2\" : \"20/12/17\"}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Consultar cliente 108 por Categoria",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "http://localhost:8081/RotondAndes/rest/admin/consumoMinimoClientes/108",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"idRestaurante\" : 1, \"criterioDeBusqueda\" : 1, \"ordenDeBusqueda\" : \"ID_CLIENTE\", \"fecha1\" : \"10/10/17\", \"fecha2\" : \"20/12/17\"}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Consultar cliente 107 por Producto",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "http://localhost:8081/RotondAndes/rest/clientes/107/consumoMinimoClientes",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"idRestaurante\" : 1, \"criterioDeBusqueda\" : 2, \"ordenDeBusqueda\" : \"ID_CLIENTE\", \"fecha1\" : \"10/10/17\", \"fecha2\" : \"20/12/17\"}"
+				},
+				"description": ""
+			},
+			"response": []
+		}
+	]
+}

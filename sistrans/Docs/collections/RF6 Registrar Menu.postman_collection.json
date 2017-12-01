@@ -21,7 +21,7 @@
 				}
 			],
 			"request": {
-				"url": "http://localhost:8080/RotondAndes/rest/restaurantes/1/menus",
+				"url": "http://localhost:8081/RotondAndes/rest/restaurantes/1/menus",
 				"method": "POST",
 				"header": [
 					{
@@ -52,7 +52,7 @@
 				}
 			],
 			"request": {
-				"url": "http://localhost:8080/RotondAndes/rest/restaurantes/1/menus",
+				"url": "http://localhost:8081/RotondAndes/rest/restaurantes/1/menus",
 				"method": "POST",
 				"header": [
 					{

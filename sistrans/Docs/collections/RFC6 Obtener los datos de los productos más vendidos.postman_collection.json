@@ -9,8 +9,21 @@
 	"item": [
 		{
 			"name": "Obtener productos más vendidos",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"",
+							"tests[\"Response time is less than 800ms\"] = responseTime < 800;"
+						]
+					}
+				}
+			],
 			"request": {
-				"url": "http://localhost:8080/RotondAndes/rest/productos/masVendidos",
+				"url": "http://localhost:8081/RotondAndes/rest/productos/masVendidos",
 				"method": "GET",
 				"header": [],
 				"body": {},

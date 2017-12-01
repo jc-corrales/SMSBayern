@@ -21,7 +21,7 @@
 				}
 			],
 			"request": {
-				"url": "http://localhost:8080/RotondAndes/rest/zonas/",
+				"url": "http://localhost:8081/RotondAndes/rest/zonas/",
 				"method": "POST",
 				"header": [
 					{

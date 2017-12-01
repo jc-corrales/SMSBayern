@@ -21,7 +21,7 @@
 				}
 			],
 			"request": {
-				"url": "http://localhost:8080/RotondAndes/rest/clientesFrecuentes/110/preferencias",
+				"url": "http://localhost:8081/RotondAndes/rest/clientesFrecuentes/110/preferencias",
 				"method": "POST",
 				"header": [
 					{

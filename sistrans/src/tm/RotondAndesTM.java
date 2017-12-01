@@ -29,6 +29,7 @@ import dao.DAOTablaProductos;
 import dao.DAOTablaRestaurantes;
 import dao.DAOTablaUsuarios;
 import dao.DAOTablaZonas;
+import dtm.RotondAndesDistributed;
 import vos.Cliente;
 import vos.ClienteFrecuente;
 import vos.ConsumoCliente;
@@ -88,8 +89,10 @@ public class RotondAndesTM {
 	 * conexion a la base de datos
 	 */
 	private Connection conn;
-
-
+	/**
+	 * Atributo que contiene el DTM.
+	 */
+	private RotondAndesDistributed dtm;
 	/**
 	 * Metodo constructor de la clase RotondAndesMaster, esta clase modela y contiene cada una de las 
 	 * transacciones y la logica de negocios que estas conllevan.
@@ -100,6 +103,9 @@ public class RotondAndesTM {
 	public RotondAndesTM(String contextPathP) {
 		connectionDataPath = contextPathP + CONNECTION_DATA_FILE_NAME_REMOTE;
 		initConnectionData();
+		System.out.println("Instancing DTM...");
+		dtm = RotondAndesDistributed.getInstance(this);
+		System.out.println("Done!");
 	}
 
 	/**
@@ -1802,9 +1808,11 @@ public class RotondAndesTM {
 		}
 		return productos;
 	}
-
+	//---------------------------------------------------	
+	//	Requerimiento: RFC11A
+	//---------------------------------------------------
 	/**
-	 * M√©todo que da el o los Productos m√°s ofrecidos en RotondAndes.
+	 * MÈtodo que da el o los Productos m√°s ofrecidos en RotondAndes.
 	 * @return List<Producto>, Lista de Productos m√°s ofrecidos.
 	 * @throws SQLException
 	 * @throws Exception
@@ -1846,8 +1854,11 @@ public class RotondAndesTM {
 		}
 		return true;
 	}
+	//---------------------------------------------------	
+	//	Requerimiento: RFC11B
+	//---------------------------------------------------
 	/**
-	 * M√©todo que da el Registro de Ventas de la Semana.
+	 * MÈtodo que da el Registro de Ventas de la Semana.
 	 * @return List<RegistroVentas> Lista de Registro de Ventas.
 	 * @throws SQLException
 	 * @throws Exception
@@ -1998,13 +2009,13 @@ public class RotondAndesTM {
 	/**
 	 * MÈtodo que obtiene si un cliente ha consumido un producto de un Restaurante dado por ID
 	 * en un rango de fechas.
-	 * @param idCliente
-	 * @param idRestaurante
-	 * @param fecha1
-	 * @param fecha2
-	 * @param criterio
-	 * @param orderBy
-	 * @return
+	 * @param idCliente Long, ID del Cliente.
+	 * @param idRestaurante Long, ID del Restaurante.
+	 * @param fecha1 String, Cadena de la Fecha 1.
+	 * @param fecha2 String, Cadena de la Fecha 2.
+	 * @param criterio Integer, Entero con el tipo de Criterio, se traduce en el DAO.
+	 * @param orderBy String, valor seg˙n el cual ordenar.
+	 * @return List<Cliente>, Lista con el Cliente que no ha consumido.
 	 * @throws Exception
 	 */
 	public List<Cliente> getClienteConMinUnConsumoEnRangoFechasPorRestaurante(Long idCliente, Long idRestaurante, String fecha1, String fecha2, Integer criterio, String orderBy) throws Exception
@@ -2047,7 +2058,7 @@ public class RotondAndesTM {
 	//---------------------------------------------------
 
 	/**
-	 *M√©toodo que llama al RFC9 que retorna los clientes que al menos hayan pedido un producto de un restaurante dado con un rango de fechas dado. 
+	 * MÈtoodo que llama al RFC9 que retorna los clientes que al menos hayan pedido un producto de un restaurante dado con un rango de fechas dado. 
 	 * RFC10 Consultar consumo en Rotondandes
 	 * @param idRestaurante id del restaurante determinado
 	 * @param fecha1 fecha inicial
@@ -2060,12 +2071,89 @@ public class RotondAndesTM {
 	 * @throws Exception 
 	 */
 
-	public List<Cliente> getClientesConNOMin1ConsumoEnRangoFechasEnRestaurante(Long idRestaurante, Date fecha1, Date fecha2, String orderBy, String groupBy, Long idUsuario, String contrasenia) throws Exception
+	public List<Cliente> getClientesSinMinUnConsumoEnRangoFechasEnRestaurante(Long idRestaurante, String fecha1, String fecha2, Integer criterio, String orderBy) throws Exception
 	{
-		DAOTablaClientes daoCli = new DAOTablaClientes(); 
-		return daoCli.getClientesConNOMin1ConsumoEnRangoFechasEnRestaurante(idRestaurante, fecha1, fecha2, orderBy, groupBy, idUsuario, contrasenia);
+		DAOTablaClientes dao = new DAOTablaClientes(); 
+		List<Cliente> clientes = new ArrayList<Cliente>();
+		try {
+			this.conn = darConexion();
+			dao.setConn(conn);
+			clientes = dao.getClientesSinMinUnConsumoEnRangoFechasEnRestaurante(idRestaurante, fecha1, fecha2, criterio, orderBy);
+			for(int i = 0; i < clientes.size(); i++)
+			{
+				Long idCliente = clientes.get(i).getId();
+				Cliente clienteCompleto = dao.darClienteSinOrdenes(idCliente);
+				clientes.set(i, clienteCompleto);
+			}
+		}catch (SQLException e) {
+			System.err.println("SQLException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		} catch (Exception e) {
+			System.err.println("GeneralException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		}finally {
+			try {
+				dao.cerrarRecursos();
+				if(this.conn!=null)
+					this.conn.close();
+			} catch (SQLException exception) {
+				System.err.println("SQLException closing resources:" + exception.getMessage());
+				exception.printStackTrace();
+				throw exception;
+			}
+		}
+		return clientes;
 	}
 
+	/**
+	 * MÈtodo que obtiene si un cliente NO ha consumido un producto de un Restaurante dado por ID
+	 * en un rango de fechas.
+	 * @param idCliente Long, ID del Cliente.
+	 * @param idRestaurante Long, ID del Restaurante.
+	 * @param fecha1 String, Cadena de la Fecha 1.
+	 * @param fecha2 String, Cadena de la Fecha 2.
+	 * @param criterio Integer, Entero con el tipo de Criterio, se traduce en el DAO.
+	 * @param orderBy String, valor seg˙n el cual ordenar.
+	 * @return List<Cliente>, Lista con el Cliente que no ha consumido.
+	 * @throws Exception
+	 */
+	public List<Cliente> getClienteSinMinUnConsumoEnRangoFechasPorRestaurante(Long idCliente, Long idRestaurante, String fecha1, String fecha2, Integer criterio, String orderBy) throws Exception
+	{
+		DAOTablaClientes dao = new DAOTablaClientes(); 
+		List<Cliente> clientes = new ArrayList<Cliente>();
+		try {
+			this.conn = darConexion();
+			dao.setConn(conn);
+			clientes = dao.getClienteSinMinUnConsumoEnRangoFechasPorRestaurante(idCliente, idRestaurante, fecha1, fecha2, criterio, orderBy);
+			for(int i = 0; i < clientes.size(); i++)
+			{
+				Long idClienteTemp = clientes.get(i).getId();
+				Cliente clienteCompleto = dao.darClienteSinOrdenes(idClienteTemp);
+				clientes.set(i, clienteCompleto);
+			}
+		}catch (SQLException e) {
+			System.err.println("SQLException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		} catch (Exception e) {
+			System.err.println("GeneralException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		}finally {
+			try {
+				dao.cerrarRecursos();
+				if(this.conn!=null)
+					this.conn.close();
+			} catch (SQLException exception) {
+				System.err.println("SQLException closing resources:" + exception.getMessage());
+				exception.printStackTrace();
+				throw exception;
+			}
+		}
+		return clientes;
+	}
 	//---------------------------------------------------	
 	//	Requerimiento: RF12
 	//---------------------------------------------------

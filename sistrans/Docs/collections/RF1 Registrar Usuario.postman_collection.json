@@ -21,7 +21,7 @@
 				}
 			],
 			"request": {
-				"url": "http://localhost:8080/RotondAndes/rest/clientes",
+				"url": "http://localhost:8081/RotondAndes/rest/clientes",
 				"method": "POST",
 				"header": [
 					{
@@ -52,7 +52,7 @@
 				}
 			],
 			"request": {
-				"url": "http://localhost:8080/RotondAndes/rest/clientes",
+				"url": "http://localhost:8081/RotondAndes/rest/clientes",
 				"method": "POST",
 				"header": [
 					{
@@ -83,7 +83,7 @@
 				}
 			],
 			"request": {
-				"url": "http://localhost:8080/RotondAndes/rest/admin",
+				"url": "http://localhost:8081/RotondAndes/rest/admin",
 				"method": "POST",
 				"header": [
 					{

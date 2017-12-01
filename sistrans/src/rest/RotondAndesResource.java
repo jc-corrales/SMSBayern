@@ -288,11 +288,51 @@ public class RotondAndesResource {
 	@POST
 	@Path("consumoMinimoClientes/{idCliente: \\d+}")
 	@Produces( { MediaType.APPLICATION_JSON } )
-	public Response getClientesConsumoMinimoRestFechas(@PathParam("idCliente") Long clienteId, RequestBodyUnConsumo request) 
+	public Response getClienteConsumoMinimoRestFechas(@PathParam("idCliente") Long clienteId, RequestBodyUnConsumo request) 
 	{
 		RotondAndesTM tm = new RotondAndesTM(getPath());
 		try {
 			List<Cliente> respuesta = tm.getClienteConMinUnConsumoEnRangoFechasPorRestaurante(clienteId, request.idRestaurante, request.fecha1, request.fecha2, request.criterioDeBusqueda, request.ordenDeBusqueda);
+			return Response.status( 200 ).entity( respuesta ).build( );		
+		}catch( Exception e )
+		{
+			return Response.status( 500 ).entity( doErrorMessage( e ) ).build( );
+		}
+	}
+
+	/**
+	 * Método que obtiene los Clientes que NO han realizado al menos un consumo en un Restaurante dado.
+	 * @param request RequestBodyUnConsumo
+	 * @return
+	 */
+	@POST
+	@Path("noConsumoMinimoClientes")
+	@Produces( { MediaType.APPLICATION_JSON } )
+	public Response getClientesNoConsumoMinimoRestFechas(RequestBodyUnConsumo request) 
+	{
+		RotondAndesTM tm = new RotondAndesTM(getPath());
+		try {
+			List<Cliente> respuesta = tm.getClientesSinMinUnConsumoEnRangoFechasEnRestaurante(request.idRestaurante, request.fecha1, request.fecha2, request.criterioDeBusqueda, request.ordenDeBusqueda);
+			return Response.status( 200 ).entity( respuesta ).build( );		
+		}catch( Exception e )
+		{
+			return Response.status( 500 ).entity( doErrorMessage( e ) ).build( );
+		}
+	}
+	
+	/**
+	 * Método que obtiene los Clientes que NO han realizado al menos un consumo en un Restaurante dado.
+	 * @param request RequestBodyUnConsumo
+	 * @return
+	 */
+	@POST
+	@Path("noConsumoMinimoClientes/{idCliente: \\d+}")
+	@Produces( { MediaType.APPLICATION_JSON } )
+	public Response getClienteNoConsumoMinimoRestFechas(@PathParam("idCliente") Long clienteId, RequestBodyUnConsumo request) 
+	{
+		RotondAndesTM tm = new RotondAndesTM(getPath());
+		try {
+			List<Cliente> respuesta = tm.getClienteSinMinUnConsumoEnRangoFechasPorRestaurante(clienteId, request.idRestaurante, request.fecha1, request.fecha2, request.criterioDeBusqueda, request.ordenDeBusqueda);
 			return Response.status( 200 ).entity( respuesta ).build( );		
 		}catch( Exception e )
 		{

@@ -21,7 +21,7 @@
 				}
 			],
 			"request": {
-				"url": "http://localhost:8080/RotondAndes/rest/pedidos/23",
+				"url": "http://localhost:8081/RotondAndes/rest/pedidos/23",
 				"method": "DELETE",
 				"header": [],
 				"body": {},
@@ -43,7 +43,7 @@
 				}
 			],
 			"request": {
-				"url": "http://localhost:8080/RotondAndes/rest/pedidos/13",
+				"url": "http://localhost:8081/RotondAndes/rest/pedidos/13",
 				"method": "DELETE",
 				"header": [],
 				"body": {},
