@@ -9,7 +9,6 @@ import java.util.List;
 
 import org.codehaus.jackson.map.ObjectMapper;
 
-import vos.Ingrediente;
 import vos.Menu;
 import vos.Producto;
 import vos.ProductoBase;

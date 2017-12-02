@@ -7,15 +7,23 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.codehaus.jackson.annotate.JsonProperty;
 
 import vos.Menu;
 import vos.Producto;
+import vos.ProductoBase;
+import vos.RentabilidadRestaurante;
 import vos.Representante;
 import vos.Restaurante;
 import vos.TipoComida;
+import vos.Zona;
 
 public class DAOTablaRestaurantes {
+	
+	public final static Integer NINGUNO = 0;
+	public final static Integer CATEGORIA = 1;
+	public final static Integer PRODUCTO = 2;
+	public final static Integer ZONA = 3;
+	
 	private ArrayList<Object> recursos;
 	private Connection conn;
 	
@@ -56,7 +64,7 @@ public class DAOTablaRestaurantes {
 			@JsonProperty(value = "productos")List<Producto> productos,
 			@JsonProperty(value = "tipo")TipoComida tipo
 			 */
-			Restaurante res = new Restaurante(rs.getLong("ID"), rs.getString("NAME"), rs.getString("PAGINA_WEB"), new ArrayList<Producto>(), new TipoComida(0L, new String("hola")), rs.getDouble("PRECIO"));
+			Restaurante res = new Restaurante(rs.getLong("ID"), rs.getString("NAME"), rs.getString("PAGINA_WEB"), new ArrayList<Producto>(), new TipoComida(0L, new String("hola")), rs.getDouble("PRECIO"), rs.getBoolean("EN_OPERACION"));
 			restaurantes.add(res);
 		}
 		
@@ -324,8 +332,13 @@ public class DAOTablaRestaurantes {
 		Long idRestaurante = restaurante.getId();
 //		Long idRepresentante = getSiguienteIdRepresentante();
 		//AGREGAR RESTAURANTE.
-		String sqlRestaurante = "INSERT INTO RESTAURANTES (ID, NAME, PRECIO, ID_TIPO, ID_ZONA, PAGINA_WEB)\r\n" + 
-				"    VALUES (" + idRestaurante + ", '"+ restaurante.getName() + "', " + restaurante.getPrecio() + ", " + restaurante.getTipoRestaurante().getId()+ ", " + idZona + " , '" + restaurante.getPagina() + "')";
+		Integer estadoOperacion = 1;
+		if(!restaurante.getEstadoOperacion())
+		{
+			estadoOperacion = 0;
+		}
+		String sqlRestaurante = "INSERT INTO RESTAURANTES (ID, NAME, PRECIO, ID_TIPO, ID_ZONA, PAGINA_WEB, EN_OPERACION)\r\n" + 
+				"    VALUES (" + idRestaurante + ", '"+ restaurante.getName() + "', " + restaurante.getPrecio() + ", " + restaurante.getTipoRestaurante().getId()+ ", " + idZona + " , '" + restaurante.getPagina() + "', " + estadoOperacion + ")";
 		System.out.println("SQL Restaurante: "+sqlRestaurante);
 		PreparedStatement prepStmtRestaurante= conn.prepareStatement(sqlRestaurante);
 		recursos.add(prepStmtRestaurante);
@@ -356,7 +369,7 @@ public class DAOTablaRestaurantes {
 	 */
 	public Restaurante obtenerRestaurante(Long id) throws SQLException, Exception
 	{
-		String sql = "SELECT R.ID, R.NAME, R.PRECIO, R.PAGINA_WEB, T.ID AS IDTIPO, T.NAME AS NAMETIPO\r\n" + 
+		String sql = "SELECT R.ID, R.NAME, R.PRECIO, R.PAGINA_WEB, R.EN_OPERACION AS EN_OPERACION, T.ID AS IDTIPO, T.NAME AS NAMETIPO\r\n" + 
 				"    FROM RESTAURANTES R, TIPOS T WHERE T.ID = R.ID_TIPO AND R.ID = " + id;
 		PreparedStatement st = conn.prepareStatement(sql);
 		recursos.add(st);
@@ -369,9 +382,405 @@ public class DAOTablaRestaurantes {
 			Double precio = rs.getDouble("PRECIO");
 			TipoComida tipo = new TipoComida(rs.getLong("IDTIPO"), rs.getString("NAMETIPO"));
 			List<Producto> productos = new ArrayList<Producto>();
-			restaurante = new Restaurante(id, name, pagina, productos, tipo, precio);
+			Boolean enOperacion = true;
+			if(rs.getInt("EN_OPERACION") == 0)
+			{
+				enOperacion = false;
+			}
+			restaurante = new Restaurante(id, name, pagina, productos, tipo, precio, enOperacion);
 		}
 		
 		return restaurante;
+	}
+	/**
+	 * Método que indica si el Restaurante está en operación o no.
+	 * @param idRestaurante Long, ID del Restaurante a consultar.
+	 * @return Boolean, Booleano que indica si el Restaurante está en Operación o no.
+	 * @throws SQLException
+	 * @throws Exception
+	 */
+	public Boolean darEstadoOperacionRestaurante(Long idRestaurante)throws SQLException, Exception
+	{
+		String sql = "SELECT EN_OPERACION\r\n" + 
+				"    FROM RESTAURANTES WHERE ID = " + idRestaurante;
+		PreparedStatement st = conn.prepareStatement(sql);
+		recursos.add(st);
+		ResultSet rs = st.executeQuery();
+		if(rs.next())
+		{
+			return rs.getBoolean("EN_OPERACION");
+		}
+		else
+		{
+			throw new Exception("Restaurante no existe");
+		}
+	}
+	/**
+	 * Método que indica si el Restaurante tiene algún Pedido pendiente por entregar.
+	 * Si el Restaurante tiene algún Pedido pendiente, todavía no se puede retirar.
+	 * Si el Restaurante no tiene ningún Pedido pendiente, se puede retirar.
+	 * @param idRestaurante Long, ID del Restaurante.
+	 * @return Boolean, Booleano que determina si el Restaurante tiene Pedidos pendientes por entregar o no.
+	 * @throws SQLException
+	 * @throws Exception
+	 */
+	public Boolean darEstadoOrdenesRestaurante(Long idRestaurante)throws SQLException, Exception
+	{
+		String sql = "SELECT * FROM PEDIDOS WHERE SERVIDO = 0 AND ID_RESTAURANTE =" + idRestaurante;
+		PreparedStatement st = conn.prepareStatement(sql);
+		recursos.add(st);
+		ResultSet rs = st.executeQuery();
+		if(rs.next())
+		{
+			return false;
+		}
+		else
+		{
+			return true;
+		}
+	}
+	/**
+	 * Método que establece que un Restaurante ya no está en servicio.
+	 * @param idRestaurante Long, ID del Restaurante a retirar del Servicio.
+	 * @throws SQLException
+	 * @throws Exception
+	 */
+	public void retirarRestaurante(Long idRestaurante)throws SQLException, Exception
+	{
+		String sql = "UPDATE RESTAURANTES SET EN_OPERACION = 0 WHERE ID = " + idRestaurante;
+		System.out.println(sql);
+		PreparedStatement prepStmt = conn.prepareStatement(sql);
+		recursos.add(prepStmt);
+		prepStmt.executeQuery();
+	}
+	/**
+	 * Método que obtiene la Rentabilidad de los Restaurantes, puede incluir un criterio de búsqueda.
+	 * @param fecha1 String, cadena de la primera fecha del rango de consulta.
+	 * @param fecha2 String, cadena de la segunda fecha del rango de consulta.
+	 * @param criterio Integer, Criterio según el cual se va a realizar la consulta.
+	 * @param idProducto Long, ID del Producto según el cual se va a realizar la consulta, si aplica.
+	 * @return List<RentabilidadRestaurante>, Lista con las Rentabilidades de todos los Restaurantes en el Rango de búsqueda.
+	 * @throws SQLException
+	 * @throws Exception
+	 */
+	public List<RentabilidadRestaurante> darRentabilidadDeRestaurantes(String fecha1, String fecha2, Integer criterio, Long idProducto)throws SQLException, Exception
+	{
+		List<RentabilidadRestaurante> respuesta = new ArrayList<RentabilidadRestaurante>();
+		String sql = "";
+		if(criterio.equals(CATEGORIA))
+		{
+			sql = "SELECT ID_REST, CATEGORIA, SUM(PRECIO) AS INGRESOS, SUM(COSTO_PRODUCCION) AS GASTOS, COUNT(PED.ID) AS NUMPEDIDOSTOTAL\r\n" + 
+					"    FROM PEDIDOS PED, PRODUCTO_RESTAURANTE PRODREST\r\n" + 
+					"    INNER JOIN PRODUCTOS PROD ON (PRODREST.ID_PROD = PROD.ID)\r\n" + 
+					"    WHERE (PED.ID_PRODUCTO = PRODREST.ID_PROD AND PED.ID_RESTAURANTE = PRODREST.ID_REST) AND FECHA >= '" + fecha1 + " 01:00:00, 000000000 AM' AND FECHA <= '" + fecha2 + " 12:59:59, 000000000 PM'\r\n" + 
+					"    GROUP BY ID_REST, CATEGORIA\r\n" + 
+					"    ORDER BY INGRESOS DESC";
+			PreparedStatement prepStmt = conn.prepareStatement(sql);
+			recursos.add(prepStmt);
+			ResultSet rs = prepStmt.executeQuery();
+			while(rs.next())
+			{
+				
+				Double rentabilidad = (rs.getDouble("INGRESOS") - rs.getDouble("GASTOS"));
+				Restaurante restaurante = obtenerRestaurante(rs.getLong("ID_REST"));
+				String categoria = rs.getString("CATEGORIA");
+				Integer cantidadPedidos = rs.getInt("NUMPEDIDOSTOTAL");
+				Double ingresos = rs.getDouble("INGRESOS");
+				Double gastos = rs.getDouble("GASTOS");
+				respuesta.add(new RentabilidadRestaurante(ingresos, gastos, rentabilidad, cantidadPedidos, restaurante, categoria, null, null));
+			}
+		}
+		else if(criterio.equals(PRODUCTO))
+		{
+			if(idProducto == null)
+			{
+				sql = "SELECT ID_REST, PRODREST.ID_PROD, SUM(PRECIO) AS INGRESOS, SUM(COSTO_PRODUCCION) AS GASTOS, COUNT(PED.ID) AS NUMPEDIDOSTOTAL\r\n" + 
+						"    FROM PEDIDOS PED, PRODUCTO_RESTAURANTE PRODREST\r\n" + 
+						"    INNER JOIN PRODUCTOS PROD ON (PRODREST.ID_PROD = PROD.ID)\r\n" + 
+						"    WHERE (PED.ID_PRODUCTO = PRODREST.ID_PROD AND PED.ID_RESTAURANTE = PRODREST.ID_REST) AND FECHA >= '10/10/17 01:00:00, 000000000 AM' AND FECHA <= '20/12/17 12:59:59, 000000000 PM'\r\n" + 
+						"    GROUP BY ID_REST, PRODREST.ID_PROD\r\n" + 
+						"    ORDER BY INGRESOS DESC";
+				PreparedStatement prepStmt = conn.prepareStatement(sql);
+				recursos.add(prepStmt);
+				ResultSet rs = prepStmt.executeQuery();
+				while(rs.next())
+				{
+					
+					Double rentabilidad = (rs.getDouble("INGRESOS") - rs.getDouble("GASTOS"));
+					Restaurante restaurante = obtenerRestaurante(rs.getLong("ID_REST"));
+					Producto producto = darProducto(rs.getLong("ID_PROD"), rs.getLong("ID_REST"));
+					Integer cantidadPedidos = rs.getInt("NUMPEDIDOSTOTAL");
+					Double ingresos = rs.getDouble("INGRESOS");
+					Double gastos = rs.getDouble("GASTOS");
+					respuesta.add(new RentabilidadRestaurante(ingresos, gastos, rentabilidad, cantidadPedidos, restaurante, null, producto, null));
+				}
+			}
+			else
+			{
+				sql = "SELECT ID_REST, PRODREST.ID_PROD, SUM(PRECIO) AS INGRESOS, SUM(COSTO_PRODUCCION) AS GASTOS, COUNT(PED.ID) AS NUMPEDIDOSTOTAL\r\n" + 
+						"    FROM PEDIDOS PED, PRODUCTO_RESTAURANTE PRODREST\r\n" + 
+						"    INNER JOIN PRODUCTOS PROD ON (PRODREST.ID_PROD = PROD.ID)\r\n" + 
+						"    WHERE (PED.ID_PRODUCTO = PRODREST.ID_PROD AND PED.ID_RESTAURANTE = PRODREST.ID_REST) AND FECHA >= '10/10/17 01:00:00, 000000000 AM' AND FECHA <= '20/12/17 12:59:59, 000000000 PM' AND PROD.ID = " + idProducto + "\r\n" + 
+						"    GROUP BY ID_REST, PRODREST.ID_PROD\r\n" + 
+						"    ORDER BY INGRESOS DESC";
+				PreparedStatement prepStmt = conn.prepareStatement(sql);
+				recursos.add(prepStmt);
+				ResultSet rs = prepStmt.executeQuery();
+				while(rs.next())
+				{
+					
+					Double rentabilidad = (rs.getDouble("INGRESOS") - rs.getDouble("GASTOS"));
+					Restaurante restaurante = obtenerRestaurante(rs.getLong("ID_REST"));
+					Producto producto = darProducto(rs.getLong("ID_PROD"), rs.getLong("ID_REST"));
+					Integer cantidadPedidos = rs.getInt("NUMPEDIDOSTOTAL");
+					Double ingresos = rs.getDouble("INGRESOS");
+					Double gastos = rs.getDouble("GASTOS");
+					respuesta.add(new RentabilidadRestaurante(ingresos, gastos, rentabilidad, cantidadPedidos, restaurante, null, producto, null));
+				}
+			}
+		}
+		else if(criterio.equals(ZONA))
+		{
+			sql = "SELECT RESTAURANTE.ID_ZONA AS ZONA, SUM(PRODREST.PRECIO) AS INGRESOS, SUM(COSTO_PRODUCCION) AS GASTOS, COUNT(PED.ID) AS NUMPEDIDOSTOTAL\r\n" + 
+					"    FROM PEDIDOS PED, RESTAURANTES RESTAURANTE, PRODUCTO_RESTAURANTE PRODREST\r\n" + 
+					"    INNER JOIN PRODUCTOS PROD ON (PRODREST.ID_PROD = PROD.ID)\r\n" + 
+					"    WHERE (RESTAURANTE.ID = PED.ID_RESTAURANTE AND RESTAURANTE.ID = PRODREST.ID_REST AND PED.ID_PRODUCTO = PRODREST.ID_PROD AND PED.ID_RESTAURANTE = PRODREST.ID_REST) AND FECHA >= '10/10/17 01:00:00, 000000000 AM' AND FECHA <= '20/12/17 12:59:59, 000000000 PM'\r\n" + 
+					"    GROUP BY RESTAURANTE.ID_ZONA\r\n" + 
+					"    ORDER BY INGRESOS DESC";
+			PreparedStatement prepStmt = conn.prepareStatement(sql);
+			recursos.add(prepStmt);
+			ResultSet rs = prepStmt.executeQuery();
+			while(rs.next())
+			{
+				
+				Double rentabilidad = (rs.getDouble("INGRESOS") - rs.getDouble("GASTOS"));
+				
+				Integer cantidadPedidos = rs.getInt("NUMPEDIDOSTOTAL");
+				Double ingresos = rs.getDouble("INGRESOS");
+				Double gastos = rs.getDouble("GASTOS");
+				Zona zona = darZona(rs.getLong("ZONA"));
+				respuesta.add(new RentabilidadRestaurante(ingresos, gastos, rentabilidad, cantidadPedidos, null, null, null, zona));
+			}
+		}
+		else
+		{
+			sql = "SELECT ID_REST, SUM(PRECIO) AS INGRESOS, SUM(COSTO_PRODUCCION) AS GASTOS, COUNT(PED.ID) AS NUMPEDIDOSTOTAL\r\n" + 
+					"    FROM PEDIDOS PED, PRODUCTO_RESTAURANTE PRODREST\r\n" + 
+					"    INNER JOIN PRODUCTOS PROD ON (PRODREST.ID_PROD = PROD.ID)\r\n" + 
+					"    WHERE (PED.ID_PRODUCTO = PRODREST.ID_PROD AND PED.ID_RESTAURANTE = PRODREST.ID_REST) AND FECHA >= '10/10/17 01:00:00, 000000000 AM' AND FECHA <= '20/12/17 12:59:59, 000000000 PM'\r\n" + 
+					"    GROUP BY ID_REST\r\n" + 
+					"    ORDER BY INGRESOS DESC";
+			PreparedStatement prepStmt = conn.prepareStatement(sql);
+			recursos.add(prepStmt);
+			ResultSet rs = prepStmt.executeQuery();
+			while(rs.next())
+			{
+				
+				Double rentabilidad = (rs.getDouble("INGRESOS") - rs.getDouble("GASTOS"));
+				Restaurante restaurante = obtenerRestaurante(rs.getLong("ID_REST"));
+				Integer cantidadPedidos = rs.getInt("NUMPEDIDOSTOTAL");
+				Double ingresos = rs.getDouble("INGRESOS");
+				Double gastos = rs.getDouble("GASTOS");
+				respuesta.add(new RentabilidadRestaurante(ingresos, gastos, rentabilidad, cantidadPedidos, restaurante, null, null, null));
+			}
+		}
+		return respuesta;
+	}
+	
+	/**
+	 * Método que obtiene la Rentabilidad de un Restaurante específico.
+	 * @param fecha1 String, cadena de la primera fecha del rango de consulta.
+	 * @param fecha2 String, cadena de la segunda fecha del rango de consulta.
+	 * @param criterio Integer, Criterio según el cual se va a realizar la consulta.
+	 * @param idProducto Long, ID del Producto según el cual se va a realizar la consulta, si aplica.
+	 * @param idRestaurante Long, ID del Restaurante a consultar.
+	 * @return List<RentabilidadRestaurante>, Lista con las Rentabilidades del Restaurante consultado en el rango de búsqueda.
+	 * @throws SQLException
+	 * @throws Exception
+	 */
+	public List<RentabilidadRestaurante> darRentabilidadDeRestaurante(String fecha1, String fecha2, Integer criterio, Long idProducto, Long idRestaurante)throws SQLException, Exception
+	{
+		List<RentabilidadRestaurante> respuesta = new ArrayList<RentabilidadRestaurante>();
+		String sql = "";
+		if(criterio.equals(CATEGORIA))
+		{
+			sql = "SELECT ID_REST, CATEGORIA, SUM(PRECIO) AS INGRESOS, SUM(COSTO_PRODUCCION) AS GASTOS, COUNT(PED.ID) AS NUMPEDIDOSTOTAL\r\n" + 
+					"    FROM PEDIDOS PED, PRODUCTO_RESTAURANTE PRODREST\r\n" + 
+					"    INNER JOIN PRODUCTOS PROD ON (PRODREST.ID_PROD = PROD.ID)\r\n" + 
+					"    WHERE (PED.ID_PRODUCTO = PRODREST.ID_PROD AND PED.ID_RESTAURANTE = PRODREST.ID_REST) AND PED.ID_RESTAURANTE = " + idRestaurante + " AND FECHA >= '" + fecha1 + " 01:00:00, 000000000 AM' AND FECHA <= '" + fecha2 + " 12:59:59, 000000000 PM'\r\n" + 
+					"    GROUP BY ID_REST, CATEGORIA\r\n" + 
+					"    ORDER BY INGRESOS DESC";
+			PreparedStatement prepStmt = conn.prepareStatement(sql);
+			recursos.add(prepStmt);
+			ResultSet rs = prepStmt.executeQuery();
+			while(rs.next())
+			{
+				
+				Double rentabilidad = (rs.getDouble("INGRESOS") - rs.getDouble("GASTOS"));
+				Restaurante restaurante = obtenerRestaurante(rs.getLong("ID_REST"));
+				String categoria = rs.getString("CATEGORIA");
+				Integer cantidadPedidos = rs.getInt("NUMPEDIDOSTOTAL");
+				Double ingresos = rs.getDouble("INGRESOS");
+				Double gastos = rs.getDouble("GASTOS");
+				respuesta.add(new RentabilidadRestaurante(ingresos, gastos, rentabilidad, cantidadPedidos, restaurante, categoria, null, null));
+			}
+		}
+		else if(criterio.equals(PRODUCTO))
+		{
+			if(idProducto == null)
+			{
+				sql = "SELECT ID_REST, PRODREST.ID_PROD, SUM(PRECIO) AS INGRESOS, SUM(COSTO_PRODUCCION) AS GASTOS, COUNT(PED.ID) AS NUMPEDIDOSTOTAL\r\n" + 
+						"    FROM PEDIDOS PED, PRODUCTO_RESTAURANTE PRODREST\r\n" + 
+						"    INNER JOIN PRODUCTOS PROD ON (PRODREST.ID_PROD = PROD.ID)\r\n" + 
+						"    WHERE (PED.ID_PRODUCTO = PRODREST.ID_PROD AND PED.ID_RESTAURANTE = PRODREST.ID_REST) AND PED.ID_RESTAURANTE = " + idRestaurante + " AND FECHA >= '10/10/17 01:00:00, 000000000 AM' AND FECHA <= '20/12/17 12:59:59, 000000000 PM'\r\n" + 
+						"    GROUP BY ID_REST, PRODREST.ID_PROD\r\n" + 
+						"    ORDER BY INGRESOS DESC";
+				PreparedStatement prepStmt = conn.prepareStatement(sql);
+				recursos.add(prepStmt);
+				ResultSet rs = prepStmt.executeQuery();
+				while(rs.next())
+				{
+					
+					Double rentabilidad = (rs.getDouble("INGRESOS") - rs.getDouble("GASTOS"));
+					Restaurante restaurante = obtenerRestaurante(rs.getLong("ID_REST"));
+					Producto producto = darProducto(rs.getLong("ID_PROD"), rs.getLong("ID_REST"));
+					Integer cantidadPedidos = rs.getInt("NUMPEDIDOSTOTAL");
+					Double ingresos = rs.getDouble("INGRESOS");
+					Double gastos = rs.getDouble("GASTOS");
+					respuesta.add(new RentabilidadRestaurante(ingresos, gastos, rentabilidad, cantidadPedidos, restaurante, null, producto, null));
+				}
+			}
+			else
+			{
+				sql = "SELECT ID_REST, PRODREST.ID_PROD, SUM(PRECIO) AS INGRESOS, SUM(COSTO_PRODUCCION) AS GASTOS, COUNT(PED.ID) AS NUMPEDIDOSTOTAL\r\n" + 
+						"    FROM PEDIDOS PED, PRODUCTO_RESTAURANTE PRODREST\r\n" + 
+						"    INNER JOIN PRODUCTOS PROD ON (PRODREST.ID_PROD = PROD.ID)\r\n" + 
+						"    WHERE (PED.ID_PRODUCTO = PRODREST.ID_PROD AND PED.ID_RESTAURANTE = PRODREST.ID_REST) AND PED.ID_RESTAURANTE = " + idRestaurante + " AND FECHA >= '10/10/17 01:00:00, 000000000 AM' AND FECHA <= '20/12/17 12:59:59, 000000000 PM' AND PROD.ID = " + idProducto + "\r\n" + 
+						"    GROUP BY ID_REST, PRODREST.ID_PROD\r\n" + 
+						"    ORDER BY INGRESOS DESC";
+				PreparedStatement prepStmt = conn.prepareStatement(sql);
+				recursos.add(prepStmt);
+				ResultSet rs = prepStmt.executeQuery();
+				while(rs.next())
+				{
+					
+					Double rentabilidad = (rs.getDouble("INGRESOS") - rs.getDouble("GASTOS"));
+					Restaurante restaurante = obtenerRestaurante(rs.getLong("ID_REST"));
+					Producto producto = darProducto(rs.getLong("ID_PROD"), rs.getLong("ID_REST"));
+					Integer cantidadPedidos = rs.getInt("NUMPEDIDOSTOTAL");
+					Double ingresos = rs.getDouble("INGRESOS");
+					Double gastos = rs.getDouble("GASTOS");
+					respuesta.add(new RentabilidadRestaurante(ingresos, gastos, rentabilidad, cantidadPedidos, restaurante, null, producto, null));
+				}
+			}
+		}
+		else if(criterio.equals(ZONA))
+		{
+			
+		}
+		else
+		{
+			sql = "SELECT ID_REST, SUM(PRECIO) AS INGRESOS, SUM(COSTO_PRODUCCION) AS GASTOS, COUNT(PED.ID) AS NUMPEDIDOSTOTAL\r\n" + 
+					"    FROM PEDIDOS PED, PRODUCTO_RESTAURANTE PRODREST\r\n" + 
+					"    INNER JOIN PRODUCTOS PROD ON (PRODREST.ID_PROD = PROD.ID)\r\n" + 
+					"    WHERE (PED.ID_PRODUCTO = PRODREST.ID_PROD AND PED.ID_RESTAURANTE = PRODREST.ID_REST) AND PED.ID_RESTAURANTE = " + idRestaurante + " AND FECHA >= '10/10/17 01:00:00, 000000000 AM' AND FECHA <= '20/12/17 12:59:59, 000000000 PM'\r\n" + 
+					"    GROUP BY ID_REST\r\n" + 
+					"    ORDER BY INGRESOS DESC";
+//			System.out.println(sql);
+			PreparedStatement prepStmt = conn.prepareStatement(sql);
+			recursos.add(prepStmt);
+			ResultSet rs = prepStmt.executeQuery();
+			while(rs.next())
+			{
+				
+				Double rentabilidad = (rs.getDouble("INGRESOS") - rs.getDouble("GASTOS"));
+				Restaurante restaurante = obtenerRestaurante(rs.getLong("ID_REST"));
+				Integer cantidadPedidos = rs.getInt("NUMPEDIDOSTOTAL");
+				Double ingresos = rs.getDouble("INGRESOS");
+				Double gastos = rs.getDouble("GASTOS");
+				respuesta.add(new RentabilidadRestaurante(ingresos, gastos, rentabilidad, cantidadPedidos, restaurante, null, null, null));
+			}
+		}
+		System.out.println(sql);
+		return respuesta;
+	}
+	
+	public Zona darZona(Long id)  throws SQLException, Exception{
+
+		Zona zona = null;
+
+		String sql = "SELECT * FROM ZONAS WHERE ID = " + id;
+		PreparedStatement st = conn.prepareStatement(sql);
+		recursos.add(st);
+
+		ResultSet rs = st.executeQuery();
+		if(rs.next()) {
+			zona = new Zona();
+
+			zona.setId(rs.getLong("ID"));
+			zona.setNombre(rs.getString("NAME"));
+			zona.setEsEspacioAbierto(rs.getBoolean("ESPACIO_ABIERTO"));
+			zona.setCapacidad(rs.getInt("CAPACIDAD"));;
+			zona.setEsIncluyente(rs.getBoolean("INCLUYENTE"));
+		}
+		return zona;
+	}
+	
+	
+	public Producto darProducto(Long id, Long idRest) throws SQLException, Exception {
+		Producto producto = new Producto();
+
+		String sqlProductoPorId = "SELECT * FROM PRODUCTOS, PRODUCTO_RESTAURANTE WHERE ID_PROD = ID AND ID_PROD = " + id + " AND ID_REST =" + idRest; 
+		PreparedStatement stProductoPorId = conn.prepareStatement(sqlProductoPorId);
+		recursos.add(stProductoPorId);
+		ResultSet rs = stProductoPorId.executeQuery();
+		
+		String sqlTipos= "SELECT * FROM TIPOS TIPOS, TIPOPRODUCTO RELACION\r\n" + 
+				"    WHERE Relacion.Id_Prod = " + id + " AND RELACION.ID_TIPO = TIPOS.ID"; 
+		PreparedStatement stTipos = conn.prepareStatement(sqlTipos);
+		recursos.add(stTipos);
+		ResultSet rsTipos = stTipos.executeQuery();
+		List<TipoComida> tipos = new ArrayList<TipoComida>();
+		while(rsTipos.next())
+		{
+			tipos.add(new TipoComida(rsTipos.getLong("ID"), rsTipos.getString("NAME")));
+		}
+		
+		if (rs.next()) {
+			producto.setId(rs.getLong("ID"));
+			producto.setNombre(rs.getString("NAME"));
+			producto.setDescripcionEspaniol(rs.getString("DESCRIPCION"));
+			producto.setDescripcionIngles(rs.getString("DESCRIPTION"));
+			producto.setCategoria(rs.getString("CATEGORIA"));
+			producto.setCostoDeProduccion(rs.getDouble("COSTO_PRODUCCION"));
+			producto.setPrecio(rs.getDouble("PRECIO"));
+			producto.setProductosEquivalentes(darProductosEquivalentes(producto.getId(), idRest));
+			producto.setCantidad(rs.getInt("CANTIDAD"));
+			producto.setTiposComida(tipos);
+			return producto;
+		}
+		return null;
+	}
+	
+	private List<ProductoBase> darProductosEquivalentes(Long id, Long idRest)  throws SQLException, Exception {
+		String sql = "SELECT * FROM PRODUCTOS, PRODUCTO_RESTAURANTE, PRODUCTOSSIMILARES WHERE ID = ID_PROD AND ID_PROD2 = ID_PROD AND ID_REST = "; 
+		sql += idRest + " AND ID_PROD1 = "  + id; 
+		System.out.println(sql);
+		PreparedStatement st = conn.prepareStatement(sql);
+		recursos.add(st);
+		ResultSet rs = st.executeQuery();
+		
+		List<ProductoBase> prods = new ArrayList<>();
+		
+		while (rs.next()) {
+			ProductoBase prod = new ProductoBase();
+			prod.setId(rs.getLong("ID"));
+			prod.setNombre(rs.getString("NAME"));
+			prod.setDescripcionEspaniol(rs.getString("DESCRIPCION"));
+			prod.setDescripcionIngles(rs.getString("DESCRIPTION"));
+			prod.setCategoria(rs.getString("CATEGORIA"));
+			prods.add(prod);
+		}
+		return prods;
 	}
 }

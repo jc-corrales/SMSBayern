@@ -10,7 +10,6 @@ import java.util.Date;
 import java.util.List;
 
 import vos.Cliente;
-import vos.ClienteFrecuente;
 import vos.Menu;
 import vos.Orden;
 import vos.Pedido;

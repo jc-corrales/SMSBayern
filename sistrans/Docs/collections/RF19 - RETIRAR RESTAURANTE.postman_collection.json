@@ -1,0 +1,73 @@
+{
+	"variables": [],
+	"info": {
+		"name": "RF19 - RETIRAR RESTAURANTE",
+		"_postman_id": "a3563fc2-d31c-e81d-2e04-6af5b04f57a0",
+		"description": "Este requerimiento se utiliza cuando un restaurante, por razones ajenas a RotondAndes3\r\n, decide retirarse de las rotondas\r\nen las que inicialmente había decidido participar (Ocurre sobre todo para las grandes cadenas, que tienen locales en\r\nmuchas rotondas de la ciudad. Los productos ofrecidos por ese restaurante ya no deben estar disponibles, aunque los pedidos que los incluían deben seguir existiendo, y se debe garantizar que la base de datos quede en estado coherente.\r\nEsta operación puede ser realizada por uno de los administradores de RotondAndes3",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Retirar Restaurante 39 del Servicio",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "http://localhost:8081/RotondAndes/rest/admin/restaurantes/39/retirarDeServicio",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"idAdmin\" : 500, \"passwordAdmin\": \"lshfvlosdhlo\"}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Retirar Restaurante 1 del Servicio (error)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 500\"] = responseCode.code === 500;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "http://localhost:8081/RotondAndes/rest/admin/restaurantes/1/retirarDeServicio",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"idAdmin\" : 500, \"passwordAdmin\": \"lshfvlosdhlo\"}"
+				},
+				"description": ""
+			},
+			"response": []
+		}
+	]
+}

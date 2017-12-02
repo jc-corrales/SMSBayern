@@ -16,7 +16,6 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 
@@ -43,6 +42,7 @@ import vos.Pedido;
 import vos.PedidoDeMenu;
 import vos.Producto;
 import vos.RegistroVentas;
+import vos.RentabilidadRestaurante;
 import vos.Representante;
 import vos.Restaurante;
 import vos.Zona;
@@ -243,7 +243,7 @@ public class RotondAndesTM {
 		return res;
 	}
 	/**
-	 * M√©todo que obtiene un Men√∫ seg√∫n su ID y el ID del Restaurante due√±o.
+	 * MÈtodo que obtiene un Men√∫ seg√∫n su ID y el ID del Restaurante due√±o.
 	 * @param id Long, ID del producto.
 	 * @param idRest Long, ID del restaurante.
 	 * @return Menu
@@ -495,7 +495,7 @@ public class RotondAndesTM {
 	//	Requerimiento: RF8
 	//---------------------------------------------------
 	/**
-	 * M√©todo que Registra un Producto como preferido por un cliente.
+	 * MÈtodo que Registra un Producto como preferido por un cliente.
 	 * @param id Long, ID del cliente.
 	 * @param password String, Contrase√±a del cliente.
 	 * @param idProd Long, ID del producto a registrar.
@@ -594,7 +594,7 @@ public class RotondAndesTM {
 	//	Requerimiento: RF9 Parte 1
 	//---------------------------------------------------
 	/**
-	 * M√©todo que crea una Orden a nombre de un Cliente o Cliente Frecuente.
+	 * MÈtodo que crea una Orden a nombre de un Cliente o Cliente Frecuente.
 	 * @param orden Orden, Informaci√≥n de la Orden a crear.
 	 * @return Orden, La Orden recientemente creada.
 	 * @throws SQLException
@@ -639,11 +639,11 @@ public class RotondAndesTM {
 	//	Requerimiento: RF9 Parte 2A
 	//---------------------------------------------------
 	/**
-	 * M√©todo para registrar un Pedido a una Orden.
+	 * MÈtodo para registrar un Pedido a una Orden.
 	 * @param id Long, ID del Cliente.
 	 * @param idProd Long, ID del Producto a Ordenar.
 	 * @param idRestProd Long, ID del Restaurante al cual ordenar el Producto.
-	 * @param idOrden Long, ID de la Orden que contendr√° el Pedido.
+	 * @param idOrden Long, ID de la Orden que contendr· el Pedido.
 	 * @return Pedido, toda la informaci√≥n del Pedido.
 	 * @throws SQLException
 	 * @throws Exception
@@ -652,19 +652,25 @@ public class RotondAndesTM {
 		Pedido res = null;
 		DAOTablaPedidos dao = new DAOTablaPedidos();
 		DAOTablaUsuarios daoUsuarios = new DAOTablaUsuarios();
+		DAOTablaRestaurantes daoRestaurantes = new DAOTablaRestaurantes();
 		try {
 			this.conn = darConexion();
 			dao.setConn(conn);
 			daoUsuarios.setConn(conn);
+			daoRestaurantes.setConn(conn);
+			if(!daoRestaurantes.darEstadoOperacionRestaurante(idRestProd))
+			{
+				throw new Exception("El Restaurante actualmente no est· en servicio.");
+			}
 			//			conn.setAutoCommit(false);
-			if(!dao.getEstatusOrden(idOrden))
+			if(dao.getEstatusOrden(idOrden))
 			{
 				throw new Exception("La Orden con ID: " + idOrden + " ya ha sido confirmada y no puede recibir nuevos Pedidos.");
 			}
 			Orden orden = dao.obtenerOrden(idOrden);
 			if(!orden.getCliente().getId().equals(id))
 			{
-				throw new Exception("La Orden con ID: " + idOrden + " no est√° a nombre de este cliente.");
+				throw new Exception("La Orden con ID: " + idOrden + " no est· a nombre de este cliente.");
 			}
 
 			if(!daoUsuarios.verficarUsuarioCliente(id))
@@ -701,7 +707,7 @@ public class RotondAndesTM {
 	//	Requerimiento: RF9 Parte 2B
 	//---------------------------------------------------
 	/**
-	 * M√©todo que Registra el Pedido de un Men√∫.
+	 * MÈtodo que Registra el Pedido de un Men√∫.
 	 * @param id Long, ID del Cliente.
 	 * @param idPedido Long, ID del pedido.
 	 * @param idMenu Long, ID del Men√∫ a registar.
@@ -715,19 +721,25 @@ public class RotondAndesTM {
 		PedidoDeMenu res = null;
 		DAOTablaPedidos dao = new DAOTablaPedidos();
 		DAOTablaUsuarios daoUsuarios = new DAOTablaUsuarios();
+		DAOTablaRestaurantes daoRestaurantes = new DAOTablaRestaurantes();
 		try {
 			this.conn = darConexion();
 			dao.setConn(conn);
 			daoUsuarios.setConn(conn);
+			daoRestaurantes.setConn(conn);
+			if(!daoRestaurantes.darEstadoOperacionRestaurante(idRestMenu))
+			{
+				throw new Exception("El Restaurante actualmente no est· en servicio.");
+			}
 			//			conn.setAutoCommit(false);
-			if(!dao.getEstatusOrden(idOrden))
+			if(dao.getEstatusOrden(idOrden))
 			{
 				throw new Exception("La Orden con ID: " + idOrden + " ya ha sido confirmada y no puede recibir nuevos Pedidos.");
 			}
 			Orden orden = dao.obtenerOrden(idOrden);
 			if(!orden.getCliente().getId().equals(idCliente))
 			{
-				throw new Exception("La Orden con ID: " + idOrden + " no est√° a nombre de este cliente.");
+				throw new Exception("La Orden con ID: " + idOrden + " no est· a nombre de este cliente.");
 			}
 
 			if(!daoUsuarios.verficarUsuarioCliente(idCliente))
@@ -764,7 +776,7 @@ public class RotondAndesTM {
 	//	Requerimiento: RF9 Parte 3
 	//---------------------------------------------------
 	/**
-	 * M√©todo para Confirmar una Orden.
+	 * MÈtodo para Confirmar una Orden.
 	 * @param idOrden Long, ID de la Orden a confirmar.
 	 * @param idCliente Long, ID del cliente due√±o de la Orden.
 	 * @return Boolean, Booleano que determina si la transacci√≥n fue exitosa o no.
@@ -817,7 +829,7 @@ public class RotondAndesTM {
 	//	Requerimiento: RF10
 	//---------------------------------------------------
 	/**
-	 * M√©todo que marca un Pedido como entregado.
+	 * MÈtodo que marca un Pedido como entregado.
 	 * @param idPed Long, ID del Pedido a marcar como Entregado.
 	 * @throws SQLException
 	 * @throws Exception
@@ -1220,9 +1232,15 @@ public class RotondAndesTM {
 	{
 		Producto respuesta;
 		DAOTablaProductos daoProductos = new DAOTablaProductos();
+		DAOTablaRestaurantes daoRestaurantes = new DAOTablaRestaurantes();
 		try {
 			this.conn = darConexion();
 			conn.setAutoCommit(false);
+			daoRestaurantes.setConn(conn);
+			if(!daoRestaurantes.darEstadoOperacionRestaurante(idRestaurante))
+			{
+				throw new Exception("El Restaurante no se encuentra en operaciÛn.");
+			}
 			daoProductos.setConn(conn);
 			respuesta = daoProductos.agregarProductoSinEquivalencias(idRestaurante, producto);
 			conn.commit();
@@ -1260,10 +1278,16 @@ public class RotondAndesTM {
 	{
 		DAOTablaProductos daoProductos = new DAOTablaProductos();
 		DAOTablaUsuarios daoUsuarios = new DAOTablaUsuarios();
+		DAOTablaRestaurantes daoRestaurantes = new DAOTablaRestaurantes();
 		try {
 			this.conn = darConexion();
 			daoProductos.setConn(conn);
 			daoUsuarios.setConn(conn);
+			daoRestaurantes.setConn(conn);
+			if(!daoRestaurantes.darEstadoOperacionRestaurante(idRestaurante))
+			{
+				throw new Exception("El Restaurante no se encuentra en operaciÛn.");
+			}
 			conn.setAutoCommit(false);
 			if(!daoUsuarios.verficarUsuarioRepresentante(idRepresentante, password, idRestaurante))
 			{
@@ -1475,6 +1499,10 @@ public class RotondAndesTM {
 			this.conn = darConexion();
 			//			conn.setAutoCommit(false);
 			daoRestaurantes.setConn(conn);
+			if(!daoRestaurantes.darEstadoOperacionRestaurante(idRestaurante))
+			{
+				throw new Exception("El Restaurante actualmente no est· en servicio.");
+			}
 			Producto entrada;
 			Producto platoFuerte;
 			Producto postre;
@@ -1653,7 +1681,7 @@ public class RotondAndesTM {
 	//	Requerimiento: RF1
 	//---------------------------------------------------
 	/**
-	 * M√©todo que agrega un Cliente.
+	 * MÈtodo que agrega un Cliente.
 	 * @param cliente Cliente, informaci√≥n del cliente a agregar.
 	 * @return ClienteFrecuente, informaci√É¬≥n del cliente agregado.
 	 * @throws SQLException
@@ -1692,7 +1720,7 @@ public class RotondAndesTM {
 	}
 
 	/**
-	 * M√©todo que agrega un Administrador.
+	 * MÈtodo que agrega un Administrador.
 	 * @param id Long, ID del Administrador.
 	 * @param password String, contrase√±a del Administrador.
 	 * @return Boolean, Booleano que determina si se agreg√≥ exitosamente el Administrador o no.
@@ -1732,8 +1760,8 @@ public class RotondAndesTM {
 		return respuesta;
 	}
 	/**
-	 * M√©todo que da el o los Productos m√°s ofrecidos en RotondAndes.
-	 * @return List<Producto>, Lista de Productos m√°s ofrecidos.
+	 * MÈtodo que da el o los Productos m·s ofrecidos en RotondAndes.
+	 * @return List<Producto>, Lista de Productos m·s ofrecidos.
 	 * @throws SQLException
 	 * @throws Exception
 	 */
@@ -1768,8 +1796,8 @@ public class RotondAndesTM {
 		return productos;
 	}
 	/**
-	 * M√©todo que obtiene los productos m√°s vendidos en RotondAndes.
-	 * @return List<Producto>, Lista de Productos m√°s Vendidos.
+	 * MÈtodo que obtiene los productos m·s vendidos en RotondAndes.
+	 * @return List<Producto>, Lista de Productos m·s Vendidos.
 	 * @throws SQLException
 	 * @throws Exception
 	 */
@@ -1812,8 +1840,8 @@ public class RotondAndesTM {
 	//	Requerimiento: RFC11A
 	//---------------------------------------------------
 	/**
-	 * MÈtodo que da el o los Productos m√°s ofrecidos en RotondAndes.
-	 * @return List<Producto>, Lista de Productos m√°s ofrecidos.
+	 * MÈtodo que da el o los Productos m·s ofrecidos en RotondAndes.
+	 * @return List<Producto>, Lista de Productos m·s ofrecidos.
 	 * @throws SQLException
 	 * @throws Exception
 	 */
@@ -1911,7 +1939,7 @@ public class RotondAndesTM {
 	}
 
 	/**
-	 * M√©todo que obtiene la informaci√≥n de un Restaurante.
+	 * MÈtodo que obtiene la informaci√≥n de un Restaurante.
 	 * @param idRestaurante Long, ID del Restaurante
 	 * @return Restaurante, Toda la informaci√≥n de un Restaurante.
 	 * @throws SQLException
@@ -1958,7 +1986,7 @@ public class RotondAndesTM {
 	//---------------------------------------------------
 
 	/**
-	 *M√©toodo que llama al RFC9 que retorna los clientes que al menos hayan pedido un producto de un restaurante dado con un rango de fechas dado. 
+	 *MÈtoodo que llama al RFC9 que retorna los clientes que al menos hayan pedido un producto de un restaurante dado con un rango de fechas dado. 
 	 * RFC9 Consultar consumo en Rotondandes
 	 * @param idRestaurante id del restaurante determinado
 	 * @param fecha1 fecha inicial
@@ -2054,7 +2082,7 @@ public class RotondAndesTM {
 		return clientes;
 	}
 	//---------------------------------------------------	
-	//	Requerimiento: RFC10
+	//	Requerimiento: RFC10A
 	//---------------------------------------------------
 
 	/**
@@ -2106,7 +2134,9 @@ public class RotondAndesTM {
 		}
 		return clientes;
 	}
-
+	//---------------------------------------------------	
+	//	Requerimiento: RFC10B
+	//---------------------------------------------------
 	/**
 	 * MÈtodo que obtiene si un cliente NO ha consumido un producto de un Restaurante dado por ID
 	 * en un rango de fechas.
@@ -2172,5 +2202,142 @@ public class RotondAndesTM {
 		DAOTablaClientes daoCli = new DAOTablaClientes();
 		return daoCli.getBuenosClientesTipo(tipo, idUsuario, contrasenia);
 	}
-
+	//---------------------------------------------------	
+	//	Requerimiento: RF19
+	//---------------------------------------------------
+	/**
+	 * MÈtodo que retira un Restaurante del Servicio.
+	 * @param idRestaurante Long, ID del Restaurante a Retirar.
+	 * @return Restaurante, informaciÛn del Restaurante retirado.
+	 * @throws SQLException
+	 * @throws Exception
+	 */
+	public Boolean retirarRestauranteDelServicio(Long idAdmin, String passwordAdmin, Long idRestaurante)throws SQLException, Exception
+	{
+		DAOTablaRestaurantes dao = new DAOTablaRestaurantes();
+		DAOTablaUsuarios daoUsuarios = new DAOTablaUsuarios();
+//		Restaurante respuesta = null;
+		try {
+			this.conn = darConexion();
+			daoUsuarios.setConn(conn);
+			if(!daoUsuarios.verficarUsuarioAdministrador(idAdmin, passwordAdmin))
+			{
+				throw new Exception("Credenciales de administrador inv·lidas.");
+			}
+			dao.setConn(conn);
+			if(!dao.darEstadoOrdenesRestaurante(idRestaurante))
+			{
+				throw new Exception("El Restaurante a˙n tiene Pedidos pendientes por Despachar.");
+			}
+			dao.retirarRestaurante(idRestaurante);
+			System.out.println("POST RETIRAR RESTAURANTE");
+//			respuesta = dao.obtenerRestaurante(idRestaurante);
+		}catch (SQLException e) {
+			System.err.println("SQLException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		} catch (Exception e) {
+			System.err.println("GeneralException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		}finally {
+			try {
+				dao.cerrarRecursos();
+				daoUsuarios.cerrarRecursos();
+				if(this.conn!=null)
+					this.conn.close();
+			} catch (SQLException exception) {
+				System.err.println("SQLException closing resources:" + exception.getMessage());
+				exception.printStackTrace();
+				throw exception;
+			}
+		}
+		System.out.println("PRE RETURN");
+		return true;
+	}
+	//---------------------------------------------------	
+	//	Requerimiento: RFC5A
+	//---------------------------------------------------
+	/**
+	 * MÈtodo que obtiene la Rentabilidad de los Restaurantes seg˙n unos par·metros de b˙squeda.
+	 * @param fecha1 String, cadena de la primera fecha del rango de consulta.
+	 * @param fecha2 String, cadena de la segunda fecha del rango de consulta.
+	 * @param criterio Integer, Criterio seg˙n el cual se va a realizar la consulta.
+	 * @param idProducto Long, ID del Producto seg˙n el cual se va a realizar la consulta, si aplica.
+	 * @return List<RentabilidadRestaurante>, Lista con las Rentabilidades de todos los Restaurantes en el Rango de b˙squeda.
+	 * @throws SQLException
+	 * @throws Exception
+	 */
+	public List<RentabilidadRestaurante> darRentabilidadRestaurantes(String fecha1, String fecha2, Integer criterio, Long idProducto)throws SQLException, Exception
+	{
+		DAOTablaRestaurantes dao = new DAOTablaRestaurantes();
+		List<RentabilidadRestaurante> respuesta = null;
+		try {
+			this.conn = darConexion();
+			dao.setConn(conn);
+			respuesta = dao.darRentabilidadDeRestaurantes(fecha1, fecha2, criterio, idProducto);
+		}catch (SQLException e) {
+			System.err.println("SQLException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		} catch (Exception e) {
+			System.err.println("GeneralException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		}finally {
+			try {
+				dao.cerrarRecursos();
+				if(this.conn!=null)
+					this.conn.close();
+			} catch (SQLException exception) {
+				System.err.println("SQLException closing resources:" + exception.getMessage());
+				exception.printStackTrace();
+				throw exception;
+			}
+		}
+		return respuesta;
+	}
+	//---------------------------------------------------	
+	//	Requerimiento: RFC5B
+	//---------------------------------------------------
+	/**
+	 * MÈtodo que obtiene la Rentabilidad de un Restaurante especÌfico.
+	 * @param fecha1 String, cadena de la primera fecha del rango de consulta.
+	 * @param fecha2 String, cadena de la segunda fecha del rango de consulta.
+	 * @param criterio Integer, Criterio seg˙n el cual se va a realizar la consulta.
+	 * @param idProducto Long, ID del Producto seg˙n el cual se va a realizar la consulta, si aplica.
+	 * @param idRestaurante Long, ID del Restaurante a consultar.
+	 * @return List<RentabilidadRestaurante>, Lista con las Rentabilidades del Restaurante consultado en el rango de b˙squeda.
+	 * @throws SQLException
+	 * @throws Exception
+	 */
+	public List<RentabilidadRestaurante> darRentabilidadRestaurante(String fecha1, String fecha2, Integer criterio, Long idProducto, Long idRestaurante)throws SQLException, Exception
+	{
+		DAOTablaRestaurantes dao = new DAOTablaRestaurantes();
+		List<RentabilidadRestaurante> respuesta = null;
+		try {
+			this.conn = darConexion();
+			dao.setConn(conn);
+			respuesta = dao.darRentabilidadDeRestaurante(fecha1, fecha2, criterio, idProducto, idRestaurante);
+		}catch (SQLException e) {
+			System.err.println("SQLException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		} catch (Exception e) {
+			System.err.println("GeneralException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		}finally {
+			try {
+				dao.cerrarRecursos();
+				if(this.conn!=null)
+					this.conn.close();
+			} catch (SQLException exception) {
+				System.err.println("SQLException closing resources:" + exception.getMessage());
+				exception.printStackTrace();
+				throw exception;
+			}
+		}
+		return respuesta;
+	}
 }

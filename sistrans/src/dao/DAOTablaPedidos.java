@@ -120,7 +120,7 @@ public class DAOTablaPedidos {
 		Restaurante restauranteTemp = null;
 		if(restaurante.next())
 		{
-			restauranteTemp = new Restaurante(restaurante.getLong("ID_REST"), null, null, null, null, null);
+			restauranteTemp = new Restaurante(restaurante.getLong("ID_REST"), null, null, null, null, null, null);
 		}
 		if(restaurante.getInt("CANTIDAD") <= 0)
 		{
@@ -198,8 +198,6 @@ public class DAOTablaPedidos {
 	 */
 	public void despacharPedido(Long idPed) throws SQLException, Exception{
 		String sql = "UPDATE PEDIDOS SET SERVIDO = 1 WHERE ID = " + idPed;
-		
-		
 		PreparedStatement prepStmt = conn.prepareStatement(sql);
 		recursos.add(prepStmt);
 		prepStmt.executeQuery();

@@ -4,11 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -159,6 +155,7 @@ public class DAOConsumoClientes
 	 * @throws SQLException
 	 * @throws Exception
 	 */
+	@SuppressWarnings("deprecation")
 	public void setRegistroVentas(String fechaReferencia, String lol)throws SQLException, Exception
 	{
 		System.out.println("ENTRO A METODO CONSUMO");
@@ -351,8 +348,8 @@ public class DAOConsumoClientes
 			Long restMenosVendido = rs.getLong("IDRESTAURANTEMENOSFRECUENTADO");
 			Producto productoMasConsumido = getProducto(prodMasVendido);
 			Producto productoMenosConsumido = getProducto(prodMenosVendido);
-			Restaurante restauranteMasFrecuentado= new Restaurante(restMasVendido, null, null, null, null, null);
-			Restaurante restauranteMenosFrecuentado = new Restaurante(restMenosVendido, null, null, null, null, null);
+			Restaurante restauranteMasFrecuentado= new Restaurante(restMasVendido, null, null, null, null, null, null);
+			Restaurante restauranteMenosFrecuentado = new Restaurante(restMenosVendido, null, null, null, null, null, null);
 			RegistroVentas registro = new RegistroVentas(dia, restauranteMasFrecuentado, restauranteMenosFrecuentado, productoMasConsumido, productoMenosConsumido);
 			listaRegistros.add(registro);
 		}

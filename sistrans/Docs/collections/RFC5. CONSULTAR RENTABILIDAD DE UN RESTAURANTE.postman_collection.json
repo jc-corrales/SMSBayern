@@ -1,0 +1,321 @@
+{
+	"variables": [],
+	"info": {
+		"name": "RFC5. CONSULTAR RENTABILIDAD DE UN RESTAURANTE",
+		"_postman_id": "7b4173a8-e9ab-3833-cd9a-c705d3d81d5b",
+		"description": "En un rango de fechas, el sistema debe informar por zona, por producto y por categoría, el número de productos vendidos,\r\nel costo total y el valor total facturado. El resultado debe estar ordenado de mayor a menor por el total del valor facturado.\r\nNOTA: Respetando la privacidad de los usuarios, cuando un usuario restaurante hace esta consulta, la respuesta sólo\r\ncontiene la información de su restaurante, mientras que el gerente de RotondAndes puede ver toda la información. Ver\r\nRNF1.\r\n",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Consultar la Rentabilidad sin ningún criterio.",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "http://localhost:8081/RotondAndes/rest/admin/rentabilidadRestaurantes",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"criterioDeBusqueda\" : 0, \"fecha1\" : \"10/10/17\", \"fecha2\" : \"20/12/17\"}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Consultar la Rentabilidad según Categoría",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "http://localhost:8081/RotondAndes/rest/admin/rentabilidadRestaurantes",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"criterioDeBusqueda\" : 1, \"fecha1\" : \"10/10/17\", \"fecha2\" : \"20/12/17\"}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Consultar la Rentabilidad según Producto",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "http://localhost:8081/RotondAndes/rest/admin/rentabilidadRestaurantes",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"criterioDeBusqueda\" : 2, \"fecha1\" : \"10/10/17\", \"fecha2\" : \"20/12/17\", \"idProducto\" : 58}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Consultar la Rentabilidad según Zonas",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "http://localhost:8081/RotondAndes/rest/admin/rentabilidadRestaurantes",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"criterioDeBusqueda\" : 3, \"fecha1\" : \"10/10/17\", \"fecha2\" : \"20/12/17\"}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Consultar la Rentabilidad sin ningún criterio Restaurante 1.",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "http://localhost:8081/RotondAndes/rest/admin/rentabilidadRestaurantes/restaurantes/1",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"criterioDeBusqueda\" : 0, \"fecha1\" : \"10/10/17\", \"fecha2\" : \"20/12/17\"}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Consultar la Rentabilidad según categoría Restaurante 1.",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "http://localhost:8081/RotondAndes/rest/admin/rentabilidadRestaurantes/restaurantes/1",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"criterioDeBusqueda\" : 1, \"fecha1\" : \"10/10/17\", \"fecha2\" : \"20/12/17\"}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Consultar la Rentabilidad según Producto Restaurante 1.",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "http://localhost:8081/RotondAndes/rest/admin/rentabilidadRestaurantes/restaurantes/1",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"criterioDeBusqueda\" : 2, \"fecha1\" : \"10/10/17\", \"fecha2\" : \"20/12/17\", \"idProducto\" : 1}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Consultar la Rentabilidad sin ningún criterio Restaurante 1.",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "http://localhost:8081/RotondAndes/rest/restaurantes/1/rentabilidadRestaurantes",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"criterioDeBusqueda\" : 0, \"fecha1\" : \"10/10/17\", \"fecha2\" : \"20/12/17\"}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Consultar la Rentabilidad según categoría Restaurante 1.",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "http://localhost:8081/RotondAndes/rest/restaurantes/1/rentabilidadRestaurantes",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"criterioDeBusqueda\" : 1, \"fecha1\" : \"10/10/17\", \"fecha2\" : \"20/12/17\"}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Consultar la Rentabilidad según Producto Restaurante 1.",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "http://localhost:8081/RotondAndes/rest/restaurantes/1/rentabilidadRestaurantes",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"criterioDeBusqueda\" : 2, \"fecha1\" : \"10/10/17\", \"fecha2\" : \"20/12/17\", \"idProducto\" : 1}"
+				},
+				"description": ""
+			},
+			"response": []
+		}
+	]
+}

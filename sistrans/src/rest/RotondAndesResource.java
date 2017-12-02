@@ -1,6 +1,5 @@
 package rest;
 
-import java.util.Date;
 import java.util.List;
 
 import javax.servlet.ServletContext;
@@ -17,7 +16,6 @@ import javax.ws.rs.core.Response;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import rest.ClienteResorce.RequestBody;
 import tm.RotondAndesTM;
 import vos.Cliente;
 import vos.ClienteFrecuente;
@@ -25,7 +23,7 @@ import vos.ConsumoCliente;
 import vos.EstadisticasPedidos;
 import vos.Producto;
 import vos.RegistroVentas;
-//import vos.ProductoBase;
+import vos.RentabilidadRestaurante;
 import vos.Representante;
 import vos.Restaurante;
 
@@ -48,6 +46,7 @@ public class RotondAndesResource {
 	    @XmlElement public String fecha1;
 	    @XmlElement public String fecha2;
 	    @XmlElement public Long idCliente;
+	    @XmlElement public Long idProducto;
 	}
 	
 	
@@ -333,6 +332,66 @@ public class RotondAndesResource {
 		RotondAndesTM tm = new RotondAndesTM(getPath());
 		try {
 			List<Cliente> respuesta = tm.getClienteSinMinUnConsumoEnRangoFechasPorRestaurante(clienteId, request.idRestaurante, request.fecha1, request.fecha2, request.criterioDeBusqueda, request.ordenDeBusqueda);
+			return Response.status( 200 ).entity( respuesta ).build( );		
+		}catch( Exception e )
+		{
+			return Response.status( 500 ).entity( doErrorMessage( e ) ).build( );
+		}
+	}
+	/**
+	 * Método que retira un Restaurante del Servicio.
+	 * @param idRestaurante Long, ID del Restaurante.
+	 * @param entrada RequestBody, entrada que contiene la información de las credenciales del Administrador.
+	 * @return Response.
+	 */
+	@POST
+	@Path("restaurantes/{idRestaurante: \\d+}/retirarDeServicio")
+	@Produces( { MediaType.APPLICATION_JSON } )
+	public Response retirarRestauranteDelServicio(@PathParam("idRestaurante") Long idRestaurante, RequestBody entrada) 
+	{
+		RotondAndesTM tm = new RotondAndesTM(getPath());
+		try {
+			Boolean respuesta = tm.retirarRestauranteDelServicio(entrada.idAdmin, entrada.passwordAdmin, idRestaurante);
+			return Response.status( 200 ).entity( respuesta ).build( );		
+		}catch( Exception e )
+		{
+			return Response.status( 500 ).entity( doErrorMessage( e ) ).build( );
+		}
+	}
+	
+	/**
+	 * Método que obtiene la Rentabilidad de un Restaurante según unos parámetros de consulta.
+	 * @param entrada RequesBodyUnConsumo.
+	 * @return Response.
+	 */
+	@POST
+	@Path("rentabilidadRestaurantes")
+	@Produces( { MediaType.APPLICATION_JSON } )
+	public Response darRentabilidadRestaurantes(RequestBodyUnConsumo entrada) 
+	{
+		RotondAndesTM tm = new RotondAndesTM(getPath());
+		try {
+			List<RentabilidadRestaurante> respuesta = tm.darRentabilidadRestaurantes(entrada.fecha1, entrada.fecha2, entrada.criterioDeBusqueda, entrada.idProducto);
+			return Response.status( 200 ).entity( respuesta ).build( );		
+		}catch( Exception e )
+		{
+			return Response.status( 500 ).entity( doErrorMessage( e ) ).build( );
+		}
+	}
+	/**
+	 * Método que consulta la Rentabilidad de un Restaurante.
+	 * @param idRestaurante Long, ID del Restaurante a Consultar.
+	 * @param entrada RequestBodyUnConsumo.
+	 * @return Response.
+	 */
+	@POST
+	@Path("rentabilidadRestaurantes/restaurantes/{idRestaurante: \\d+}")
+	@Produces( { MediaType.APPLICATION_JSON } )
+	public Response darRentabilidadRestaurante(@PathParam("idRestaurante") Long idRestaurante, RequestBodyUnConsumo entrada) 
+	{
+		RotondAndesTM tm = new RotondAndesTM(getPath());
+		try {
+			List<RentabilidadRestaurante> respuesta = tm.darRentabilidadRestaurante(entrada.fecha1, entrada.fecha2, entrada.criterioDeBusqueda, entrada.idProducto, idRestaurante);
 			return Response.status( 200 ).entity( respuesta ).build( );		
 		}catch( Exception e )
 		{

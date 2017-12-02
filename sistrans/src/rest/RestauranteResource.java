@@ -14,12 +14,13 @@ import javax.ws.rs.core.Response;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-
+import rest.RotondAndesResource.RequestBodyUnConsumo;
 import tm.RotondAndesTM;
 import vos.Ingrediente;
 import vos.Menu;
 import vos.Producto;
 import vos.ProductoBase;
+import vos.RentabilidadRestaurante;
 import vos.Representante;
 import vos.Restaurante;
 
@@ -152,5 +153,24 @@ public class RestauranteResource {
 			return Response.status( 500 ).entity( doErrorMessage( e ) ).build( );
 		}
 	}
-	
+	/**
+	 * Método que consulta la Rentabilidad de un Restaurante.
+	 * @param idRestaurante Long, ID del Restaurante a Consultar.
+	 * @param entrada RequestBodyUnConsumo.
+	 * @return Response.
+	 */
+	@POST
+	@Path("{idRestaurante: \\d+}/rentabilidadRestaurantes")
+	@Produces( { MediaType.APPLICATION_JSON } )
+	public Response darRentabilidadRestaurante(@PathParam("idRestaurante") Long idRestaurante, RequestBodyUnConsumo entrada) 
+	{
+		RotondAndesTM tm = new RotondAndesTM(getPath());
+		try {
+			List<RentabilidadRestaurante> respuesta = tm.darRentabilidadRestaurante(entrada.fecha1, entrada.fecha2, entrada.criterioDeBusqueda, entrada.idProducto, idRestaurante);
+			return Response.status( 200 ).entity( respuesta ).build( );		
+		}catch( Exception e )
+		{
+			return Response.status( 500 ).entity( doErrorMessage( e ) ).build( );
+		}
+	}
 }

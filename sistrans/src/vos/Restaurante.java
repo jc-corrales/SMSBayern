@@ -42,21 +42,27 @@ public class Restaurante {
 	@JsonProperty(value = "precio")
 	private Double precio;
 	/**
+	 * Atributo que indica si el Restaurante aún está en operación o no.
+	 */
+	@JsonProperty(value = "estadoOperacion")
+	private Boolean estadoOperacion;
+	/**
 	 * Método constructor de la clase Restaurante.
-	 * @param id Long
-	 * @param name String
-	 * @param pagina String
-	 * @param entradas Collection<Entrada>
-	 * @param platosFuertes Collection<PlatoFuerte>
-	 * @param postres Collection<Postre>
-	 * @param bebidas Collection<Bebida>
+	 * @param id Long, ID del Restaurante.
+	 * @param name String, Nombre del Restaurante.
+	 * @param pagina String, Dirección de la Página web del Restaurante.
+	 * @param productos List<Producto>, Lista de Productos del Restaurante.
+	 * @param tipo TipoComida, Tipo de Comida del Restaurante.
+	 * @param precio Double, precio base del Restaurante.
+	 * @param enOperacion, Booleano que indica si el Restaurante aún está en operación o no.
 	 */
 	public Restaurante(@JsonProperty(value="id") Long id, 
 			@JsonProperty(value="name") String name, 
 			@JsonProperty(value="pagina") String pagina,
 			@JsonProperty(value = "productos")List<Producto> productos,
 			@JsonProperty(value = "tipo")TipoComida tipo,
-			@JsonProperty(value = "precio")Double precio
+			@JsonProperty(value = "precio")Double precio,
+			@JsonProperty(value = "estadoOperacion") Boolean estadoOperacion
 			)
 			{
 		
@@ -69,6 +75,7 @@ public class Restaurante {
 //		this.entradas = entradas;
 //		this.platosFuertes = platosFuertes;
 //		this.postres = postres;
+		this.estadoOperacion = estadoOperacion;
 	}
 	/**
 	 * Método que obtiene el ID de un Restaurante.
@@ -215,5 +222,19 @@ public class Restaurante {
 	public void setPrecio(Double precio)
 	{
 		this.precio = precio;
+	}
+	/**
+	 * Método que obtiene el Estado de Operación del Restaurante.
+	 * @return Boolean, Booleano que indica si el Restaurane está en Operación o no.
+	 */
+	public Boolean getEstadoOperacion() {
+		return estadoOperacion;
+	}
+	/**
+	 * Método que establece el Estado de Operación del Restaurante.
+	 * @param enOperacion Boolean, nuevo Booleano que determina el estado de Operación del Restaurante.
+	 */
+	public void setEstadoOperacion(Boolean estadoOperacion) {
+		this.estadoOperacion = estadoOperacion;
 	}
 }

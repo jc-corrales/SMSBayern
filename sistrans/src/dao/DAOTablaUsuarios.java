@@ -10,7 +10,6 @@ import java.util.List;
 import vos.Cliente;
 import vos.ClienteFrecuente;
 import vos.Orden;
-import vos.Producto;
 import vos.ProductoBase;
 import vos.Representante;
 
