@@ -2,6 +2,7 @@ package dtm;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
+import java.util.List;
 
 import javax.jms.JMSException;
 import javax.jms.Queue;
@@ -23,7 +24,10 @@ import com.rabbitmq.jms.admin.RMQConnectionFactory;
 import com.rabbitmq.jms.admin.RMQDestination;
 
 import jms.NonReplyException;
+import jms.RentabilidadRestaurantesMDB;
 import tm.RotondAndesTM;
+import vos.ListaRentabilidad;
+import vos.RentabilidadRestaurante;
 
 public class RotondAndesDistributed {
 	private final static String QUEUE_NAME = "java:global/RMQAppQueue";
@@ -37,7 +41,7 @@ public class RotondAndesDistributed {
 	
 	private TopicConnectionFactory factory;
 	
-//	private AllVideosMDB allVideosMQ;
+	private RentabilidadRestaurantesMDB rentabilidadRestaurantesMDB;
 	
 	private static String path;
 	
@@ -45,15 +49,15 @@ public class RotondAndesDistributed {
 	{
 		InitialContext ctx = new InitialContext();
 		factory = (RMQConnectionFactory) ctx.lookup(MQ_CONNECTION_NAME);
-//		allVideosMQ = new AllVideosMDB(factory, ctx);
-//		
-//		allVideosMQ.start();
+		rentabilidadRestaurantesMDB = new RentabilidadRestaurantesMDB(factory, ctx);
+		
+		rentabilidadRestaurantesMDB.start();
 		
 	}
 	
 	public void stop() throws JMSException
 	{
-		allVideosMQ.close();
+		rentabilidadRestaurantesMDB.close();
 	}
 	
 	/**
@@ -105,4 +109,31 @@ public class RotondAndesDistributed {
 		RotondAndesTM tm = new RotondAndesTM(path);
 		return getInstance(tm);
 	}
+	/**
+	 * Método que obtiene las Rentabilidades Locales.
+	 * @param parametrosUnidos
+	 * @return
+	 * @throws Exception
+	 */
+	public ListaRentabilidad getLocalRentabilidades(String parametrosUnidos)throws Exception
+	{
+		String [] parametros = parametrosUnidos.split(",");
+		String fecha1 = parametros[0];
+		String fecha2 = parametros[1];
+		Integer criterio = Integer.parseInt(parametros[2]);
+		Long idProducto = null;
+		if(!parametros[3].equals("null"))
+		{
+			idProducto = Long.parseLong(parametros[3]);
+		}
+			
+		List<RentabilidadRestaurante> lista = tm.darRentabilidadRestaurantes(fecha1, fecha2, criterio, idProducto);
+		return new ListaRentabilidad(lista);
+	}
+	
+	public ListaRentabilidad getRemoteRentabilidades(String parametrosUnidos)throws Exception
+	{
+		return rentabilidadRestaurantesMDB.getRemoteRentabilidades(parametrosUnidos);
+	}
+	
 }

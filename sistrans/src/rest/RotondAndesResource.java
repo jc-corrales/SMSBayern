@@ -21,6 +21,7 @@ import vos.Cliente;
 import vos.ClienteFrecuente;
 import vos.ConsumoCliente;
 import vos.EstadisticasPedidos;
+import vos.ListaRentabilidad;
 import vos.Producto;
 import vos.RegistroVentas;
 import vos.RentabilidadRestaurante;
@@ -371,7 +372,7 @@ public class RotondAndesResource {
 	{
 		RotondAndesTM tm = new RotondAndesTM(getPath());
 		try {
-			List<RentabilidadRestaurante> respuesta = tm.darRentabilidadRestaurantes(entrada.fecha1, entrada.fecha2, entrada.criterioDeBusqueda, entrada.idProducto);
+			ListaRentabilidad respuesta = tm.darRentabilidadRestaurantesUniversal(entrada.fecha1, entrada.fecha2, entrada.criterioDeBusqueda, entrada.idProducto);
 			return Response.status( 200 ).entity( respuesta ).build( );		
 		}catch( Exception e )
 		{

@@ -29,6 +29,7 @@ import dao.DAOTablaRestaurantes;
 import dao.DAOTablaUsuarios;
 import dao.DAOTablaZonas;
 import dtm.RotondAndesDistributed;
+import jms.NonReplyException;
 import vos.Cliente;
 import vos.ClienteFrecuente;
 import vos.ConsumoCliente;
@@ -36,6 +37,7 @@ import vos.EstadisticasPedidos;
 import vos.Ingrediente;
 
 import vos.IngredientesSimilares;
+import vos.ListaRentabilidad;
 import vos.Menu;
 import vos.Orden;
 import vos.Pedido;
@@ -2339,5 +2341,28 @@ public class RotondAndesTM {
 			}
 		}
 		return respuesta;
+	}
+	
+	/**
+	 * Método que modela la transacción que retorna todos los videos de la base de datos.
+	 * @return ListaVideos - objeto que modela  un arreglo de videos. este arreglo contiene el resultado de la búsqueda
+	 * @throws Exception -  cualquier error que se genere durante la transacción
+	 */
+	public ListaRentabilidad darRentabilidadRestaurantesUniversal(String fecha1, String fecha2, Integer criterio, Long idProducto) throws Exception {
+		List<RentabilidadRestaurante> lista = darRentabilidadRestaurantes(fecha1, fecha2, criterio, idProducto);
+		ListaRentabilidad remL = new ListaRentabilidad(lista);
+		try
+		{
+			String parametrosUnidos = fecha1 + "," + fecha2 + "," + criterio + "," + idProducto;
+			System.out.println("PARÁMETROS UNIDOS: " + parametrosUnidos);
+			ListaRentabilidad resp = dtm.getRemoteRentabilidades(parametrosUnidos);
+			System.out.println(resp.getRentabilidades().size());
+			remL.getRentabilidades().addAll(resp.getRentabilidades());
+		}
+		catch(NonReplyException e)
+		{
+			
+		}
+		return remL;
 	}
 }
