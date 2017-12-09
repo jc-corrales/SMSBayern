@@ -30,7 +30,7 @@ public class Restaurante {
 	 * Productos del restaurante.
 	 */
 	@JsonProperty(value = "productos")
-	private List<Producto> productos;
+	private List<ProductoLocal> productos;
 	/**
 	 * Atributo que contiene el tipo de Restaurante.
 	 */
@@ -59,7 +59,7 @@ public class Restaurante {
 	public Restaurante(@JsonProperty(value="id") Long id, 
 			@JsonProperty(value="name") String name, 
 			@JsonProperty(value="pagina") String pagina,
-			@JsonProperty(value = "productos")List<Producto> productos,
+			@JsonProperty(value = "productos")List<ProductoLocal> productos,
 			@JsonProperty(value = "tipo")TipoComida tipo,
 			@JsonProperty(value = "precio")Double precio,
 			@JsonProperty(value = "estadoOperacion") Boolean estadoOperacion
@@ -179,7 +179,7 @@ public class Restaurante {
 	 * Método que obtiene los productos de un restaurante.
 	 * @return List<Producto>, Lista de productos.
 	 */
-	public List<Producto> getProductos()
+	public List<ProductoLocal> getProductos()
 	{
 		return productos;
 	}
@@ -187,7 +187,7 @@ public class Restaurante {
 	 * Método que establece una nueva lista de productos de este restaurante.
 	 * @param productos List<Producto>, nueva lista de productos.
 	 */
-	public void setProductos(List<Producto> productos)
+	public void setProductos(List<ProductoLocal> productos)
 	{
 		this.productos = productos;
 	}

@@ -16,7 +16,7 @@ public class ListaRentabilidad
 	}
 	/**
 	 * Método que obtiene la Lista de Rentabilidades.
-	 * @return List<RentabilidadRestaurante, Lista de las Rentabilidades de los Restaurantes.
+	 * @return List<RentabilidadRestaurante>, Lista de las Rentabilidades de los Restaurantes.
 	 */
 	public List<RentabilidadRestaurante> getRentabilidades() {
 		return rentabilidades;

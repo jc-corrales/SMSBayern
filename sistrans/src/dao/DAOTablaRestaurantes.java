@@ -9,7 +9,7 @@ import java.util.List;
 
 
 import vos.Menu;
-import vos.Producto;
+import vos.ProductoLocal;
 import vos.ProductoBase;
 import vos.RentabilidadRestaurante;
 import vos.Representante;
@@ -64,7 +64,7 @@ public class DAOTablaRestaurantes {
 			@JsonProperty(value = "productos")List<Producto> productos,
 			@JsonProperty(value = "tipo")TipoComida tipo
 			 */
-			Restaurante res = new Restaurante(rs.getLong("ID"), rs.getString("NAME"), rs.getString("PAGINA_WEB"), new ArrayList<Producto>(), new TipoComida(0L, new String("hola")), rs.getDouble("PRECIO"), rs.getBoolean("EN_OPERACION"));
+			Restaurante res = new Restaurante(rs.getLong("ID"), rs.getString("NAME"), rs.getString("PAGINA_WEB"), new ArrayList<ProductoLocal>(), new TipoComida(0L, new String("hola")), rs.getDouble("PRECIO"), rs.getBoolean("EN_OPERACION"));
 			restaurantes.add(res);
 		}
 		
@@ -381,7 +381,7 @@ public class DAOTablaRestaurantes {
 			String pagina = rs.getString("PAGINA_WEB");
 			Double precio = rs.getDouble("PRECIO");
 			TipoComida tipo = new TipoComida(rs.getLong("IDTIPO"), rs.getString("NAMETIPO"));
-			List<Producto> productos = new ArrayList<Producto>();
+			List<ProductoLocal> productos = new ArrayList<ProductoLocal>();
 			Boolean enOperacion = true;
 			if(rs.getInt("EN_OPERACION") == 0)
 			{
@@ -508,7 +508,7 @@ public class DAOTablaRestaurantes {
 					
 					Double rentabilidad = (rs.getDouble("INGRESOS") - rs.getDouble("GASTOS"));
 					Restaurante restaurante = obtenerRestaurante(rs.getLong("ID_REST"));
-					Producto producto = darProducto(rs.getLong("ID_PROD"), rs.getLong("ID_REST"));
+					ProductoLocal producto = darProducto(rs.getLong("ID_PROD"), rs.getLong("ID_REST"));
 					Integer cantidadPedidos = rs.getInt("NUMPEDIDOSTOTAL");
 					Double ingresos = rs.getDouble("INGRESOS");
 					Double gastos = rs.getDouble("GASTOS");
@@ -531,7 +531,7 @@ public class DAOTablaRestaurantes {
 					
 					Double rentabilidad = (rs.getDouble("INGRESOS") - rs.getDouble("GASTOS"));
 					Restaurante restaurante = obtenerRestaurante(rs.getLong("ID_REST"));
-					Producto producto = darProducto(rs.getLong("ID_PROD"), rs.getLong("ID_REST"));
+					ProductoLocal producto = darProducto(rs.getLong("ID_PROD"), rs.getLong("ID_REST"));
 					Integer cantidadPedidos = rs.getInt("NUMPEDIDOSTOTAL");
 					Double ingresos = rs.getDouble("INGRESOS");
 					Double gastos = rs.getDouble("GASTOS");
@@ -643,7 +643,7 @@ public class DAOTablaRestaurantes {
 					
 					Double rentabilidad = (rs.getDouble("INGRESOS") - rs.getDouble("GASTOS"));
 					Restaurante restaurante = obtenerRestaurante(rs.getLong("ID_REST"));
-					Producto producto = darProducto(rs.getLong("ID_PROD"), rs.getLong("ID_REST"));
+					ProductoLocal producto = darProducto(rs.getLong("ID_PROD"), rs.getLong("ID_REST"));
 					Integer cantidadPedidos = rs.getInt("NUMPEDIDOSTOTAL");
 					Double ingresos = rs.getDouble("INGRESOS");
 					Double gastos = rs.getDouble("GASTOS");
@@ -666,7 +666,7 @@ public class DAOTablaRestaurantes {
 					
 					Double rentabilidad = (rs.getDouble("INGRESOS") - rs.getDouble("GASTOS"));
 					Restaurante restaurante = obtenerRestaurante(rs.getLong("ID_REST"));
-					Producto producto = darProducto(rs.getLong("ID_PROD"), rs.getLong("ID_REST"));
+					ProductoLocal producto = darProducto(rs.getLong("ID_PROD"), rs.getLong("ID_REST"));
 					Integer cantidadPedidos = rs.getInt("NUMPEDIDOSTOTAL");
 					Double ingresos = rs.getDouble("INGRESOS");
 					Double gastos = rs.getDouble("GASTOS");
@@ -727,8 +727,8 @@ public class DAOTablaRestaurantes {
 	}
 	
 	
-	public Producto darProducto(Long id, Long idRest) throws SQLException, Exception {
-		Producto producto = new Producto();
+	public ProductoLocal darProducto(Long id, Long idRest) throws SQLException, Exception {
+		ProductoLocal producto = new ProductoLocal();
 
 		String sqlProductoPorId = "SELECT * FROM PRODUCTOS, PRODUCTO_RESTAURANTE WHERE ID_PROD = ID AND ID_PROD = " + id + " AND ID_REST =" + idRest; 
 		PreparedStatement stProductoPorId = conn.prepareStatement(sqlProductoPorId);

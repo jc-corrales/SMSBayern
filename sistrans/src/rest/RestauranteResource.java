@@ -18,11 +18,9 @@ import rest.RotondAndesResource.RequestBodyUnConsumo;
 import tm.RotondAndesTM;
 import vos.Ingrediente;
 import vos.Menu;
-import vos.Producto;
+import vos.ProductoLocal;
 import vos.ProductoBase;
 import vos.RentabilidadRestaurante;
-import vos.Representante;
-import vos.Restaurante;
 
 @Path("restaurantes")
 public class RestauranteResource {
@@ -67,7 +65,7 @@ public class RestauranteResource {
 	public Response getProducto(@PathParam("idRest") Long idRest, @PathParam("idProd") Long idProd) {
 		RotondAndesTM tm = new RotondAndesTM(getPath());
 		try {
-			Producto producto = tm.darProducto(idProd, idRest);
+			ProductoLocal producto = tm.darProducto(idProd, idRest);
 			System.out.println("FINAL ingredientes: " + producto.getIngredientes().size());
 			return Response.status( 200 ).entity( producto ).build( );		
 		}catch( Exception e )
@@ -122,10 +120,10 @@ public class RestauranteResource {
 	@Path("{idRestaurante: \\d+}")
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.APPLICATION_JSON })
-	public Response agregarProducto(@PathParam("idRestaurante") Long idRestaurante, Producto producto) {
+	public Response agregarProducto(@PathParam("idRestaurante") Long idRestaurante, ProductoLocal producto) {
 		RotondAndesTM tm = new RotondAndesTM(getPath());
 		try {
-			Producto res = tm.agregarProducto(idRestaurante, producto);;
+			ProductoLocal res = tm.agregarProducto(idRestaurante, producto);;
 			return Response.status( 200 ).entity( res ).build();	
 		}catch( Exception e )
 		{

@@ -13,7 +13,7 @@ public class ConsumoCliente
 	 * Atributo que contiene la información del Producto.
 	 */
 	@JsonProperty(value = "producto")
-	private Producto producto;
+	private ProductoLocal producto;
 	/**
 	 * Atributo que contiene la cantidad de Producto consumida por este cliente.
 	 */
@@ -26,7 +26,7 @@ public class ConsumoCliente
 	 * @param cantidadConsumida
 	 */
 	public ConsumoCliente(@JsonProperty(value = "cliente") Cliente cliente,
-			@JsonProperty(value = "producto")Producto producto,
+			@JsonProperty(value = "producto")ProductoLocal producto,
 			@JsonProperty(value = "cantidadConsumida")Integer cantidadConsumida)
 	{
 		this.cliente = cliente;
@@ -53,7 +53,7 @@ public class ConsumoCliente
 	 * Método que obtiene el Producto.
 	 * @return Producto, producto.
 	 */
-	public Producto getProducto()
+	public ProductoLocal getProducto()
 	{
 		return producto;
 	}
@@ -61,7 +61,7 @@ public class ConsumoCliente
 	 * Método que establece el Producto.
 	 * @param producto Producto, nuevo Producto.
 	 */
-	public void setProducto(Producto producto)
+	public void setProducto(ProductoLocal producto)
 	{
 		this.producto = producto;
 	}

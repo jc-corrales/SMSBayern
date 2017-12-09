@@ -2,6 +2,7 @@ package dtm;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.jms.JMSException;
@@ -24,9 +25,15 @@ import com.rabbitmq.jms.admin.RMQConnectionFactory;
 import com.rabbitmq.jms.admin.RMQDestination;
 
 import jms.NonReplyException;
+import jms.ProductosMDB;
 import jms.RentabilidadRestaurantesMDB;
+import jms.RetirarRestauranteMDB;
+import jms.TodosLosProductosMDB;
 import tm.RotondAndesTM;
+import vos.ListaConfirmaciones;
+import vos.ListaProductos;
 import vos.ListaRentabilidad;
+import vos.Producto;
 import vos.RentabilidadRestaurante;
 
 public class RotondAndesDistributed {
@@ -41,23 +48,36 @@ public class RotondAndesDistributed {
 	
 	private TopicConnectionFactory factory;
 	
-	private RentabilidadRestaurantesMDB rentabilidadRestaurantesMDB;
+	private RentabilidadRestaurantesMDB rentabilidadRestaurantesMQ;
 	
+	private TodosLosProductosMDB todosLosProductosMQ;
+	
+	private ProductosMDB productosMQ;
+	
+	private RetirarRestauranteMDB retirarRestauranteMQ;
 	private static String path;
 	
 	private RotondAndesDistributed() throws NamingException, JMSException
 	{
 		InitialContext ctx = new InitialContext();
 		factory = (RMQConnectionFactory) ctx.lookup(MQ_CONNECTION_NAME);
-		rentabilidadRestaurantesMDB = new RentabilidadRestaurantesMDB(factory, ctx);
-		
-		rentabilidadRestaurantesMDB.start();
+		rentabilidadRestaurantesMQ = new RentabilidadRestaurantesMDB(factory, ctx);
+		todosLosProductosMQ = new TodosLosProductosMDB(factory, ctx);
+		productosMQ = new ProductosMDB(factory, ctx);
+		retirarRestauranteMQ = new RetirarRestauranteMDB(factory, ctx);
+		todosLosProductosMQ.start();
+		rentabilidadRestaurantesMQ.start();
+		productosMQ.start();
+		retirarRestauranteMQ.start();;
 		
 	}
 	
 	public void stop() throws JMSException
 	{
-		rentabilidadRestaurantesMDB.close();
+		productosMQ.close();
+		todosLosProductosMQ.close();
+		rentabilidadRestaurantesMQ.close();
+		rentabilidadRestaurantesMQ.close();
 	}
 	
 	/**
@@ -133,7 +153,44 @@ public class RotondAndesDistributed {
 	
 	public ListaRentabilidad getRemoteRentabilidades(String parametrosUnidos)throws Exception
 	{
-		return rentabilidadRestaurantesMDB.getRemoteRentabilidades(parametrosUnidos);
+		return rentabilidadRestaurantesMQ.getRemoteRentabilidades(parametrosUnidos);
 	}
 	
+	public ListaProductos getLocalTodosLosProductos()throws Exception
+	{
+		return new ListaProductos(tm.darProductosSinCantidad());
+	}
+	
+	public ListaProductos getRemoteTodosLosProductos()throws Exception
+	{
+		return todosLosProductosMQ.getRemoteProductos();
+	}
+	
+	public ListaProductos getLocalProductos(String parametrosUnidos)throws Exception
+	{
+		String [] parametros = parametrosUnidos.split(",");
+		Integer filtro = Integer.parseInt(parametros[0]);
+		String parametro = parametros[1];			
+		List<Producto> lista = tm.darProductosPorSinCantidad(filtro, parametro);
+		return new ListaProductos(lista);
+	}
+	
+	public ListaProductos getRemoteProductos(String parametrosUnidos)throws Exception
+	{
+		return productosMQ.getRemoteProductos(parametrosUnidos);
+	}
+	
+	public ListaConfirmaciones retirarLocalRestaurantes(String parametrosUnidos)throws Exception
+	{
+		Long idRestaurante = Long.parseLong(parametrosUnidos);
+		Boolean resultado = tm.retirarRestauranteDelServicio(idRestaurante);
+		List<Boolean> lista = new ArrayList<Boolean>();
+		lista.add(resultado);
+		return new ListaConfirmaciones(lista);
+	}
+	
+	public ListaConfirmaciones retirarRemoteRestaurantes(String parametrosUnidos)throws Exception
+	{
+		return retirarRestauranteMQ.retirarRemoteRestaurantes(parametrosUnidos);
+	}
 }

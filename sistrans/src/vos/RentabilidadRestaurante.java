@@ -37,7 +37,7 @@ public class RentabilidadRestaurante
 	 * Atributo que contiene el producto.
 	 */
 	@JsonProperty(value = "producto")
-	private Producto producto;
+	private ProductoLocal producto;
 	/**
 	 * Atributo que contiene la información del Restaurante.
 	 */
@@ -65,7 +65,7 @@ public class RentabilidadRestaurante
 			@JsonProperty(value = "cantidadPedidos")Integer cantidadPedidos,
 			@JsonProperty(value = "restaurante")Restaurante restaurante,
 			@JsonProperty(value = "categoria")String categoria,
-			@JsonProperty(value = "producto")Producto producto,
+			@JsonProperty(value = "producto")ProductoLocal producto,
 			@JsonProperty(value = "zona")Zona zona
 			)
 	{
@@ -160,14 +160,14 @@ public class RentabilidadRestaurante
 	 * Método que obtiene el Producto de referencia de la Consulta.
 	 * @return Producto, toda la información del Producto.
 	 */
-	public Producto getProducto() {
+	public ProductoLocal getProducto() {
 		return producto;
 	}
 	/**
 	 * Método que establece el Producto de referencia de la Consulta.
 	 * @param producto Producto, nuevo Producto de referencia de la Consulta.
 	 */
-	public void setProducto(Producto producto) {
+	public void setProducto(ProductoLocal producto) {
 		this.producto = producto;
 	}
 	/**

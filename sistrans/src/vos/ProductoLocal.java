@@ -15,7 +15,7 @@ import java.util.List;
 import org.codehaus.jackson.annotate.*;
 
 
-public class Producto extends ProductoBase
+public class ProductoLocal extends ProductoBase
 {
 	public final static String ENTRADA = "ENTRADA";
 	public final static String PLATOFUERTE = "PLATOFUERTE";
@@ -44,6 +44,11 @@ public class Producto extends ProductoBase
 	@JsonProperty(value = "tiposComida")
 	private List<TipoComida> tiposComida;
 	/**
+	 * Atributo que contiene la cantidad de producto disponible.
+	 */
+	@JsonProperty(value = "cantidad")
+	private Integer cantidad;
+	/**
 	 * Método constructor de la clase Producto.
 	 * @param id
 	 * @param nombre
@@ -55,11 +60,11 @@ public class Producto extends ProductoBase
 	 * @param tiposComida
 	 */
 	
-	public Producto() {
+	public ProductoLocal() {
 		super();
 	}
 	
-	public Producto(@JsonProperty(value = "id")Long id, 
+	public ProductoLocal(@JsonProperty(value = "id")Long id, 
 			@JsonProperty(value = "nombre") String nombre, 
 			@JsonProperty(value = "descripcionEspaniol")String descripcionEspaniol,
 			@JsonProperty(value = "descripcionIngles")String descripcionIngles,
@@ -68,13 +73,15 @@ public class Producto extends ProductoBase
 			@JsonProperty(value = "precio") Double precio, 
 			@JsonProperty(value = "tipos") List<TipoComida> tiposComida,
 			@JsonProperty(value = "categoria") String categoria,
-			@JsonProperty(value = "ingredientes") List<Ingrediente> ingredientes){
+			@JsonProperty(value = "ingredientes") List<Ingrediente> ingredientes,
+			@JsonProperty(value = "cantidad")Integer cantidad){
 		
 		super(id, nombre, descripcionEspaniol, descripcionIngles, categoria, ingredientes);
 		this.costoDeProduccion = costoDeProduccion;
 		this.productosEquivalentes = productosEquivalentes;
 		this.precio = precio;
 		this.tiposComida = tiposComida;
+		this.cantidad = cantidad;
 	}
 	
 	/**
@@ -140,5 +147,29 @@ public class Producto extends ProductoBase
 	public void setTiposComida(List<TipoComida> tiposComida)
 	{
 		this.tiposComida = tiposComida;
+	}
+	/**
+	 * Método que obtiene la cantidad de este Producto disponible.
+	 * @return Integer, Cantidad de producto disponible.
+	 */
+	public Integer getCantidad()
+	{
+		return cantidad;
+	}
+	/**
+	 * Método que establece la cantidad de producto disponible.
+	 * @param cantidad Integer, nueva cantidad de Producto disponible.
+	 */
+	public void setCantidad(Integer cantidad)
+	{
+		this.cantidad = cantidad;
+	}
+	/**
+	 * Método que construye un ProductoGranConexion a partir de este producto.
+	 * @return ProductoGranConexion.
+	 */
+	public Producto toProductoGranConexion()
+	{
+		return new Producto(getId(), getNombre(), getDescripcionEspaniol(), getDescripcionIngles(), costoDeProduccion, productosEquivalentes, precio, tiposComida, getCategoria(), getIngredientes());
 	}
 }

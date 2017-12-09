@@ -41,8 +41,8 @@ public class RentabilidadRestaurantesMDB implements MessageListener, ExceptionLi
 	public final static int TIME_OUT = 5;
 	private final static String APP = "app1";
 	
-	private final static String GLOBAL_TOPIC_NAME = "java:global/RMQTopicAllVideos";
-	private final static String LOCAL_TOPIC_NAME = "java:global/RMQAllVideosLocal";
+	private final static String GLOBAL_TOPIC_NAME = "java:global/RMQTopicRentabilidades";
+	private final static String LOCAL_TOPIC_NAME = "java:global/RMQRentabilidadesLocal";
 	
 	private final static String REQUEST = "REQUEST";
 	private final static String REQUEST_ANSWER = "REQUEST_ANSWER";
@@ -81,7 +81,7 @@ public class RentabilidadRestaurantesMDB implements MessageListener, ExceptionLi
 	 * 
 	 * @param parametros String: (fecha1, fecha2, criterio, idProducto)
 	 * Ejemplo: "10/10/17,20/12/17,0,null"
-	 * @return
+	 * @return ListaRentabilidad
 	 * @throws JsonGenerationException
 	 * @throws JsonMappingException
 	 * @throws JMSException
@@ -134,7 +134,7 @@ public class RentabilidadRestaurantesMDB implements MessageListener, ExceptionLi
 	{
 		ObjectMapper mapper = new ObjectMapper();
 		System.out.println(id);
-		ExchangeMsg msg = new ExchangeMsg("rentabilidades.datos.app1", APP, payload, status, id);
+		ExchangeMsg msg = new ExchangeMsg("rentabilidades.general.app1", APP, payload, status, id);
 		TopicPublisher topicPublisher = topicSession.createPublisher(dest);
 		topicPublisher.setDeliveryMode(DeliveryMode.PERSISTENT);
 		TextMessage txtMsg = topicSession.createTextMessage();
@@ -165,7 +165,7 @@ public class RentabilidadRestaurantesMDB implements MessageListener, ExceptionLi
 					RotondAndesDistributed dtm = RotondAndesDistributed.getInstance();
 					ListaRentabilidad rentabilidades = dtm.getLocalRentabilidades(ex.getPayload());
 					String payload = mapper.writeValueAsString(rentabilidades);
-					Topic t = new RMQDestination("", "videos.test", ex.getRoutingKey(), "", false);
+					Topic t = new RMQDestination("", "rentabilidades.test", ex.getRoutingKey(), "", false);
 					sendMessage(payload, REQUEST_ANSWER, t, id);
 				}
 				else if(ex.getStatus().equals(REQUEST_ANSWER))

@@ -43,13 +43,14 @@ import vos.ExchangeMsg;
 import vos.ListaProductos;
 import vos.Producto;
 
-public class TodosLosProductosMDB implements MessageListener, ExceptionListener{
 
+public class ProductosMDB implements MessageListener, ExceptionListener 
+{
 	public final static int TIME_OUT = 5;
 	private final static String APP = "app1";
 	
-	private final static String GLOBAL_TOPIC_NAME = "java:global/RMQTopicAllProductos";
-	private final static String LOCAL_TOPIC_NAME = "java:global/RMQAllProductosLocal";
+	private final static String GLOBAL_TOPIC_NAME = "java:global/RMQTopicProductos";
+	private final static String LOCAL_TOPIC_NAME = "java:global/RMQProductosLocal";
 	
 	private final static String REQUEST = "REQUEST";
 	private final static String REQUEST_ANSWER = "REQUEST_ANSWER";
@@ -61,7 +62,7 @@ public class TodosLosProductosMDB implements MessageListener, ExceptionListener{
 	
 	private List<Producto> answer = new ArrayList<Producto>();
 	
-	public TodosLosProductosMDB(TopicConnectionFactory factory, InitialContext ctx) throws JMSException, NamingException 
+	public ProductosMDB(TopicConnectionFactory factory, InitialContext ctx) throws JMSException, NamingException 
 	{	
 		topicConnection = factory.createTopicConnection();
 		topicSession = topicConnection.createTopicSession(false, Session.AUTO_ACKNOWLEDGE);
@@ -85,7 +86,7 @@ public class TodosLosProductosMDB implements MessageListener, ExceptionListener{
 		topicConnection.close();
 	}
 	
-	public ListaProductos getRemoteProductos() throws JsonGenerationException, JsonMappingException, JMSException, IOException, NonReplyException, InterruptedException, NoSuchAlgorithmException
+	public ListaProductos getRemoteProductos(String parametros) throws JsonGenerationException, JsonMappingException, JMSException, IOException, NonReplyException, InterruptedException, NoSuchAlgorithmException
 	{
 		answer.clear();
 		String id = APP+""+System.currentTimeMillis();
@@ -93,7 +94,7 @@ public class TodosLosProductosMDB implements MessageListener, ExceptionListener{
 		id = DatatypeConverter.printHexBinary(md.digest(id.getBytes())).substring(0, 8);
 //		id = new String(md.digest(id.getBytes()));
 		
-		sendMessage("", REQUEST, globalTopic, id);
+		sendMessage(parametros, REQUEST, globalTopic, id);
 		boolean waiting = true;
 
 		int count = 0;
@@ -115,11 +116,12 @@ public class TodosLosProductosMDB implements MessageListener, ExceptionListener{
         return res;
 	}
 	
+	
 	private void sendMessage(String payload, String status, Topic dest, String id) throws JMSException, JsonGenerationException, JsonMappingException, IOException
 	{
 		ObjectMapper mapper = new ObjectMapper();
 		System.out.println(id);
-		ExchangeMsg msg = new ExchangeMsg("productos.general.app1", APP, payload, status, id);
+		ExchangeMsg msg = new ExchangeMsg("videos.general.app1", APP, payload, status, id);
 		TopicPublisher topicPublisher = topicSession.createPublisher(dest);
 		topicPublisher.setDeliveryMode(DeliveryMode.PERSISTENT);
 		TextMessage txtMsg = topicSession.createTextMessage();
@@ -148,9 +150,9 @@ public class TodosLosProductosMDB implements MessageListener, ExceptionListener{
 				if(ex.getStatus().equals(REQUEST))
 				{
 					RotondAndesDistributed dtm = RotondAndesDistributed.getInstance();
-					ListaProductos productos = dtm.getLocalTodosLosProductos();
+					ListaProductos productos= dtm.getLocalProductos(ex.getPayload());
 					String payload = mapper.writeValueAsString(productos);
-					Topic t = new RMQDestination("", "productos.test", ex.getRoutingKey(), "", false);
+					Topic t = new RMQDestination("", "videos.test", ex.getRoutingKey(), "", false);
 					sendMessage(payload, REQUEST_ANSWER, t, id);
 				}
 				else if(ex.getStatus().equals(REQUEST_ANSWER))
@@ -178,9 +180,11 @@ public class TodosLosProductosMDB implements MessageListener, ExceptionListener{
 		}
 		
 	}
+
 	@Override
 	public void onException(JMSException exception) 
 	{
 		System.out.println(exception);
 	}
+
 }

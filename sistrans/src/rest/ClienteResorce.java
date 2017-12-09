@@ -1,6 +1,5 @@
 package rest;
 
-import java.util.Date;
 import java.util.List;
 
 import javax.servlet.ServletContext;
@@ -19,7 +18,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 import rest.RotondAndesResource.RequestBodyUnConsumo;
 import tm.RotondAndesTM;
 import vos.Cliente;
-import vos.ClienteFrecuente;
 import vos.ConsumoCliente;
 import vos.Orden;
 import vos.Pedido;

@@ -18,7 +18,7 @@ public class Pedido {
 	 * Atributo que contiene el producto pedido.
 	 */
 	@JsonProperty(value = "producto")
-	private Producto producto; 
+	private ProductoLocal producto; 
 	/**
 	 * Atributo que contiene la fecha de este pedido.
 	 */
@@ -47,7 +47,7 @@ public class Pedido {
 	 */
 	public Pedido(@JsonProperty(value = "id") Long id, 
 //			@JsonProperty(value = "cliente") Cliente cliente, 
-			@JsonProperty(value = "producto") Producto producto,
+			@JsonProperty(value = "producto") ProductoLocal producto,
 			@JsonProperty(value = "fecha") Date fecha,
 			@JsonProperty(value = "servido") Boolean servido,
 			@JsonProperty(value = "idRestaurante") Long idRestaurante
@@ -84,7 +84,7 @@ public class Pedido {
 	 * Método que obtiene el Producto pedido en este Pedido.
 	 * @return Producto, producto del pedido.
 	 */
-	public Producto getProducto() {
+	public ProductoLocal getProducto() {
 		return this.producto;
 	}
 	/**
@@ -112,7 +112,7 @@ public class Pedido {
 	 * Método que establece el Producto en este Pedido.
 	 * @param producto Producto, nuevo Producto del Pedido.
 	 */
-	public void setProducto(Producto producto) {
+	public void setProducto(ProductoLocal producto) {
 		this.producto = producto; 
 	}
 	/**

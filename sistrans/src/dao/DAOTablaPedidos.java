@@ -17,7 +17,7 @@ import vos.Menu;
 import vos.Orden;
 import vos.Pedido;
 import vos.PedidoDeMenu;
-import vos.Producto;
+import vos.ProductoLocal;
 import vos.Restaurante;
 import vos.TipoComida;
 
@@ -102,7 +102,7 @@ public class DAOTablaPedidos {
 	 * @throws SQLException
 	 * @throws Exception
 	 */
-	public Pedido registrarPedido(Producto producto, Long idOrden, Long idRest) throws SQLException, Exception{
+	public Pedido registrarPedido(ProductoLocal producto, Long idOrden, Long idRest) throws SQLException, Exception{
 //		System.out.println("Entro metodo registrarPedido");
 		Long id =  darIdPedidosMax();	
 		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -487,7 +487,7 @@ public class DAOTablaPedidos {
 		{
 			Long id = rs.getLong("ID");
 			Date fecha = rs.getDate("FECHA");
-			Producto producto = new Producto();
+			ProductoLocal producto = new ProductoLocal();
 			producto.setId(rs.getLong("ID_PRODUCTO"));
 			Boolean servido = rs.getBoolean("SERVIDO");
 			Long idRestaurante = rs.getLong("ID_RESTAURANTE");
@@ -522,11 +522,11 @@ public class DAOTablaPedidos {
 			String descripcion = rs.getString("Descripcion");
 			String description = rs.getString("Description");
 			Double precio = rs.getDouble("PRECIO");
-			Producto entrada = darProducto(rs.getLong("ID_ENTRADA"), idRestaurante);
-			Producto platoFuerte = darProducto(rs.getLong("ID_PLATOFUERTE"), idRestaurante);
-			Producto postre = darProducto(rs.getLong("ID_POSTRE"), idRestaurante);
-			Producto bebida = darProducto(rs.getLong("ID_BEBIDA"), idRestaurante);
-			Producto acompaniamiento = darProducto(rs.getLong("ID_ACOMPANIAMIENTO"), idRestaurante);
+			ProductoLocal entrada = darProducto(rs.getLong("ID_ENTRADA"), idRestaurante);
+			ProductoLocal platoFuerte = darProducto(rs.getLong("ID_PLATOFUERTE"), idRestaurante);
+			ProductoLocal postre = darProducto(rs.getLong("ID_POSTRE"), idRestaurante);
+			ProductoLocal bebida = darProducto(rs.getLong("ID_BEBIDA"), idRestaurante);
+			ProductoLocal acompaniamiento = darProducto(rs.getLong("ID_ACOMPANIAMIENTO"), idRestaurante);
 			Double costoProduccion = (entrada.getCostoDeProduccion() + platoFuerte.getCostoDeProduccion() + postre.getCostoDeProduccion() + bebida.getCostoDeProduccion() + acompaniamiento.getCostoDeProduccion());
 			Menu menu = new Menu(idRestaurante, name, costoProduccion, descripcion, description, precio, entrada, platoFuerte, bebida, postre, acompaniamiento);
 			PedidoDeMenu pedido = new PedidoDeMenu(id, menu);
@@ -568,8 +568,8 @@ public class DAOTablaPedidos {
 		prepStmt2.executeQuery();
 	}
 	
-	public Producto darProducto(Long id, Long idRest) throws SQLException, Exception {
-		Producto producto = new Producto();
+	public ProductoLocal darProducto(Long id, Long idRest) throws SQLException, Exception {
+		ProductoLocal producto = new ProductoLocal();
 
 		String sqlProductoPorId = "SELECT * FROM PRODUCTOS, PRODUCTO_RESTAURANTE WHERE ID_PROD = ID AND ID_PROD = " + id + " AND ID_REST =" + idRest; 
 		PreparedStatement stProductoPorId = conn.prepareStatement(sqlProductoPorId);

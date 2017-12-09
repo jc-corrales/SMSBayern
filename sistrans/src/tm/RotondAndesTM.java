@@ -19,6 +19,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import org.codehaus.jackson.map.ObjectMapper;
+
 import dao.DAOConsumoClientes;
 import dao.DAOTablaClientes;
 import dao.DAOTablaClientesFrecuentes;
@@ -37,11 +39,14 @@ import vos.EstadisticasPedidos;
 import vos.Ingrediente;
 
 import vos.IngredientesSimilares;
+import vos.ListaConfirmaciones;
+import vos.ListaProductos;
 import vos.ListaRentabilidad;
 import vos.Menu;
 import vos.Orden;
 import vos.Pedido;
 import vos.PedidoDeMenu;
+import vos.ProductoLocal;
 import vos.Producto;
 import vos.RegistroVentas;
 import vos.RentabilidadRestaurante;
@@ -206,8 +211,8 @@ public class RotondAndesTM {
 		return res;
 	}
 
-	public Producto darProducto(Long id, Long idRest) throws SQLException, Exception {
-		Producto res;
+	public ProductoLocal darProducto(Long id, Long idRest) throws SQLException, Exception {
+		ProductoLocal res;
 		DAOTablaProductos daoProd = new DAOTablaProductos(); 
 		DAOTablaIngredientes daoIng = new DAOTablaIngredientes();
 		try {
@@ -265,31 +270,31 @@ public class RotondAndesTM {
 			daoIng.setConn(conn);
 			if(res.getEntrada() != null)
 			{
-				Producto entrada = res.getAcompaniamiento();
+				ProductoLocal entrada = res.getAcompaniamiento();
 				entrada.setIngredientes(daoIng.darIngredientesProducto(entrada.getId()));
 				res.setEntrada(entrada);
 			}
 			if(res.getPlatoFuerte() != null)
 			{
-				Producto platoFuerte = res.getAcompaniamiento();
+				ProductoLocal platoFuerte = res.getAcompaniamiento();
 				platoFuerte.setIngredientes(daoIng.darIngredientesProducto(platoFuerte.getId()));
 				res.setPlatoFuerte(platoFuerte);
 			}
 			if(res.getPostre() != null)
 			{
-				Producto postre = res.getAcompaniamiento();
+				ProductoLocal postre = res.getAcompaniamiento();
 				postre.setIngredientes(daoIng.darIngredientesProducto(postre.getId()));
 				res.setPostre(postre);
 			}
 			if(res.getBebida() != null)
 			{
-				Producto bebida = res.getAcompaniamiento();
+				ProductoLocal bebida = res.getAcompaniamiento();
 				bebida.setIngredientes(daoIng.darIngredientesProducto(bebida.getId()));
 				res.setBebida(bebida);
 			}
 			if(res.getAcompaniamiento() != null)
 			{
-				Producto acompaniamiento = res.getAcompaniamiento();
+				ProductoLocal acompaniamiento = res.getAcompaniamiento();
 				acompaniamiento.setIngredientes(daoIng.darIngredientesProducto(acompaniamiento.getId()));
 				res.setAcompaniamiento(acompaniamiento);
 			}
@@ -679,7 +684,7 @@ public class RotondAndesTM {
 			{
 				throw new Exception ("Informacion de Cliente invalida.");
 			}
-			Producto producto = darProducto(idProd, idRestProd);
+			ProductoLocal producto = darProducto(idProd, idRestProd);
 			res = dao.registrarPedido(producto, idOrden, idRestProd);
 			dao.updateCostoTotalOrden(idOrden, res.getProducto().getPrecio());
 		}catch (SQLException e) {
@@ -865,8 +870,8 @@ public class RotondAndesTM {
 		}
 	}
 
-	public List<Producto> darProductos() throws SQLException, Exception {
-		List<Producto> productos; 
+	public List<ProductoLocal> darProductos() throws SQLException, Exception {
+		List<ProductoLocal> productos; 
 		DAOTablaProductos dao = new DAOTablaProductos();
 
 		try {
@@ -895,14 +900,85 @@ public class RotondAndesTM {
 		return productos; 
 	}
 
-	public List<Producto> darProductosPor(Integer filtro, String parametro)  throws SQLException, Exception {
+	
+	public List<Producto> darProductosSinCantidad() throws SQLException, Exception {
 		List<Producto> productos; 
+		DAOTablaProductos dao = new DAOTablaProductos();
+
+		try {
+			this.conn = darConexion();
+			dao.setConn(conn);
+			productos = dao.darProductosSinCantidad();
+		}catch (SQLException e) {
+			System.err.println("SQLException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		} catch (Exception e) {
+			System.err.println("GeneralException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		} finally {
+			try {
+				dao.cerrarRecursos();
+				if(this.conn!=null)
+					this.conn.close();
+			} catch (SQLException exception) {
+				System.err.println("SQLException closing resources:" + exception.getMessage());
+				exception.printStackTrace();
+				throw exception;
+			}
+		}
+		return productos; 
+	}
+	public List<ProductoLocal> darProductosPor(Integer filtro, String parametro)  throws SQLException, Exception {
+		List<ProductoLocal> productos; 
 		DAOTablaProductos dao = new DAOTablaProductos();
 		DAOTablaIngredientes daoIng = new DAOTablaIngredientes();
 		try {
 			this.conn = darConexion();
 			dao.setConn(conn);
 			productos = dao.darProductosPor(filtro, parametro);
+
+			daoIng.setConn(conn);
+			int a = 0;
+			for(ProductoLocal prod : productos) {
+				List<Ingrediente> ingredientes = daoIng.darIngredientesProducto(prod.getId());
+				prod.setIngredientes(ingredientes);
+				productos.set(a, prod);
+				a++;
+			}
+
+		}catch (SQLException e) {
+			System.err.println("SQLException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		} catch (Exception e) {
+			System.err.println("GeneralException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		} finally {
+			try {
+				daoIng.cerrarRecursos();
+				dao.cerrarRecursos();
+				if(this.conn!=null)
+					this.conn.close();
+			} catch (SQLException exception) {
+				System.err.println("SQLException closing resources:" + exception.getMessage());
+				exception.printStackTrace();
+				throw exception;
+			}
+		}
+		return productos; 
+	}
+	
+	public List<Producto> darProductosPorSinCantidad(Integer filtro, String parametro)  throws SQLException, Exception {
+		List<Producto> productos; 
+		DAOTablaProductos dao = new DAOTablaProductos();
+		DAOTablaIngredientes daoIng = new DAOTablaIngredientes();
+		try {
+			this.conn = darConexion();
+			dao.setConn(conn);
+			productos = dao.darProductosPorSinCantidad(filtro, parametro);
 
 			daoIng.setConn(conn);
 			int a = 0;
@@ -1230,9 +1306,9 @@ public class RotondAndesTM {
 	 * @throws SQLException
 	 * @throws Exception
 	 */
-	public Producto agregarProducto(Long idRestaurante, Producto producto) throws SQLException, Exception
+	public ProductoLocal agregarProducto(Long idRestaurante, ProductoLocal producto) throws SQLException, Exception
 	{
-		Producto respuesta;
+		ProductoLocal respuesta;
 		DAOTablaProductos daoProductos = new DAOTablaProductos();
 		DAOTablaRestaurantes daoRestaurantes = new DAOTablaRestaurantes();
 		try {
@@ -1295,8 +1371,8 @@ public class RotondAndesTM {
 			{
 				throw new Exception("Error en la verificaciÃ³n del Representante");
 			}
-			Producto producto1 = daoProductos.darProducto(idProducto1, idRestaurante);
-			Producto producto2 = daoProductos.darProducto(idProducto2, idRestaurante);
+			ProductoLocal producto1 = daoProductos.darProducto(idProducto1, idRestaurante);
+			ProductoLocal producto2 = daoProductos.darProducto(idProducto2, idRestaurante);
 			if(producto1 == null)
 			{
 				throw new Exception("El Restaurante con ID: " + idRestaurante + " no ofrece el producto con ID: " + idProducto1);
@@ -1505,11 +1581,11 @@ public class RotondAndesTM {
 			{
 				throw new Exception("El Restaurante actualmente no está en servicio.");
 			}
-			Producto entrada;
-			Producto platoFuerte;
-			Producto postre;
-			Producto bebida;
-			Producto acompaniamiento;
+			ProductoLocal entrada;
+			ProductoLocal platoFuerte;
+			ProductoLocal postre;
+			ProductoLocal bebida;
+			ProductoLocal acompaniamiento;
 			if(menu.getEntrada() != null)
 			{
 				menu.setEntrada(darProducto(menu.getEntrada().getId(), idRestaurante));
@@ -1767,9 +1843,9 @@ public class RotondAndesTM {
 	 * @throws SQLException
 	 * @throws Exception
 	 */
-	public List<Producto> darProductoMasOfrecido() throws SQLException, Exception
+	public List<ProductoLocal> darProductoMasOfrecido() throws SQLException, Exception
 	{
-		List<Producto> productos;
+		List<ProductoLocal> productos;
 		DAOTablaProductos daoProductos = new DAOTablaProductos();
 		try {
 			this.conn = darConexion();
@@ -1803,9 +1879,9 @@ public class RotondAndesTM {
 	 * @throws SQLException
 	 * @throws Exception
 	 */
-	public List<Producto> darProductoMasVendido() throws SQLException, Exception
+	public List<ProductoLocal> darProductoMasVendido() throws SQLException, Exception
 	{
-		List<Producto> productos = new ArrayList<Producto>();
+		List<ProductoLocal> productos = new ArrayList<ProductoLocal>();
 		DAOTablaProductos daoProductos = new DAOTablaProductos();
 		try {
 			this.conn = darConexion();
@@ -2214,18 +2290,12 @@ public class RotondAndesTM {
 	 * @throws SQLException
 	 * @throws Exception
 	 */
-	public Boolean retirarRestauranteDelServicio(Long idAdmin, String passwordAdmin, Long idRestaurante)throws SQLException, Exception
+	public Boolean retirarRestauranteDelServicio(Long idRestaurante)throws SQLException, Exception
 	{
 		DAOTablaRestaurantes dao = new DAOTablaRestaurantes();
-		DAOTablaUsuarios daoUsuarios = new DAOTablaUsuarios();
 //		Restaurante respuesta = null;
 		try {
 			this.conn = darConexion();
-			daoUsuarios.setConn(conn);
-			if(!daoUsuarios.verficarUsuarioAdministrador(idAdmin, passwordAdmin))
-			{
-				throw new Exception("Credenciales de administrador inválidas.");
-			}
 			dao.setConn(conn);
 			if(!dao.darEstadoOrdenesRestaurante(idRestaurante))
 			{
@@ -2245,7 +2315,6 @@ public class RotondAndesTM {
 		}finally {
 			try {
 				dao.cerrarRecursos();
-				daoUsuarios.cerrarRecursos();
 				if(this.conn!=null)
 					this.conn.close();
 			} catch (SQLException exception) {
@@ -2358,6 +2427,160 @@ public class RotondAndesTM {
 			ListaRentabilidad resp = dtm.getRemoteRentabilidades(parametrosUnidos);
 			System.out.println(resp.getRentabilidades().size());
 			remL.getRentabilidades().addAll(resp.getRentabilidades());
+		}
+		catch(NonReplyException e)
+		{
+			
+		}
+		return remL;
+	}
+	
+	public ListaProductos darTodosLosProductosUniversal()throws Exception
+	{
+		List<Producto> lista = darProductosSinCantidad();
+		ListaProductos remL = new ListaProductos(lista);
+		try
+		{
+			ListaProductos resp = dtm.getRemoteTodosLosProductos();
+			System.out.println(resp.getProductos().size());
+			remL.getProductos().addAll(resp.getProductos());
+			ObjectMapper mapper = new ObjectMapper();
+			String respuesta = mapper.writeValueAsString(remL);
+			System.out.println("Respuesta: " + respuesta);
+		}
+		catch(NonReplyException e)
+		{
+			System.out.println("EXCEPCIÓN: " + e);
+		}
+		try
+		{
+			ObjectMapper mapper = new ObjectMapper();
+			String respuesta = mapper.writeValueAsString(remL);
+			System.out.println("Respuesta: " + respuesta);
+			
+			
+			Producto producto = lista.get(0);
+//			System.out.println("PARTE 1:");
+//			String valor1 = mapper.writeValueAsString(producto);
+//			ProductoGranConexion productoFromMapper = mapper.readValue(valor1, ProductoGranConexion.class);
+//			System.out.println("Cadena 1: " + valor1);
+//			System.out.println(productoFromMapper.getId());
+//			System.out.println(productoFromMapper.getCategoria());
+//			System.out.println(productoFromMapper.getDescripcionEspaniol());
+//			System.out.println(productoFromMapper.getDescripcionIngles());
+//			System.out.println(productoFromMapper.getCostoDeProduccion());
+			
+			System.out.println("PARTE 2:");
+			Producto subProducto = new Producto(producto.getId(), producto.getNombre(), producto.getDescripcionEspaniol(), producto.getDescripcionIngles(), producto.getCostoDeProduccion(), producto.getProductosEquivalentes(), producto.getPrecio(), null, producto.getCategoria(), producto.getIngredientes());
+			String valor2 = mapper.writeValueAsString(subProducto);
+			System.out.println("Cadena 2: " + valor2);
+			ProductoLocal productoFromMapper2 = mapper.readValue(valor2, ProductoLocal.class);
+			
+			System.out.println(productoFromMapper2.getId());
+			System.out.println(productoFromMapper2.getCategoria());
+			System.out.println(productoFromMapper2.getDescripcionEspaniol());
+			System.out.println(productoFromMapper2.getDescripcionIngles());
+			System.out.println(productoFromMapper2.getCostoDeProduccion());
+			System.out.println(productoFromMapper2.getCantidad());
+			
+//			System.out.println("PARTE 3:");
+//			producto.setCantidad(null);
+//			String valor3 = mapper.writeValueAsString(producto);
+//			ProductoGranConexion productoFromMapper = mapper.readValue(valor3, ProductoGranConexion.class);
+//			System.out.println("Cadena 1: " + valor3);
+//			System.out.println(productoFromMapper.getId());
+//			System.out.println(productoFromMapper.getCategoria());
+//			System.out.println(productoFromMapper.getDescripcionEspaniol());
+//			System.out.println(productoFromMapper.getDescripcionIngles());
+//			System.out.println(productoFromMapper.getCostoDeProduccion());
+		}
+		catch(Exception e)
+		{
+			System.out.println("ERROR EN GENERACIÓN: " + e.getMessage());
+		}
+		return remL;
+	}
+	
+	/**
+	 * Método que obtiene los Productos según parametros de búsqueda
+	 * @param filtro
+	 * @param parametro
+	 * @return
+	 * @throws Exception
+	 */
+	public ListaProductos darProductosPorUniversal(Integer filtro, String parametro)throws Exception
+	{
+		List<Producto> lista = darProductosPorSinCantidad(filtro, parametro);
+		ListaProductos remL = new ListaProductos(lista);
+		try
+		{
+			String parametrosUnidos = filtro + "," + parametro;
+			System.out.println("PARÁMETROS UNIDOS: " + parametrosUnidos);
+			ListaProductos resp = dtm.getRemoteProductos(parametrosUnidos);
+			System.out.println(resp.getProductos().size());
+			remL.getProductos().addAll(resp.getProductos());
+		}
+		catch(NonReplyException e)
+		{
+			
+		}
+		return remL;
+	}
+	/**
+	 * Método que confirma las Credenciales de un administrador para los métodos universales.
+	 * @param idAdmin Long, ID del Administrador.
+	 * @param passwordAdmin String, contraseña del Administrador.
+	 * @return Boolean.
+	 * @throws SQLException
+	 * @throws Exception
+	 */
+	public Boolean confirmarCredencialesAdministrador(Long idAdmin, String passwordAdmin)throws SQLException, Exception
+	{
+		DAOTablaUsuarios daoUsuarios = new DAOTablaUsuarios();
+		try {
+			this.conn = darConexion();
+			daoUsuarios.setConn(conn);
+			if(!daoUsuarios.verficarUsuarioAdministrador(idAdmin, passwordAdmin))
+			{
+				throw new Exception("Credenciales de administrador inválidas.");
+			}
+		}catch (SQLException e) {
+			System.err.println("SQLException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		} catch (Exception e) {
+			System.err.println("GeneralException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		}finally {
+			try {
+				daoUsuarios.cerrarRecursos();
+				if(this.conn!=null)
+					this.conn.close();
+			} catch (SQLException exception) {
+				System.err.println("SQLException closing resources:" + exception.getMessage());
+				exception.printStackTrace();
+				throw exception;
+			}
+		}
+		System.out.println("PRE RETURN");
+		return true;
+	}
+	
+	
+	public ListaConfirmaciones retirarRestauranteUniversal(Long idAdmin, String passwordAdmin, Long idRestaurante)throws Exception
+	{
+		List<Boolean> lista = new ArrayList<Boolean>();
+		lista.add(retirarRestauranteDelServicio(idRestaurante));
+		ListaConfirmaciones remL = new ListaConfirmaciones(lista);
+		confirmarCredencialesAdministrador(idAdmin, passwordAdmin);
+		try
+		{
+			String parametrosUnidos = "" + idRestaurante;
+			System.out.println("PARÁMETROS UNIDOS: " + parametrosUnidos);
+			ListaConfirmaciones resp = dtm.retirarRemoteRestaurantes(parametrosUnidos);
+			System.out.println(resp.getConfirmaciones().size());
+			remL.getConfirmaciones().addAll(resp.getConfirmaciones());
 		}
 		catch(NonReplyException e)
 		{

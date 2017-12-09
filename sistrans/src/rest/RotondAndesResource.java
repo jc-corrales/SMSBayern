@@ -21,8 +21,10 @@ import vos.Cliente;
 import vos.ClienteFrecuente;
 import vos.ConsumoCliente;
 import vos.EstadisticasPedidos;
+import vos.ListaConfirmaciones;
+import vos.ListaProductos;
 import vos.ListaRentabilidad;
-import vos.Producto;
+import vos.ProductoLocal;
 import vos.RegistroVentas;
 import vos.RentabilidadRestaurante;
 import vos.Representante;
@@ -61,9 +63,9 @@ public class RotondAndesResource {
 	@Produces({MediaType.APPLICATION_JSON})
 	public Response getProductosPor(@QueryParam("filtro") Integer ident, @QueryParam("parametro") String parametro) {
 		RotondAndesTM tm = new RotondAndesTM(getPath());
-		List<Producto> productos;
+		ListaProductos productos;
 		try {
-			productos = tm.darProductosPor(ident, parametro);
+			productos = tm.darProductosPorUniversal(ident, parametro);
 		} catch (Exception e) {
 			return Response.status(500).entity(doErrorMessage(e)).build();
 		}
@@ -352,7 +354,7 @@ public class RotondAndesResource {
 	{
 		RotondAndesTM tm = new RotondAndesTM(getPath());
 		try {
-			Boolean respuesta = tm.retirarRestauranteDelServicio(entrada.idAdmin, entrada.passwordAdmin, idRestaurante);
+			ListaConfirmaciones respuesta = tm.retirarRestauranteUniversal(entrada.idAdmin, entrada.passwordAdmin, idRestaurante);
 			return Response.status( 200 ).entity( respuesta ).build( );		
 		}catch( Exception e )
 		{
@@ -393,6 +395,23 @@ public class RotondAndesResource {
 		RotondAndesTM tm = new RotondAndesTM(getPath());
 		try {
 			List<RentabilidadRestaurante> respuesta = tm.darRentabilidadRestaurante(entrada.fecha1, entrada.fecha2, entrada.criterioDeBusqueda, entrada.idProducto, idRestaurante);
+			return Response.status( 200 ).entity( respuesta ).build( );		
+		}catch( Exception e )
+		{
+			return Response.status( 500 ).entity( doErrorMessage( e ) ).build( );
+		}
+	}
+	/**
+	 * Método que obtiene todos los Productos.
+	 * @return ListaProductos
+	 */
+	@GET
+	@Path("allProductos")
+	@Produces( { MediaType.APPLICATION_JSON } )
+	public Response getProductos() {
+		RotondAndesTM tm = new RotondAndesTM(getPath());
+		try {
+			ListaProductos respuesta = tm.darTodosLosProductosUniversal();
 			return Response.status( 200 ).entity( respuesta ).build( );		
 		}catch( Exception e )
 		{

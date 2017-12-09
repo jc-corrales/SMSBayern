@@ -16,7 +16,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import tm.RotondAndesTM;
 import vos.Ingrediente;
-import vos.Producto;
+import vos.ProductoLocal;
 import vos.ProductoBase;
 @Path("productos")
 @Produces("application/json")
@@ -72,10 +72,10 @@ public class ProductosResource
 	@POST
 	@Path("{idRestaurante: \\d+}")
 	@Consumes({ MediaType.APPLICATION_JSON })
-	public Response agregarProducto(@PathParam("idRestaurante") Long idRestaurante, Producto producto) {
+	public Response agregarProducto(@PathParam("idRestaurante") Long idRestaurante, ProductoLocal producto) {
 		RotondAndesTM tm = new RotondAndesTM(getPath());
 		try {
-			Producto res = tm.agregarProducto(idRestaurante, producto);;
+			ProductoLocal res = tm.agregarProducto(idRestaurante, producto);;
 			return Response.status( 200 ).entity( res ).build();	
 		}catch( Exception e )
 		{
@@ -94,7 +94,7 @@ public class ProductosResource
 	public Response obtenerProductoMasOfrecido() {
 		RotondAndesTM tm = new RotondAndesTM(getPath());
 		try {
-			List<Producto> res = tm.darProductoMasOfrecido();
+			List<ProductoLocal> res = tm.darProductoMasOfrecido();
 			return Response.status( 200 ).entity( res ).build();	
 		}catch( Exception e )
 		{
@@ -111,7 +111,7 @@ public class ProductosResource
 	public Response obtenerProductoMasVendido() {
 		RotondAndesTM tm = new RotondAndesTM(getPath());
 		try {
-			List<Producto> res = tm.darProductoMasVendido();
+			List<ProductoLocal> res = tm.darProductoMasVendido();
 			return Response.status( 200 ).entity( res ).build();	
 		}catch( Exception e )
 		{

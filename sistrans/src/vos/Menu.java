@@ -57,27 +57,27 @@ public class Menu{
 	 * Atributo que contiene la Entrada de este Menú.
 	 */
 	@JsonProperty(value="entrada")
-	private Producto entrada; 
+	private ProductoLocal entrada; 
 	/**
 	 * Atributo que contiene el Plato Fuerte de este Menú.
 	 */
 	@JsonProperty(value="platoFuerte")
-	private Producto platoFuerte;
+	private ProductoLocal platoFuerte;
 	/**
 	 * Atributo que contiene el Postre de este Menú.
 	 */
 	@JsonProperty(value="postre")
-	private Producto postre;
+	private ProductoLocal postre;
 	/**
 	 * Atributo que contiene la Bebida de este Menú.
 	 */
 	@JsonProperty(value="bebida")
-	private Producto bebida;
+	private ProductoLocal bebida;
 	/**
 	 * Atributo que contiene el acompañamiento de este menú.
 	 */
 	@JsonProperty(value = "acompaniamiento")
-	private Producto acompaniamiento;
+	private ProductoLocal acompaniamiento;
 
 	/**
 	 * Método constructor de la clase menu
@@ -92,11 +92,11 @@ public class Menu{
 			@JsonProperty(value="descripcion") String descripcion, 
 			@JsonProperty(value = "description") String description, 
 			@JsonProperty(value = "precio") Double precio,
-			@JsonProperty(value="entrada") Producto entrada,
-			@JsonProperty(value="platoFuerte") Producto platoFuerte,
-			@JsonProperty(value="bebida") Producto bebida,
-			@JsonProperty(value="postre") Producto postre,
-			@JsonProperty(value = "acompaniamiento")Producto acompaniamiento){
+			@JsonProperty(value="entrada") ProductoLocal entrada,
+			@JsonProperty(value="platoFuerte") ProductoLocal platoFuerte,
+			@JsonProperty(value="bebida") ProductoLocal bebida,
+			@JsonProperty(value="postre") ProductoLocal postre,
+			@JsonProperty(value = "acompaniamiento")ProductoLocal acompaniamiento){
 		super();
 		this.id = id;
 		this.name = name;
@@ -207,63 +207,63 @@ public class Menu{
 	 * Método que obtiene la Entrada de este Menú.
 	 * @return Entrada, Entrada de este Menú.
 	 */
-	public Producto getEntrada() {
+	public ProductoLocal getEntrada() {
 		return entrada;
 	}
 	/**
 	 * Método que establece la Entrada de este Menú.
 	 * @param entrada Entrada, nueva Entrada de este Menú.
 	 */
-	public void setEntrada(Producto entrada) {
+	public void setEntrada(ProductoLocal entrada) {
 		this.entrada = entrada;
 	}
 	/**
 	 * Método que obtiene el Plato Fuerte de este Menú.
 	 * @return PlatoFuerte, Plato Fuerte de este Menú.
 	 */
-	public Producto getPlatoFuerte() {
+	public ProductoLocal getPlatoFuerte() {
 		return platoFuerte;
 	}
 	/**
 	 * Método que establece el Plato Fuerte de este Menú.
 	 * @param platoFuerte PlatoFuerte, nuevo PlatoFuerte de este Menú.
 	 */
-	public void setPlatoFuerte(Producto platoFuerte) {
+	public void setPlatoFuerte(ProductoLocal platoFuerte) {
 		this.platoFuerte = platoFuerte;
 	}
 	/**
 	 * Método que obtiene el Postre de este Menú.
 	 * @return Postre, Postre de este Menú.
 	 */
-	public Producto getPostre() {
+	public ProductoLocal getPostre() {
 		return postre;
 	}
 	/**
 	 * Método que establece el Postre de este Menú.
 	 * @param postre Postre, nuevo postre de este Menú.
 	 */
-	public void setPostre(Producto postre) {
+	public void setPostre(ProductoLocal postre) {
 		this.postre = postre;
 	}
 	/**
 	 * Método que obtiene la Bebida de este Menú.
 	 * @return Bebida, Bebida de este Menú.
 	 */
-	public Producto getBebida() {
+	public ProductoLocal getBebida() {
 		return bebida;
 	}
 	/**
 	 * Método que establece la Bebida de este Menú.
 	 * @param bebida Bebida, nueva Bebida de este Menú.
 	 */
-	public void setBebida(Producto bebida) {
+	public void setBebida(ProductoLocal bebida) {
 		this.bebida = bebida;
 	}
 	/**
 	 * Método que obtiene el acompañamiento de este Menú.
 	 * @return Producto, acompañamiento del Menú.
 	 */
-	public Producto getAcompaniamiento()
+	public ProductoLocal getAcompaniamiento()
 	{
 		return acompaniamiento;
 	}
@@ -271,7 +271,7 @@ public class Menu{
 	 * Método que establece el acompaniamiento de este Menú.
 	 * @param acompaniamiento Producto, nuevo acompañamiento.
 	 */
-	public void setAcompaniamiento(Producto acompaniamiento)
+	public void setAcompaniamiento(ProductoLocal acompaniamiento)
 	{
 		this.acompaniamiento = acompaniamiento;
 	}

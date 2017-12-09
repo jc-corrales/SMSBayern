@@ -23,12 +23,12 @@ public class RegistroVentas
 	 * Atributo que contiene el Producto más consumido.
 	 */
 	@JsonProperty(value="productoMasConsumido")
-	private Producto productoMasConsumido;
+	private ProductoLocal productoMasConsumido;
 	/**
 	 * Atributo que contiene el producto menos consumido.
 	 */
 	@JsonProperty(value="productoMenosConsumido")
-	private Producto productoMenosConsumido;
+	private ProductoLocal productoMenosConsumido;
 	/**
 	 * Método constructor de la Clase.
 	 * @param restauranteMasFrecuentado Restaurante Más Frecuentado.
@@ -40,8 +40,8 @@ public class RegistroVentas
 			@JsonProperty(value = "dia") String dia,
 			@JsonProperty(value="restauranteMasFrecuentado")Restaurante restauranteMasFrecuentado,
 			@JsonProperty(value="restauranteMenosFrecuentado")Restaurante restauranteMenosFrecuentado,
-			@JsonProperty(value="productoMasFrecuentado")Producto productoMasConsumido,
-			@JsonProperty(value="productoMenosFrecuentado")Producto productoMenosConsumido)
+			@JsonProperty(value="productoMasFrecuentado")ProductoLocal productoMasConsumido,
+			@JsonProperty(value="productoMenosFrecuentado")ProductoLocal productoMenosConsumido)
 	{
 		this.dia = dia;
 		this.restauranteMasFrecuentado = restauranteMasFrecuentado;
@@ -66,19 +66,19 @@ public class RegistroVentas
 		this.restauranteMenosFrecuentado = restauranteMenosFrecuentado;
 	}
 
-	public Producto getProductoMasConsumido() {
+	public ProductoLocal getProductoMasConsumido() {
 		return productoMasConsumido;
 	}
 
-	public void setProductoMasConsumido(Producto productoMasConsumido) {
+	public void setProductoMasConsumido(ProductoLocal productoMasConsumido) {
 		this.productoMasConsumido = productoMasConsumido;
 	}
 
-	public Producto getProductoMenosConsumido() {
+	public ProductoLocal getProductoMenosConsumido() {
 		return productoMenosConsumido;
 	}
 
-	public void setProductoMenosConsumido(Producto productoMenosConsumido) {
+	public void setProductoMenosConsumido(ProductoLocal productoMenosConsumido) {
 		this.productoMenosConsumido = productoMenosConsumido;
 	}
 

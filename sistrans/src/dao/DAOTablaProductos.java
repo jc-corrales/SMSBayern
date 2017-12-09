@@ -9,9 +9,12 @@ import java.util.List;
 
 import org.codehaus.jackson.map.ObjectMapper;
 
+import vos.Ingrediente;
+import vos.IngredienteBase;
 import vos.Menu;
-import vos.Producto;
+import vos.ProductoLocal;
 import vos.ProductoBase;
+import vos.Producto;
 import vos.TipoComida;
 
 public class DAOTablaProductos {
@@ -45,30 +48,60 @@ public class DAOTablaProductos {
 		this.conn = conn;
 	}
 
-	public List<Producto> darProductos() throws SQLException, Exception {
-		ArrayList<Producto> productos = new ArrayList<Producto>();
+	public List<ProductoLocal> darProductos() throws SQLException, Exception {
+		ArrayList<ProductoLocal> productos = new ArrayList<ProductoLocal>();
 
-		String sentencia = "SELECT * FROM PRODUCTOS";
+		String sentencia = "SELECT * FROM PRODUCTOS, PRODUCTO_RESTAURANTE WHERE ID = ID_PROD ";
 		PreparedStatement stamnt = conn.prepareStatement(sentencia);
 		recursos.add(stamnt);
 		ResultSet rs = stamnt.executeQuery();
-		int a = 1;
 		while(rs.next()) {
-			Producto producto = new Producto();
-			producto.setId(rs.getLong("ID"));
-			producto.setNombre("Producto" + a);
-			producto.setCostoDeProduccion(rs.getDouble("COSTO_PRODUCCION"));
-			producto.setDescripcionEspaniol(rs.getString("DESCRIPCION"));
-			producto.setDescripcionIngles(rs.getString("DESCRIPTION"));
+			
+			Long id = rs.getLong("ID");
+			String nombre = rs.getString("NAME");
+			String descripcionEspaniol = rs.getString("DESCRIPCION");
+			String descripcionIngles = rs.getString("DESCRIPTION");
+			Double costoDeProduccion = rs.getDouble("COSTO_PRODUCCION");
+			Double precio = rs.getDouble("PRECIO");
+			Long idRest = rs.getLong("ID_REST");
+			String categoria = rs.getString("CATEGORIA");
+//			Integer cantidad = rs.getInt("CANTIDAD");
+			Integer cantidad = null;
+			List<TipoComida> tiposComida = null;
+			ProductoLocal producto = new ProductoLocal(id, nombre, descripcionEspaniol, descripcionIngles, costoDeProduccion, darProductosEquivalentes(id, idRest), precio, tiposComida, categoria, null, cantidad);
 			productos.add(producto);
-			a++;
 		}
 		return productos;
 	}
 
+	public List<Producto> darProductosSinCantidad() throws SQLException, Exception {
+		ArrayList<Producto> productos = new ArrayList<Producto>();
 
-	public Producto darProducto(Long id, Long idRest) throws SQLException, Exception {
-		Producto producto = new Producto();
+		String sentencia = "SELECT * FROM PRODUCTOS, PRODUCTO_RESTAURANTE WHERE ID = ID_PROD ";
+		PreparedStatement stamnt = conn.prepareStatement(sentencia);
+		recursos.add(stamnt);
+		ResultSet rs = stamnt.executeQuery();
+		while(rs.next()) {
+			
+			Long id = rs.getLong("ID");
+			String nombre = rs.getString("NAME");
+			String descripcionEspaniol = rs.getString("DESCRIPCION");
+			String descripcionIngles = rs.getString("DESCRIPTION");
+			Double costoDeProduccion = rs.getDouble("COSTO_PRODUCCION");
+			Double precio = rs.getDouble("PRECIO");
+			Long idRest = rs.getLong("ID_REST");
+			String categoria = rs.getString("CATEGORIA");
+//			Integer cantidad = rs.getInt("CANTIDAD");
+			Integer cantidad = null;
+			List<TipoComida> tiposComida = null;
+			Producto producto = new Producto(id, nombre, descripcionEspaniol, descripcionIngles, costoDeProduccion, darProductosEquivalentes(id, idRest), precio, tiposComida, categoria, null);
+			productos.add(producto);
+		}
+		return productos;
+	}
+
+	public ProductoLocal darProducto(Long id, Long idRest) throws SQLException, Exception {
+		ProductoLocal producto = new ProductoLocal();
 
 		String sqlProductoPorId = "SELECT * FROM PRODUCTOS, PRODUCTO_RESTAURANTE WHERE ID_PROD = ID AND ID_PROD = " + id + " AND ID_REST =" + idRest; 
 		PreparedStatement stProductoPorId = conn.prepareStatement(sqlProductoPorId);
@@ -127,12 +160,62 @@ public class DAOTablaProductos {
 	/**
 	 * Método dinámico, obtiene una lista de Productos según unos parámetros de búsqueda.
 	 * @param filtro Integer, tipo de filtro.
-	 * @param parametro String, parámetro según el cual realizar la búsqueda.
+	 * @param parametro String, parámetro seg�n el cual realizar la búsqueda.
 	 * @return List<Producto>, lista de Productos.
 	 * @throws SQLException
 	 * @throws Exception
 	 */
-	public List<Producto> darProductosPor(Integer filtro, String parametro) throws SQLException, Exception{
+	public List<ProductoLocal> darProductosPor(Integer filtro, String parametro) throws SQLException, Exception{
+		ObjectMapper om = new ObjectMapper();
+		ArrayList<ProductoLocal> productos = new ArrayList<ProductoLocal>();
+		String sentencia = "SELECT * FROM PRODUCTOS, PRODUCTO_RESTAURANTE WHERE ID = ID_PROD ";
+
+		switch(filtro) {
+
+		case RESTAURANTE:
+			sentencia +=  "AND ID_REST = " + Integer.parseInt(parametro);
+			break;
+
+		case CATEGORIA: 
+			sentencia += "AND CATEGORIA = '" + ((String) parametro) + "'";
+			System.out.println("sentencia -> " + sentencia);
+			break;
+			
+		case RANGO_PRECIOS:
+			String[] precios = parametro.split(",");
+			sentencia += "AND PRECIO >= " + Integer.parseInt(precios[0]) + " AND  PRECIO <= " + Integer.parseInt(precios[1]);
+		default:
+			break;
+		}
+
+		PreparedStatement stamnt = conn.prepareStatement(sentencia);
+		recursos.add(stamnt);
+		ResultSet rs = stamnt.executeQuery();
+		while(rs.next()) {
+			ProductoLocal producto = new ProductoLocal();
+			producto.setId(rs.getLong("ID"));
+			producto.setNombre(rs.getString("NAME"));
+			producto.setDescripcionEspaniol(rs.getString("DESCRIPCION"));
+			producto.setDescripcionIngles(rs.getString("DESCRIPTION"));
+			producto.setCategoria(rs.getString("CATEGORIA"));
+			producto.setPrecio(rs.getDouble("PRECIO"));
+			producto.setCostoDeProduccion(rs.getDouble("COSTO_PRODUCCION"));
+			producto.setProductosEquivalentes(darProductosEquivalentes(producto.getId(), rs.getLong("ID_REST")));
+			producto.setCantidad(rs.getInt("CANTIDAD"));
+			productos.add(producto);
+		}
+		return productos;
+	}
+	
+	/**
+	 * Método dinámico, obtiene una lista de Productos según unos parámetros de búsqueda.
+	 * @param filtro Integer, tipo de filtro.
+	 * @param parametro String, parámetro seg�n el cual realizar la búsqueda.
+	 * @return List<Producto>, lista de Productos.
+	 * @throws SQLException
+	 * @throws Exception
+	 */
+	public List<Producto> darProductosPorSinCantidad(Integer filtro, String parametro) throws SQLException, Exception{
 		ObjectMapper om = new ObjectMapper();
 		ArrayList<Producto> productos = new ArrayList<Producto>();
 		String sentencia = "SELECT * FROM PRODUCTOS, PRODUCTO_RESTAURANTE WHERE ID = ID_PROD ";
@@ -168,7 +251,6 @@ public class DAOTablaProductos {
 			producto.setPrecio(rs.getDouble("PRECIO"));
 			producto.setCostoDeProduccion(rs.getDouble("COSTO_PRODUCCION"));
 			producto.setProductosEquivalentes(darProductosEquivalentes(producto.getId(), rs.getLong("ID_REST")));
-			producto.setCantidad(rs.getInt("CANTIDAD"));
 			productos.add(producto);
 		}
 		return productos;
@@ -208,7 +290,7 @@ public class DAOTablaProductos {
 	 * @throws SQLException
 	 * @throws Exception
 	 */
-	public Producto agregarProductoSinEquivalencias(Long idRestaurante, Producto producto)throws SQLException, Exception
+	public ProductoLocal agregarProductoSinEquivalencias(Long idRestaurante, ProductoLocal producto)throws SQLException, Exception
 	{
 		//Agregar informaci�n para el Producto base.
 		String sqlComprobar = "SELECT * FROM PRODUCTOS WHERE ID = " + producto.getId();
@@ -363,9 +445,9 @@ public class DAOTablaProductos {
 	 * @throws SQLException
 	 * @throws Exception
 	 */
-	public List<Producto> darProductosMasOfrecidos()throws SQLException, Exception
+	public List<ProductoLocal> darProductosMasOfrecidos()throws SQLException, Exception
 	{
-		List<Producto> productos = new ArrayList<Producto>();
+		List<ProductoLocal> productos = new ArrayList<ProductoLocal>();
 		String sql = "SELECT PRODUCTO.ID, PRODUCTO.NAME, PRODUCTO.DESCRIPCION, PRODUCTO.DESCRIPTION, PRODUCTO.CATEGORIA, COUNT(COMPL.ID_REST) AS NUMVECESOFRECIDOS\r\n" + 
 				"    FROM PRODUCTOS PRODUCTO, PRODUCTO_RESTAURANTE COMPL\r\n" + 
 				"    WHERE PRODUCTO.ID = COMPL.ID_PROD\r\n" + 
@@ -385,7 +467,7 @@ public class DAOTablaProductos {
 			String categoria = rs1.getString("CATEGORIA");
 			numMax = rs1.getInt("NUMVECESOFRECIDOS");
 		
-			Producto temp = new Producto(id, nombre, descripcionEspaniol, descripcionIngles, null, null, null, null, categoria, null, numMax);
+			ProductoLocal temp = new ProductoLocal(id, nombre, descripcionEspaniol, descripcionIngles, null, null, null, null, categoria, null, numMax);
 			productos.add(temp);
 		}
 		while(rs1.next())
@@ -397,7 +479,7 @@ public class DAOTablaProductos {
 				String descripcionEspaniol = rs1.getString("DESCRIPCION");
 				String descripcionIngles = rs1.getString("DESCRIPTION");
 				String categoria = rs1.getString("CATEGORIA");
-				Producto temp = new Producto(id, nombre, descripcionEspaniol, descripcionIngles, null, null, null, null, categoria, null, numMax);
+				ProductoLocal temp = new ProductoLocal(id, nombre, descripcionEspaniol, descripcionIngles, null, null, null, null, categoria, null, numMax);
 				productos.add(temp);
 			}
 		}
@@ -477,11 +559,11 @@ public class DAOTablaProductos {
 		Long idPostre = rs.getLong("ID_POSTRE");
 		Long idBebida = rs.getLong("ID_BEBIDA");
 		Long idAcompaniamiento = rs.getLong("ID_ACOMPANIAMIENTO");
-		Producto entrada = null;
-		Producto platoFuerte = null;
-		Producto postre = null;
-		Producto bebida = null;
-		Producto acompaniamiento = null;
+		ProductoLocal entrada = null;
+		ProductoLocal platoFuerte = null;
+		ProductoLocal postre = null;
+		ProductoLocal bebida = null;
+		ProductoLocal acompaniamiento = null;
 		Double costoProduccion = (double) 0;
 		if(idEntrada != null)
 		{
@@ -510,5 +592,56 @@ public class DAOTablaProductos {
 		}
 		Menu menu = new Menu(idRest, name, costoProduccion, descripcion, description, precio, entrada, platoFuerte, bebida, postre, acompaniamiento);
 		return menu;
+	}
+	/**
+	 * M�todo que obtiene los Ingredientes requeridos por el Producto.
+	 * @param id Long, ID del Producto cuyos ingredientes se van a consultar.
+	 * @return List<Ingrediente>, Lista de Ingredientes.
+	 * @throws SQLException
+	 * @throws Exception
+	 */
+	public List<Ingrediente> darIngredientesProducto(Long id) throws SQLException, Exception{
+
+		String sql = "SELECT * FROM INGREDIENTES, INGREDIENTES_PRODUCTO WHERE ID = ID_INGREDIENTE AND ID_PRODUCTO = " + id;
+		PreparedStatement st = conn.prepareStatement(sql);
+		recursos.add(st);
+		ResultSet rs = st.executeQuery();
+
+		List<Ingrediente> ings = new ArrayList<>();
+
+		while(rs.next()) {
+			System.out.println("encontr� los ingredientes");
+			Long idIngrediente = rs.getLong("ID");
+			Ingrediente ing = new Ingrediente(idIngrediente, 
+					rs.getString("NAME"), 
+					rs.getString("DESCRIPCION"), 
+					rs.getString("DESCRIPTION"),
+					darIngredientesEquivalentes(idIngrediente),
+					rs.getInt("CANTIDAD_DISPONIBLE"));
+			ings.add(ing);
+		}
+		System.out.println("ings dentro de metodo: " + ings.size());
+		return ings;
+	}
+	/**
+	 * M�todo que da los Ingredientes equivalentes a un Ingrediente.
+	 * @param idIngrediente Long, ID del Ingrediente.
+	 * @return List<IngredienteBase>, Lista de Ingredientes Equivalentes.
+	 * @throws SQLException
+	 * @throws Exception
+	 */
+	private List<IngredienteBase> darIngredientesEquivalentes(Long idIngrediente) throws SQLException, Exception{
+		String sql = "SELECT * FROM INGREDIENTES, INGREDIENTESSIMILARES WHERE ID_INGREDIENTE2 = ID AND ID_INGREDIENTE1 = " + idIngrediente;
+		PreparedStatement st = conn.prepareStatement(sql);
+		recursos.add(st);
+		ResultSet rs = st.executeQuery();
+
+		List<IngredienteBase> ings = new ArrayList<>();
+
+		while(rs.next()) {
+			IngredienteBase ingB = new IngredienteBase(rs.getLong("ID"), rs.getString("NAME"));
+			ings.add(ingB);
+		}
+		return ings;
 	}
 }

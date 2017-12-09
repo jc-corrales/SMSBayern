@@ -10,7 +10,7 @@ import java.util.List;
 
 import vos.Cliente;
 import vos.ConsumoCliente;
-import vos.Producto;
+import vos.ProductoLocal;
 import vos.RegistroVentas;
 import vos.Restaurante;
 /**
@@ -74,7 +74,7 @@ public class DAOConsumoClientes
 		{
 			System.out.println("Entro a while.");
 			Cliente cliente = new Cliente(rs.getLong("ID_CLIENTE"), null, null, null);
-			Producto producto = new Producto(rs.getLong("ID_PRODUCTO"), null, null, null, null, null, null, null, null, null, null);
+			ProductoLocal producto = new ProductoLocal(rs.getLong("ID_PRODUCTO"), null, null, null, null, null, null, null, null, null, null);
 			Integer cantidad = rs.getInt("CANTIDADORDENADOS");
 			
 			String sql2 = "SELECT * FROM PRODUCTOS WHERE ID = " +producto.getId();
@@ -123,7 +123,7 @@ public class DAOConsumoClientes
 		{
 			System.out.println("Entro a while.");
 			Cliente cliente = new Cliente(rs.getLong("ID_CLIENTE"), null, null, null);
-			Producto producto = new Producto(rs.getLong("ID_PRODUCTO"), null, null, null, null, null, null, null, null, null, null);
+			ProductoLocal producto = new ProductoLocal(rs.getLong("ID_PRODUCTO"), null, null, null, null, null, null, null, null, null, null);
 			Integer cantidad = rs.getInt("CANTIDADORDENADOS");
 			
 			String sql2 = "SELECT * FROM PRODUCTOS WHERE ID = " +producto.getId();
@@ -346,8 +346,8 @@ public class DAOConsumoClientes
 			Long prodMenosVendido = rs.getLong("IDPRODUCTOMENOSVENDIDO");
 			Long restMasVendido = rs.getLong("IDRESTAURANTEMASFRECUENTADO");
 			Long restMenosVendido = rs.getLong("IDRESTAURANTEMENOSFRECUENTADO");
-			Producto productoMasConsumido = getProducto(prodMasVendido);
-			Producto productoMenosConsumido = getProducto(prodMenosVendido);
+			ProductoLocal productoMasConsumido = getProducto(prodMasVendido);
+			ProductoLocal productoMenosConsumido = getProducto(prodMenosVendido);
 			Restaurante restauranteMasFrecuentado= new Restaurante(restMasVendido, null, null, null, null, null, null);
 			Restaurante restauranteMenosFrecuentado = new Restaurante(restMenosVendido, null, null, null, null, null, null);
 			RegistroVentas registro = new RegistroVentas(dia, restauranteMasFrecuentado, restauranteMenosFrecuentado, productoMasConsumido, productoMenosConsumido);
@@ -356,7 +356,7 @@ public class DAOConsumoClientes
 		System.out.println("POST OBTENER REGISTROVENTAS DAO");
 		return listaRegistros;
 	}
-	public Producto getProducto(Long id)throws SQLException, Exception
+	public ProductoLocal getProducto(Long id)throws SQLException, Exception
 	{
 		String sql = "SELECT * FROM PRODUCTOS WHERE ID = " + id;
 		System.out.println(sql);
@@ -371,6 +371,6 @@ public class DAOConsumoClientes
 		String descripcionEspaniol = rs.getString("DESCRIPCION");
 		String descripcionIngles = rs.getString("DESCRIPTION");
 		String categoria = rs.getString("CATEGORIA");
-		return new Producto(id, nombre, descripcionEspaniol, descripcionIngles, null, null, null, null, categoria, null, null);
+		return new ProductoLocal(id, nombre, descripcionEspaniol, descripcionIngles, null, null, null, null, categoria, null, null);
 	}
 }
