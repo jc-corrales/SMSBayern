@@ -43,7 +43,7 @@ import vos.ExchangeMsg;
 import vos.ListaConfirmaciones;
 
 
-public class RetirarRestauranteMDB implements MessageListener, ExceptionListener 
+public class RetirarRestauranteTwoPhaseCommitMDB implements MessageListener, ExceptionListener 
 {
 	public final static int TIME_OUT = 5;
 	private final static String APP = "app1";
@@ -54,6 +54,15 @@ public class RetirarRestauranteMDB implements MessageListener, ExceptionListener
 	private final static String REQUEST = "REQUEST";
 	private final static String REQUEST_ANSWER = "REQUEST_ANSWER";
 	
+	private final static String INVOKE = "INVOKE";
+	private final static String PREPARE = "PREPARE";
+	private final static String VOTE = "VOTE";
+	
+	private final static String COMMIT = "COMMIT";
+	private final static String ABORT = "ABORT";
+	
+	private final static String DONE = "DONE";
+	
 	private TopicConnection topicConnection;
 	private TopicSession topicSession;
 	private Topic globalTopic;
@@ -61,7 +70,7 @@ public class RetirarRestauranteMDB implements MessageListener, ExceptionListener
 	
 	private List<Boolean> answer = new ArrayList<Boolean>();
 	
-	public RetirarRestauranteMDB(TopicConnectionFactory factory, InitialContext ctx) throws JMSException, NamingException 
+	public RetirarRestauranteTwoPhaseCommitMDB(TopicConnectionFactory factory, InitialContext ctx) throws JMSException, NamingException 
 	{	
 		topicConnection = factory.createTopicConnection();
 		topicSession = topicConnection.createTopicSession(false, Session.AUTO_ACKNOWLEDGE);

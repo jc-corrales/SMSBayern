@@ -9,6 +9,7 @@ import java.util.List;
 
 
 import vos.Menu;
+import vos.Producto;
 import vos.ProductoLocal;
 import vos.ProductoBase;
 import vos.RentabilidadRestaurante;
@@ -508,7 +509,7 @@ public class DAOTablaRestaurantes {
 					
 					Double rentabilidad = (rs.getDouble("INGRESOS") - rs.getDouble("GASTOS"));
 					Restaurante restaurante = obtenerRestaurante(rs.getLong("ID_REST"));
-					ProductoLocal producto = darProducto(rs.getLong("ID_PROD"), rs.getLong("ID_REST"));
+					Producto producto = darProducto(rs.getLong("ID_PROD"), rs.getLong("ID_REST"));
 					Integer cantidadPedidos = rs.getInt("NUMPEDIDOSTOTAL");
 					Double ingresos = rs.getDouble("INGRESOS");
 					Double gastos = rs.getDouble("GASTOS");
@@ -531,7 +532,7 @@ public class DAOTablaRestaurantes {
 					
 					Double rentabilidad = (rs.getDouble("INGRESOS") - rs.getDouble("GASTOS"));
 					Restaurante restaurante = obtenerRestaurante(rs.getLong("ID_REST"));
-					ProductoLocal producto = darProducto(rs.getLong("ID_PROD"), rs.getLong("ID_REST"));
+					Producto producto = darProducto(rs.getLong("ID_PROD"), rs.getLong("ID_REST"));
 					Integer cantidadPedidos = rs.getInt("NUMPEDIDOSTOTAL");
 					Double ingresos = rs.getDouble("INGRESOS");
 					Double gastos = rs.getDouble("GASTOS");
@@ -643,7 +644,7 @@ public class DAOTablaRestaurantes {
 					
 					Double rentabilidad = (rs.getDouble("INGRESOS") - rs.getDouble("GASTOS"));
 					Restaurante restaurante = obtenerRestaurante(rs.getLong("ID_REST"));
-					ProductoLocal producto = darProducto(rs.getLong("ID_PROD"), rs.getLong("ID_REST"));
+					Producto producto = darProducto(rs.getLong("ID_PROD"), rs.getLong("ID_REST"));
 					Integer cantidadPedidos = rs.getInt("NUMPEDIDOSTOTAL");
 					Double ingresos = rs.getDouble("INGRESOS");
 					Double gastos = rs.getDouble("GASTOS");
@@ -666,7 +667,7 @@ public class DAOTablaRestaurantes {
 					
 					Double rentabilidad = (rs.getDouble("INGRESOS") - rs.getDouble("GASTOS"));
 					Restaurante restaurante = obtenerRestaurante(rs.getLong("ID_REST"));
-					ProductoLocal producto = darProducto(rs.getLong("ID_PROD"), rs.getLong("ID_REST"));
+					Producto producto = darProducto(rs.getLong("ID_PROD"), rs.getLong("ID_REST"));
 					Integer cantidadPedidos = rs.getInt("NUMPEDIDOSTOTAL");
 					Double ingresos = rs.getDouble("INGRESOS");
 					Double gastos = rs.getDouble("GASTOS");
@@ -727,7 +728,7 @@ public class DAOTablaRestaurantes {
 	}
 	
 	
-	public ProductoLocal darProducto(Long id, Long idRest) throws SQLException, Exception {
+	public ProductoLocal darProductoLocal(Long id, Long idRest) throws SQLException, Exception {
 		ProductoLocal producto = new ProductoLocal();
 
 		String sqlProductoPorId = "SELECT * FROM PRODUCTOS, PRODUCTO_RESTAURANTE WHERE ID_PROD = ID AND ID_PROD = " + id + " AND ID_REST =" + idRest; 
@@ -761,6 +762,42 @@ public class DAOTablaRestaurantes {
 		}
 		return null;
 	}
+	
+	
+	public Producto darProducto(Long id, Long idRest) throws SQLException, Exception {
+		Producto producto = new Producto();
+
+		String sqlProductoPorId = "SELECT * FROM PRODUCTOS, PRODUCTO_RESTAURANTE WHERE ID_PROD = ID AND ID_PROD = " + id + " AND ID_REST =" + idRest; 
+		PreparedStatement stProductoPorId = conn.prepareStatement(sqlProductoPorId);
+		recursos.add(stProductoPorId);
+		ResultSet rs = stProductoPorId.executeQuery();
+		
+		String sqlTipos= "SELECT * FROM TIPOS TIPOS, TIPOPRODUCTO RELACION\r\n" + 
+				"    WHERE Relacion.Id_Prod = " + id + " AND RELACION.ID_TIPO = TIPOS.ID"; 
+		PreparedStatement stTipos = conn.prepareStatement(sqlTipos);
+		recursos.add(stTipos);
+		ResultSet rsTipos = stTipos.executeQuery();
+		List<TipoComida> tipos = new ArrayList<TipoComida>();
+		while(rsTipos.next())
+		{
+			tipos.add(new TipoComida(rsTipos.getLong("ID"), rsTipos.getString("NAME")));
+		}
+		
+		if (rs.next()) {
+			producto.setId(rs.getLong("ID"));
+			producto.setNombre(rs.getString("NAME"));
+			producto.setDescripcionEspaniol(rs.getString("DESCRIPCION"));
+			producto.setDescripcionIngles(rs.getString("DESCRIPTION"));
+			producto.setCategoria(rs.getString("CATEGORIA"));
+			producto.setCostoDeProduccion(rs.getDouble("COSTO_PRODUCCION"));
+			producto.setPrecio(rs.getDouble("PRECIO"));
+			producto.setProductosEquivalentes(darProductosEquivalentes(producto.getId(), idRest));
+			producto.setTiposComida(tipos);
+			return producto;
+		}
+		return null;
+	}
+	
 	
 	private List<ProductoBase> darProductosEquivalentes(Long id, Long idRest)  throws SQLException, Exception {
 		String sql = "SELECT * FROM PRODUCTOS, PRODUCTO_RESTAURANTE, PRODUCTOSSIMILARES WHERE ID = ID_PROD AND ID_PROD2 = ID_PROD AND ID_REST = "; 
