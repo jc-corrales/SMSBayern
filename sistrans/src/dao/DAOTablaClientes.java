@@ -763,4 +763,78 @@ public class DAOTablaClientes {
 	//		cliente.setId(idCliente);
 	//		return cliente;
 	//	}
+	
+	
+	public Cliente darClientePorNombre(String nombre, Integer origen) throws SQLException, Exception {
+		Cliente clientePorId = null;
+
+		String sqlClientePorId = "SELECT * FROM CLIENTES\r\n" + 
+				"    NATURAL JOIN USUARIOS\r\n" + 
+				"    WHERE NAME = " + nombre; 
+		PreparedStatement stClientePorId = conn.prepareStatement(sqlClientePorId);
+		recursos.add(stClientePorId);
+		ResultSet rsClientePorId = stClientePorId.executeQuery();
+
+		if (rsClientePorId.next()) {
+			Long id2 = rsClientePorId.getLong("ID");
+			String nameclientePorId = rsClientePorId.getString("NAME");
+			Long mesaClientePorId = rsClientePorId.getLong("IDMESA");
+			clientePorId = new Cliente(id2, mesaClientePorId, nameclientePorId, null);
+		}
+		List<Orden> ordenes = new ArrayList<Orden>();
+		String sentenciaOrden = "SELECT * FROM ORDENES WHERE ID_CLIENTE = " + clientePorId.getId();
+		PreparedStatement stamntOrden = conn.prepareStatement(sentenciaOrden);
+		recursos.add(stamntOrden);
+		ResultSet rsOrden = stamntOrden.executeQuery();
+		while(rsOrden.next())
+		{
+			Long idOrden = rsOrden.getLong("ID");
+			Double costoTotalOrden = rsOrden.getDouble("COSTOTOTAL");
+			List<Pedido> pedidos = getPedidosPorClienteSegunOrden(idOrden);
+			Boolean esConfirmada = rsOrden.getBoolean("ES_CONFIRMADA");
+			List<PedidoDeMenu> menusPedidos = obtenerMenusPedidosDeOrden(idOrden);
+			ordenes.add( new Orden(idOrden, costoTotalOrden, pedidos ,null, esConfirmada, menusPedidos));
+		}
+		clientePorId.setOrdenes(ordenes);
+		return clientePorId;
+	}
+	/**
+	 * Método que obtiene un cliente externo.
+	 * @param idCliente Long, ID del Cliente.
+	 * @param origen Integer, número de la base de datos de procedencia.
+	 * @return Cliente, Información del Cliente.
+	 * @throws SQLExcepcion
+	 * @throws Exception
+	 */
+	public Cliente darClienteExterno(Long idCliente, Integer origen)throws SQLException, Exception
+	{
+		String sql = "SELECT * FROM CLIENTESEXTERNOS WHERE ID = " + idCliente + " AND ORIGEN = " + origen; 
+		PreparedStatement st = conn.prepareStatement(sql);
+		recursos.add(st);
+		ResultSet rs= st.executeQuery();
+		Cliente respuesta = null;
+		if(rs.next())
+		{
+			respuesta = new Cliente(rs.getLong("ID"), rs.getLong("IDMESA"), rs.getString("NAME"), null);
+		}
+		return respuesta;
+	}
+	/**
+	 * Método que crea un nuevo cliente externo.
+	 * @param idCliente Long, Id del cliente.
+	 * @param nombre String, nombre del Cliente.
+	 * @param idMesa Long, ID de la Mesa.
+	 * @param origen Integer, número de la base de datos de la que proviene.
+	 * @return Cliente, nuevo cliente externo creado.
+	 * @throws SQLException
+	 * @throws Exception
+	 */
+	public Cliente crearClienteExterno(Long idCliente, String nombre, Long idMesa, Integer origen)throws SQLException, Exception
+	{
+		String sql = "INSERT INTO CLIENTESEXTERNOS(ID, NAME, IDMESA, ORIGEN) VALUES (" + idCliente + ", " + nombre + ", " + idMesa + ", " + origen +  ")";
+		PreparedStatement st = conn.prepareStatement(sql);
+		recursos.add(st);
+		st.executeQuery();
+		return new Cliente(idCliente, idMesa, nombre, null);
+	}
 }

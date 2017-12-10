@@ -79,9 +79,10 @@ public class Pedido {
 	 * @param nombreCliente String, nombre del Cliente.
 	 * @param idOrden Long, ID de la Orden.
 	 * @param idMesa Long, ID de la Mesa.
+	 * @Param origenPedido String, campo que determina la base de datos de origen de este Pedido.
 	 * @return PedidoConexion, información apta para enviar como mensaje.
 	 */
-	public PedidoConexion toPedidoConexion(String nombreRestaurante, Long idCliente, String nombreCliente, Long idOrden, Long idMesa)
+	public PedidoConexion toPedidoConexion(String nombreRestaurante, Long idCliente, String nombreCliente, Long idOrden, Long idMesa, Integer origenPedido)
 	{
 		Long idProducto = producto.getId();
 		String nombreProducto = producto.getNombre();
@@ -91,7 +92,7 @@ public class Pedido {
 		Double costoProduccion = producto.getCostoDeProduccion();
 		Double precio = producto.getPrecio();
 		Integer cantidadDisponible = producto.getCantidad();
-		return new PedidoConexion(id, fecha, idProducto, nombreProducto, idRestaurante, nombreRestaurante, idCliente, nombreCliente, idOrden, servido, null, null, idMesa, costoProduccion, precio, categoria, descripcionEspaniol, descripcionIngles);
+		return new PedidoConexion(id, fecha, idProducto, nombreProducto, idRestaurante, nombreRestaurante, idCliente, nombreCliente, idOrden, servido, null, null, idMesa, costoProduccion, precio, categoria, descripcionEspaniol, descripcionIngles, origenPedido);
 	}
 	/**
 	 * Método que obtiene el ID del pedido.

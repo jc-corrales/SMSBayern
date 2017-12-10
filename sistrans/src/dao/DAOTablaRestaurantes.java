@@ -585,6 +585,7 @@ public class DAOTablaRestaurantes {
 				respuesta.add(new RentabilidadRestaurante(ingresos, gastos, rentabilidad, cantidadPedidos, restaurante, null, null, null));
 			}
 		}
+		System.out.println(sql);
 		return respuesta;
 	}
 	

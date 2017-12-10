@@ -2029,16 +2029,18 @@ public class RotondAndesTM {
 	{
 		Restaurante respuesta = null;
 		DAOTablaRestaurantes dao = new DAOTablaRestaurantes();
+		DAOTablaProductos daoProductos = new DAOTablaProductos();
 		try {
 			this.conn = darConexion();
 			dao.setConn(conn);
-
+			daoProductos.setConn(conn);
 			respuesta = dao.obtenerRestaurante(idRestaurante);
 			if(deseaProductos)
 			{
 				Integer integer = 1;
 				String idRest = idRestaurante + "";
-				respuesta.setProductos(darProductosPor(integer, idRest));
+				respuesta.setProductos(daoProductos.darProductosPor(integer, idRest));
+				
 			}
 		}catch (SQLException e) {
 			System.err.println("SQLException:" + e.getMessage());
@@ -2413,7 +2415,9 @@ public class RotondAndesTM {
 		}
 		return respuesta;
 	}
-	
+	//---------------------------------------------------	
+	//	Requerimiento: RFC14
+	//---------------------------------------------------
 	/**
 	 * Método que modela la transacción que retorna todos los videos de la base de datos.
 	 * @return ListaVideos - objeto que modela  un arreglo de videos. este arreglo contiene el resultado de la búsqueda
@@ -2436,7 +2440,9 @@ public class RotondAndesTM {
 		}
 		return remL;
 	}
-	
+	//---------------------------------------------------	
+	//	Requerimiento: RFC13
+	//---------------------------------------------------
 	public ListaProductos darTodosLosProductosUniversal()throws Exception
 	{
 		List<Producto> lista = darProductosSinCantidad();
@@ -2502,7 +2508,9 @@ public class RotondAndesTM {
 		}
 		return remL;
 	}
-	
+	//---------------------------------------------------	
+	//	Requerimiento: RFC13
+	//---------------------------------------------------
 	/**
 	 * Método que obtiene los Productos según parametros de búsqueda
 	 * @param filtro
@@ -2568,8 +2576,17 @@ public class RotondAndesTM {
 		System.out.println("PRE RETURN");
 		return true;
 	}
-	
-	
+	//---------------------------------------------------	
+	//	Requerimiento: RF19
+	//---------------------------------------------------
+	/**
+	 * Método que retira un Restaurante aquí, y en otras bases de Datos.
+	 * @param idAdmin Long, ID del Administrador Local.
+	 * @param passwordAdmin String, contraseña del Administrador Local.
+	 * @param idRestaurante Long, ID del Restaurante a retirar.
+	 * @return ListaConfirmaciones
+	 * @throws Exception
+	 */
 	public ListaConfirmaciones retirarRestauranteUniversal(Long idAdmin, String passwordAdmin, Long idRestaurante)throws Exception
 	{
 		List<Boolean> lista = new ArrayList<Boolean>();
@@ -2590,8 +2607,22 @@ public class RotondAndesTM {
 		}
 		return remL;
 	}
-	
-	
+	//---------------------------------------------------	
+	//	Requerimiento: RF18
+	//---------------------------------------------------
+	/**
+	 * Método que Registra un Pedido aquí, y en otras bases de Dato.
+	 * @param idPedido Long, ID del pedido a ordenar.
+	 * @param idRestaurante Long, ID del Restaurante al cual solicitar el Pedido.
+	 * @param idOrden Long, ID de la Orden a nombre de la cual se asigna el Pedido (funcionamiento local).
+	 * @param idCliente Long, ID del Cliente que realiza el pedido.
+	 * @param idProducto Long, ID del Producto a Ordenar.
+	 * @param grupo1 Boolean, Booleano que indica si este Pedido se está ordenando a la base de datos 1 (local en este caso).
+	 * @param grupo2 Boolean, Booleano que indica si este Pedido se está ordenando a la base de datos 2 (C - 03).
+	 * @param grupo3 Boolean, Booleano que indica si este Pedido se está ordenando a la base de datos 3 (B - 09).
+	 * @return
+	 * @throws Exception
+	 */
 	public ListaPedidosConexion registrarPedidoProductoUniversal(Long idPedido, Long idRestaurante, Long idOrden, Long idCliente, Long idProducto, Boolean grupo1, Boolean grupo2, Boolean grupo3)throws Exception
 	{
 		List<PedidoConexion> lista = new ArrayList<PedidoConexion>();
@@ -2601,11 +2632,21 @@ public class RotondAndesTM {
 			Cliente cliente = darCliente(idCliente);
 			if(grupo1)
 			{
-				remL.getPedidosConexion().add(registrarPedido(idCliente, idProducto, idRestaurante, idOrden).toPedidoConexion(null, idCliente, cliente.getNombre(), idOrden, cliente.getMesa()));
+				PedidoConexion pedidoLocal = registrarPedido(idCliente, idProducto, idRestaurante, idOrden).toPedidoConexion(null, idCliente, cliente.getNombre(), idOrden, cliente.getMesa(), PedidoConexion.BASEDEDATOS1);
+				pedidoLocal.setGrupo1(true);
+				remL.getPedidosConexion().add(pedidoLocal);
 			}
 			if(grupo2 || grupo3)
 			{
-				PedidoConexion pedidoRemoto = new PedidoConexion(idPedido, null, idProducto, null, idRestaurante, null, idCliente, cliente.getNombre(), idOrden, false, null, null, cliente.getMesa(), null, null, null, null, null);
+				PedidoConexion pedidoRemoto = new PedidoConexion(idPedido, null, idProducto, null, idRestaurante, null, idCliente, cliente.getNombre(), idOrden, false, null, null, cliente.getMesa(), null, null, null, null, null, PedidoConexion.BASEDEDATOS1);
+				if(grupo2)
+				{
+					pedidoRemoto.setGrupo2(true);
+				}
+				if(grupo3)
+				{
+					pedidoRemoto.setGrupo3(true);
+				}
 				ListaPedidosConexion resp = dtm.registrarPedidoRemoto(pedidoRemoto);
 				System.out.println(resp.getPedidosConexion().size());
 				remL.getPedidosConexion().addAll(resp.getPedidosConexion());
@@ -2617,4 +2658,184 @@ public class RotondAndesTM {
 		}
 		return remL;
 	}
+	
+	//---------------------------------------------------	
+	//	Requerimiento: RF9 Parte 1
+	//---------------------------------------------------
+	
+//	/**
+//	 * Método que crea una Orden a nombre de un Cliente o Cliente Frecuente.
+//	 * @param orden Orden, InformaciÃ³n de la Orden a crear.
+//	 * @return Orden, La Orden recientemente creada.
+//	 * @throws SQLException
+//	 * @throws Exception
+//	 */
+//	public Orden registrarNuevaOrdenRemoto(Orden orden)throws SQLException, Exception
+//	{
+//		DAOTablaPedidos dao = new DAOTablaPedidos();
+//		DAOTablaUsuarios daoUsuarios = new DAOTablaUsuarios();
+//		try {
+//			this.conn = darConexion();
+//			conn.setAutoCommit(false);
+//			dao.setConn(conn);
+//			daoUsuarios.setConn(conn);
+//			//TODO Verificar Cliente
+//			daoUsuarios.verficarUsuarioCliente(orden.getCliente().getId());
+//			orden = dao.registrarNuevaOrden(orden);
+//		}catch (SQLException e) {
+//			System.err.println("SQLException:" + e.getMessage());
+//			e.printStackTrace();
+//			throw e;
+//		} catch (Exception e) {
+//			System.err.println("GeneralException:" + e.getMessage());
+//			e.printStackTrace();
+//			throw e;
+//		}finally {
+//			try {
+//				conn.setAutoCommit(true);
+//				daoUsuarios.cerrarRecursos();
+//				dao.cerrarRecursos();
+//				if(this.conn!=null)
+//					this.conn.close();
+//			} catch (SQLException exception) {
+//				System.err.println("SQLException closing resources:" + exception.getMessage());
+//				exception.printStackTrace();
+//				throw exception;
+//			}
+//		}
+//		return orden;
+//	}
+	//---------------------------------------------------	
+	//	Requerimiento: RF18, Caso en el que se recibe un Pedido de otra base de Datos.
+	//---------------------------------------------------
+	/**
+	 * Método para registrar un Pedido a una Orden.
+	 * @param idCliente Long, ID del Cliente.
+	 * @param origen Integer, número de la base de datos de procedencia de la orden.
+	 * @param idProd Long, ID del Producto a Ordenar.
+	 * @param idRestProd Long, ID del Restaurante al cual ordenar el Producto.
+	 * @return PedidoConexion, toda la información del Pedido, apta para la comunicación.
+	 * @throws SQLException
+	 * @throws Exception
+	 */
+	public PedidoConexion registrarPedidoExterno(PedidoConexion pedido) throws SQLException, Exception {
+		PedidoConexion res = null;
+		DAOTablaPedidos dao = new DAOTablaPedidos();
+		DAOTablaClientes daoClientes = new DAOTablaClientes();
+		DAOTablaProductos daoProductos = new DAOTablaProductos();
+		DAOTablaRestaurantes daoRestaurantes = new DAOTablaRestaurantes();
+		try {
+			this.conn = darConexion();
+			dao.setConn(conn);
+			daoClientes.setConn(conn);
+			daoRestaurantes.setConn(conn);
+			if(!daoRestaurantes.darEstadoOperacionRestaurante(pedido.getIdRestaurante()))
+			{
+				throw new Exception("El Restaurante actualmente no está en servicio.");
+			}
+			//			conn.setAutoCommit(false);
+			if(daoClientes.darClienteExterno(pedido.getIdCliente(), pedido.getOrigenPedido()) == null)
+			{
+				daoClientes.crearClienteExterno(pedido.getIdCliente(), pedido.getNombreCliente(), pedido.getIdMesa(), pedido.getOrigenPedido());
+			}
+			Restaurante rest = daoRestaurantes.obtenerRestaurante(pedido.getIdRestaurante());
+			ProductoLocal producto = daoProductos.darProducto(pedido.getIdProducto(), pedido.getIdRestaurante());
+			PedidoConexion pedidoLocal = dao.registrarNuevoPedidoExterno(pedido.getIdCliente(), pedido.getOrigenPedido(), producto, pedido.getIdRestaurante());
+			pedidoLocal.setNombreCliente(pedido.getNombreCliente());
+			pedidoLocal.setIdMesa(pedido.getIdMesa());
+			pedidoLocal.setNombreRestaurante(rest.getName());
+			res = pedidoLocal;
+		}catch (SQLException e) {
+			System.err.println("SQLException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		} catch (Exception e) {
+			System.err.println("GeneralException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		}finally {
+			try {
+				//				conn.setAutoCommit(true);
+				daoClientes.cerrarRecursos();
+				daoRestaurantes.cerrarRecursos();
+				dao.cerrarRecursos();
+				if(this.conn!=null)
+					this.conn.close();
+			} catch (SQLException exception) {
+				System.err.println("SQLException closing resources:" + exception.getMessage());
+				exception.printStackTrace();
+				throw exception;
+			}
+		}
+		return res;
+	}
+	//---------------------------------------------------	
+	//	Requerimiento: RF9 Parte 2B
+	//---------------------------------------------------
+	/**
+	 * Método que Registra el Pedido de un MenÃº.
+	 * @param id Long, ID del Cliente.
+	 * @param idPedido Long, ID del pedido.
+	 * @param idMenu Long, ID del MenÃº a registar.
+	 * @param idRestMenu Long, ID del Restaurante dueÃ±o del menÃº.
+	 * @param idOrden Long, ID de la Orden a la cual se va a asignar el Pedido.
+	 * @return PedidoDeMenu
+	 * @throws SQLException
+	 * @throws Exception
+	 */
+//	public PedidoDeMenu registrarPedidoMenu(Long idCliente, Long idMenu, Long idRestMenu, Long idOrden) throws SQLException, Exception {
+//		PedidoDeMenu res = null;
+//		DAOTablaPedidos dao = new DAOTablaPedidos();
+//		DAOTablaUsuarios daoUsuarios = new DAOTablaUsuarios();
+//		DAOTablaRestaurantes daoRestaurantes = new DAOTablaRestaurantes();
+//		try {
+//			this.conn = darConexion();
+//			dao.setConn(conn);
+//			daoUsuarios.setConn(conn);
+//			daoRestaurantes.setConn(conn);
+//			if(!daoRestaurantes.darEstadoOperacionRestaurante(idRestMenu))
+//			{
+//				throw new Exception("El Restaurante actualmente no está en servicio.");
+//			}
+//			//			conn.setAutoCommit(false);
+//			if(dao.getEstatusOrden(idOrden))
+//			{
+//				throw new Exception("La Orden con ID: " + idOrden + " ya ha sido confirmada y no puede recibir nuevos Pedidos.");
+//			}
+//			Orden orden = dao.obtenerOrden(idOrden);
+//			if(!orden.getCliente().getId().equals(idCliente))
+//			{
+//				throw new Exception("La Orden con ID: " + idOrden + " no está a nombre de este cliente.");
+//			}
+//
+//			if(!daoUsuarios.verficarUsuarioCliente(idCliente))
+//			{
+//				throw new Exception ("Informacion de Cliente invalida.");
+//			}
+//			Menu menu = darMenu(idOrden, idRestMenu);
+//			res = dao.registrarPedidoMenu(menu, idOrden, idRestMenu);
+//			dao.updateCostoTotalOrden(idOrden, menu.getPrecio());
+//		}catch (SQLException e) {
+//			System.err.println("SQLException:" + e.getMessage());
+//			e.printStackTrace();
+//			throw e;
+//		} catch (Exception e) {
+//			System.err.println("GeneralException:" + e.getMessage());
+//			e.printStackTrace();
+//			throw e;
+//		}finally {
+//			try {
+//				//				conn.setAutoCommit(true);
+//				daoUsuarios.cerrarRecursos();
+//				dao.cerrarRecursos();
+//				if(this.conn!=null)
+//					this.conn.close();
+//			} catch (SQLException exception) {
+//				System.err.println("SQLException closing resources:" + exception.getMessage());
+//				exception.printStackTrace();
+//				throw exception;
+//			}
+//		}
+//		return res;
+//	}
 }

@@ -160,22 +160,40 @@ public class RotondAndesDistributed {
 		List<RentabilidadRestaurante> lista = tm.darRentabilidadRestaurantes(fecha1, fecha2, criterio, idProducto);
 		return new ListaRentabilidad(lista);
 	}
-	
+	/**
+	 * Método que obtiene las Rentabilidades de las otras bases de Datos.
+	 * @param parametrosUnidos
+	 * @return
+	 * @throws Exception
+	 */
 	public ListaRentabilidad getRemoteRentabilidades(String parametrosUnidos)throws Exception
 	{
 		return rentabilidadRestaurantesMQ.getRemoteRentabilidades(parametrosUnidos);
 	}
-	
+	/**
+	 * Método que obtiene todos los Productos locales.
+	 * @return
+	 * @throws Exception
+	 */
 	public ListaProductos getLocalTodosLosProductos()throws Exception
 	{
 		return new ListaProductos(tm.darProductosSinCantidad());
 	}
-	
+	/**
+	 * Método que obtiene todos los Productos de las otras bases de datos.
+	 * @return
+	 * @throws Exception
+	 */
 	public ListaProductos getRemoteTodosLosProductos()throws Exception
 	{
 		return todosLosProductosMQ.getRemoteProductos();
 	}
-	
+	/**
+	 * Método que obtiene Productos locales según parámetros de búsqueda.
+	 * @param parametrosUnidos
+	 * @return
+	 * @throws Exception
+	 */
 	public ListaProductos getLocalProductos(String parametrosUnidos)throws Exception
 	{
 		String [] parametros = parametrosUnidos.split(",");
@@ -184,12 +202,22 @@ public class RotondAndesDistributed {
 		List<Producto> lista = tm.darProductosPorSinCantidad(filtro, parametro);
 		return new ListaProductos(lista);
 	}
-	
+	/**
+	 * Método que obtiene Productos de las otras bases de datos según unos parámetros de consulta.
+	 * @param parametrosUnidos
+	 * @return
+	 * @throws Exception
+	 */
 	public ListaProductos getRemoteProductos(String parametrosUnidos)throws Exception
 	{
 		return productosMQ.getRemoteProductos(parametrosUnidos);
 	}
-	
+	/**
+	 * Método que retira un Restaurante Local.
+	 * @param parametrosUnidos
+	 * @return
+	 * @throws Exception
+	 */
 	public ListaConfirmaciones retirarLocalRestaurantes(String parametrosUnidos)throws Exception
 	{
 		Long idRestaurante = Long.parseLong(parametrosUnidos);
@@ -198,22 +226,36 @@ public class RotondAndesDistributed {
 		lista.add(resultado);
 		return new ListaConfirmaciones(lista);
 	}
-	
+	/**
+	 * Método que ordena retirar restaurantes con el ID dado.
+	 * @param parametrosUnidos
+	 * @return
+	 * @throws Exception
+	 */
 	public ListaConfirmaciones retirarRemoteRestaurantes(String parametrosUnidos)throws Exception
 	{
 		return retirarRestauranteMQ.retirarRemoteRestaurantes(parametrosUnidos);
 	}
-	
+	/**
+	 * Método que registra un Pedido Local.
+	 * @param pedido
+	 * @return
+	 * @throws Exception
+	 */
 	public ListaPedidosConexion registrarPedidoLocal(PedidoConexion pedido)throws Exception
 	{
-		Pedido temp = tm.registrarPedido(pedido.getIdCliente(), pedido.getIdProducto(), pedido.getIdRestaurante(), pedido.getIdOrden());
+		PedidoConexion temp = tm.registrarPedidoExterno(pedido);
 		List<PedidoConexion> pedidosConexion = new ArrayList<PedidoConexion>();
-		Restaurante restaurante = tm.darRestaurante(pedido.getIdRestaurante(), false);
-		pedidosConexion.add(temp.toPedidoConexion(restaurante.getName(), pedido.getIdCliente(), pedido.getNombreCliente(), pedido.getIdOrden(), pedido.getIdMesa()));
+		pedidosConexion.add(temp);
 		ListaPedidosConexion lista = new ListaPedidosConexion(pedidosConexion);
 		return lista;
 	}
-	
+	/**
+	 * Método que envía Pedidos a otras bases de Datos.
+	 * @param pedido
+	 * @return
+	 * @throws Exception
+	 */
 	public ListaPedidosConexion registrarPedidoRemoto(PedidoConexion pedido)throws Exception
 	{
 		return registrarPedidoMQ.sendPedidos(pedido);

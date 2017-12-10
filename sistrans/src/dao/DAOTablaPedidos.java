@@ -16,7 +16,9 @@ import vos.EstadisticasPedidos;
 import vos.Menu;
 import vos.Orden;
 import vos.Pedido;
+import vos.PedidoConexion;
 import vos.PedidoDeMenu;
+import vos.Producto;
 import vos.ProductoLocal;
 import vos.Restaurante;
 import vos.TipoComida;
@@ -603,4 +605,107 @@ public class DAOTablaPedidos {
 		return null;
 	}
 	
+	
+	/**
+	 * Método que confirma una Orden Externa, haciendo que ya no se le puedan agregar más pedidos. Aunque si se pueden cancelar.
+	 * @param idOrden Long, ID de la Orden Externa a confirmar.
+	 * @return Boolean, Booleano que indica si el procedimiento fue exitoso o no.	
+	 * @throws SQLException
+	 * @throws Exception
+	 */
+	public Boolean confirmarOrdenExterna(Long idOrden) throws SQLException, Exception{
+		String sql = "UPDATE ORDENESEXTERNAS SET ES_CONFIRMADA = 1 WHERE ID = " + idOrden;
+		PreparedStatement prepStmt = conn.prepareStatement(sql);
+		recursos.add(prepStmt);
+		prepStmt.executeQuery();
+		return true;
+	}
+	/**
+	 * Método que registra un nuevo pedido de un cliente externo.
+	 * @param idCliente Long, ID del Cliente.
+	 * @param origen Integer, Base de datos de Origen.
+	 * @param producto Long, ID del Producto a registrar.
+	 * @param idOrden Long, ID de la Orden Externa bajo la cual se asigna el Pedido.
+	 * @param idRestaurante Long, ID del Restaurante al cual se realiza el Pedido.
+	 * @return Pedido, nuevo Pedido creado.
+	 * @throws SQLException
+	 * @throws Exception
+	 */
+	public PedidoConexion registrarNuevoPedidoExterno(Long idCliente, Integer origen, ProductoLocal producto, Long idRestaurante)throws SQLException, Exception
+	{
+		System.out.println("Entro metodo registrarPedido");
+		Long id =  darIdPedidosMax();	
+		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+		LocalDateTime localDate = LocalDateTime.now();
+		Date fecha = Date.from(localDate.atZone(ZoneId.systemDefault()).toInstant());
+//		System.out.println("pre sql 1");
+		String sqlRestaurante = "SELECT * FROM PRODUCTO_RESTAURANTE WHERE ID_PROD = " + producto.getId() + " AND ID_REST = " + idRestaurante;
+//		System.out.println(sqlRestaurante);
+		PreparedStatement prepStmtRestaurante = conn.prepareStatement(sqlRestaurante);
+//		System.out.println(sqlRestaurante);
+		recursos.add(prepStmtRestaurante);
+//		System.out.println(sqlRestaurante);
+		ResultSet restaurante = prepStmtRestaurante.executeQuery();
+//		System.out.println("post sql 1");
+		Restaurante restauranteTemp = null;
+		if(restaurante.next())
+		{
+			restauranteTemp = new Restaurante(restaurante.getLong("ID_REST"), null, null, null, null, null, null);
+		}
+		if(restaurante.getInt("CANTIDAD") <= 0)
+		{
+			throw new Exception("No Hay Cantidad Suficiente.");
+		}
+		
+		String sql2 = "UPDATE PRODUCTO_RESTAURANTE SET CANTIDAD = (CANTIDAD - 1) WHERE ID_PROD = " + producto.getId() + " AND ID_REST = " + idRestaurante;
+//		System.out.println(sqlRestaurante);
+		PreparedStatement prepStmt2 = conn.prepareStatement(sql2);
+//		System.out.println(sqlRestaurante);
+		recursos.add(prepStmt2);
+//		System.out.println(sqlRestaurante);
+		prepStmt2.executeQuery();
+		Long idOrden = darSiguienteIdOrdenExterna();
+		String sqlOrden = "INSERT INTO ORDENESEXTERNAS(ID, ID_CLIENTE, COSTOTOTAL, FECHA, ES_CONFIRMADA, ORIGEN) VALUES( " + idOrden + ", " + idCliente + ", " + 0 + ", " + "TIMESTAMP '" + dtf.format(localDate) + "', 1, " + origen;
+		PreparedStatement prepStmtOrden = conn.prepareStatement(sqlOrden);
+		recursos.add(prepStmtOrden);
+		prepStmtOrden.executeQuery();
+		
+
+		System.out.println("Pre SQL");
+		String sql = "INSERT INTO PEDIDOSEXTERNOS (ID, ID_PRODUCTO, FECHA, SERVIDO, ID_ORDEN, ID_RESTAURANTE) VALUES (";
+		sql += id + ", ";
+		sql += producto.getId() + ", ";
+		sql += "TIMESTAMP '" + dtf.format(localDate) + "', 0, ";
+		sql += idOrden + ", ";
+		sql += restauranteTemp.getId() + ")";
+		System.out.println(sql);
+		PreparedStatement prepStmt = conn.prepareStatement(sql);
+		recursos.add(prepStmt);
+		prepStmt.executeQuery();
+		System.out.println("post ejecucción sql 2");
+		
+		return (new Pedido(id, producto, fecha, false, idRestaurante).toPedidoConexion(null, idCliente, null, idOrden, null, origen));
+	}
+	/**
+	 * Método que obtiene el siguiente ID de las órdenes Externas.
+	 * @return
+	 * @throws SQLException
+	 * @throws Exception
+	 */
+	public Long darSiguienteIdOrdenExterna()throws SQLException, Exception
+	{
+		String sql = "SELECT *\r\n" + 
+				"    FROM ORDENESEXTERNAS\r\n" + 
+				"    WHERE ROWNUM = 1\r\n" + 
+				"    ORDER BY ID DESC";
+		PreparedStatement prepStmt = conn.prepareStatement(sql);
+		recursos.add(prepStmt);
+		ResultSet rs = prepStmt.executeQuery();
+		Long respuesta = (long) 0;
+		if(rs.next())
+		{
+			respuesta = (rs.getLong("ID") + 1);
+		}
+		return respuesta;
+	}
 }

@@ -7,20 +7,37 @@ import org.codehaus.jackson.annotate.JsonProperty;
 public class PedidoConexion
 {
 	/**
+	 * Base de datos 1, grupo B - 10
+	 */
+	public final static Integer BASEDEDATOS1 = 1;
+	/**
+	 * Base de datos 2, grupo C - 03
+	 */
+	public final static Integer BASEDEDATOS2 = 2;
+	/**
+	 * Base de datos 3, grupo B - 09
+	 */
+	public final static Integer BASEDEDATOS3 = 3;
+	/**
 	 * Atributo que indica si este pedido va destinado al grupo 1:
 	 * B - 10
 	 */
 	private Boolean grupo1;
 	/**
 	 * Atributo que indica si este pedido va destinado al grupo 2:
-	 * B - 
+	 * C - 03
 	 */
 	private Boolean grupo2;
 	/**
 	 * Atributo que indica si este pedido va destinado al grupo 3:
-	 * C - 03
+	 * B - 09
 	 */
 	private Boolean grupo3;
+	/**
+	 * Atributo que contiene la base de datos de la que proviene el Pedido.
+	 */
+	@JsonProperty(value = "origenPedido")
+	private Integer origenPedido;
 	/**
 	 * Atributo que contiene el ID del Pedido.
 	 */
@@ -120,6 +137,8 @@ public class PedidoConexion
 	  * Método cosntructor de la clase.
 	 * Nota: Si hay un idProducto, no debería haber un idMenu.
 	 * Así como también: Si hay un idMenu, no debería haber un idProducto.
+	 * 
+	 * Atención: Los valors de grupo1, grupo2 y grupo3 se inicializan como falso por defecto! 
 	 * @param id Long, ID del Pedido.
 	 * @param fecha Date, fecha del Pedido.
 	 * @param idProducto Long, ID del Producto pedido.
@@ -137,7 +156,7 @@ public class PedidoConexion
 	 * @param categoria String, Categoría del Producto (si aplica).
 	 * @param descripcionEspaniol String, descripción en español del Producto o Menú.
 	 * @param descripcionIngles String, descrición en inglés del Producto o Menú.
-	 * @param cantidadDisponible Integer, cantidad de Producto o Menú disponible.
+	 * @param origenPedido String, nombre que indica el origen del pedido.
 	 */
 	public PedidoConexion(
 			@JsonProperty(value = "id")
@@ -175,7 +194,8 @@ public class PedidoConexion
 			@JsonProperty(value = "descripcionEspaniol")
 			String descripcionEspaniol,
 			@JsonProperty(value = "descripcionIngles")
-			String descripcionIngles
+			String descripcionIngles,
+			@JsonProperty(value = "origenPedido")Integer origenPedido
 //			@JsonProperty(value = "cantidadDisponible")
 //			Integer cantidadDisponible
 			)
@@ -199,9 +219,10 @@ public class PedidoConexion
 		this.descripcionEspaniol = descripcionEspaniol;
 		this.descripcionIngles = descripcionIngles;
 //		this.setCantidadDisponible(cantidadDisponible);
-		setGrupo1(false);
-		setGrupo2(false);
-		setGrupo3(false);
+		this.origenPedido = origenPedido;
+		this.grupo1 = false;
+		this.grupo2 = false;
+		this.grupo3 = false;
 	}
 	
 	public Long getId() {
@@ -378,5 +399,13 @@ public class PedidoConexion
 
 	public void setGrupo3(Boolean grupo3) {
 		this.grupo3 = grupo3;
+	}
+
+	public Integer getOrigenPedido() {
+		return origenPedido;
+	}
+
+	public void setOrigenPedido(Integer origenPedido) {
+		this.origenPedido = origenPedido;
 	}
 }
