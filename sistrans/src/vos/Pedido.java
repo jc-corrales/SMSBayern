@@ -60,6 +60,40 @@ public class Pedido {
 		this.idRestaurante = idRestaurante;
 	}
 	/**
+	 * Método que contruye un Pedido a partir de la información del Pedido conexión.
+	 * @param pedidoConexion PedidoConexion, información del mensaje.
+	 */
+	public Pedido(PedidoConexion pedidoConexion)
+	{
+		this.id = pedidoConexion.getId();
+		this.producto = new ProductoLocal(pedidoConexion.getIdProducto(), pedidoConexion.getNombreProducto(), pedidoConexion.getDescripcionEspaniol(), pedidoConexion.getDescripcionIngles(), pedidoConexion.getCostoProduccion(), null, pedidoConexion.getPrecio(), null, pedidoConexion.getCategoria(), null, null);
+		this.fecha = pedidoConexion.getFecha();
+		this.servido = pedidoConexion.getServido();
+		this.idRestaurante = pedidoConexion.getIdRestaurante();
+	}
+	/**
+	 * Método que convierte un Pedido local a un PedidoConexión.
+	 * Se requiere de información adicional.
+	 * @param nombreRestaurante String, nombre del Restaurante.
+	 * @param idCliente Long, ID del Cliente.
+	 * @param nombreCliente String, nombre del Cliente.
+	 * @param idOrden Long, ID de la Orden.
+	 * @param idMesa Long, ID de la Mesa.
+	 * @return PedidoConexion, información apta para enviar como mensaje.
+	 */
+	public PedidoConexion toPedidoConexion(String nombreRestaurante, Long idCliente, String nombreCliente, Long idOrden, Long idMesa)
+	{
+		Long idProducto = producto.getId();
+		String nombreProducto = producto.getNombre();
+		String descripcionEspaniol = producto.getDescripcionEspaniol();
+		String descripcionIngles = producto.getDescripcionIngles();
+		String categoria = producto.getCategoria();
+		Double costoProduccion = producto.getCostoDeProduccion();
+		Double precio = producto.getPrecio();
+		Integer cantidadDisponible = producto.getCantidad();
+		return new PedidoConexion(id, fecha, idProducto, nombreProducto, idRestaurante, nombreRestaurante, idCliente, nombreCliente, idOrden, servido, null, null, idMesa, costoProduccion, precio, categoria, descripcionEspaniol, descripcionIngles);
+	}
+	/**
 	 * Método que obtiene el ID del pedido.
 	 * @return
 	 */

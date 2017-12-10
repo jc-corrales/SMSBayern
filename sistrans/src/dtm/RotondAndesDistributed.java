@@ -26,15 +26,20 @@ import com.rabbitmq.jms.admin.RMQDestination;
 
 import jms.NonReplyException;
 import jms.ProductosMDB;
+import jms.RegistrarPedidoMDB;
 import jms.RentabilidadRestaurantesMDB;
 import jms.RetirarRestauranteMDB;
 import jms.TodosLosProductosMDB;
 import tm.RotondAndesTM;
 import vos.ListaConfirmaciones;
+import vos.ListaPedidosConexion;
 import vos.ListaProductos;
 import vos.ListaRentabilidad;
+import vos.Pedido;
+import vos.PedidoConexion;
 import vos.Producto;
 import vos.RentabilidadRestaurante;
+import vos.Restaurante;
 
 public class RotondAndesDistributed {
 	private final static String QUEUE_NAME = "java:global/RMQAppQueue";
@@ -55,6 +60,9 @@ public class RotondAndesDistributed {
 	private ProductosMDB productosMQ;
 	
 	private RetirarRestauranteMDB retirarRestauranteMQ;
+	
+	private RegistrarPedidoMDB registrarPedidoMQ;
+	
 	private static String path;
 	
 	private RotondAndesDistributed() throws NamingException, JMSException
@@ -65,11 +73,12 @@ public class RotondAndesDistributed {
 		todosLosProductosMQ = new TodosLosProductosMDB(factory, ctx);
 		productosMQ = new ProductosMDB(factory, ctx);
 		retirarRestauranteMQ = new RetirarRestauranteMDB(factory, ctx);
+		registrarPedidoMQ = new RegistrarPedidoMDB(factory, ctx);
 		todosLosProductosMQ.start();
 		rentabilidadRestaurantesMQ.start();
 		productosMQ.start();
 		retirarRestauranteMQ.start();;
-		
+		registrarPedidoMQ.start();
 	}
 	
 	public void stop() throws JMSException
@@ -77,7 +86,8 @@ public class RotondAndesDistributed {
 		productosMQ.close();
 		todosLosProductosMQ.close();
 		rentabilidadRestaurantesMQ.close();
-		rentabilidadRestaurantesMQ.close();
+		retirarRestauranteMQ.close();
+		registrarPedidoMQ.close();
 	}
 	
 	/**
@@ -192,5 +202,20 @@ public class RotondAndesDistributed {
 	public ListaConfirmaciones retirarRemoteRestaurantes(String parametrosUnidos)throws Exception
 	{
 		return retirarRestauranteMQ.retirarRemoteRestaurantes(parametrosUnidos);
+	}
+	
+	public ListaPedidosConexion registrarPedidoLocal(PedidoConexion pedido)throws Exception
+	{
+		Pedido temp = tm.registrarPedido(pedido.getIdCliente(), pedido.getIdProducto(), pedido.getIdRestaurante(), pedido.getIdOrden());
+		List<PedidoConexion> pedidosConexion = new ArrayList<PedidoConexion>();
+		Restaurante restaurante = tm.darRestaurante(pedido.getIdRestaurante(), false);
+		pedidosConexion.add(temp.toPedidoConexion(restaurante.getName(), pedido.getIdCliente(), pedido.getNombreCliente(), pedido.getIdOrden(), pedido.getIdMesa()));
+		ListaPedidosConexion lista = new ListaPedidosConexion(pedidosConexion);
+		return lista;
+	}
+	
+	public ListaPedidosConexion registrarPedidoRemoto(PedidoConexion pedido)throws Exception
+	{
+		return registrarPedidoMQ.sendPedidos(pedido);
 	}
 }

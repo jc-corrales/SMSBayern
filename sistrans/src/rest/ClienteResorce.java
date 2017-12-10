@@ -19,6 +19,7 @@ import rest.RotondAndesResource.RequestBodyUnConsumo;
 import tm.RotondAndesTM;
 import vos.Cliente;
 import vos.ConsumoCliente;
+import vos.ListaPedidosConexion;
 import vos.Orden;
 import vos.Pedido;
 import vos.PedidoDeMenu;
@@ -42,6 +43,10 @@ public class ClienteResorce {
 	    @XmlElement public String ordenDeBusqueda;
 	    @XmlElement public String fecha1;
 	    @XmlElement public String fecha2;
+	    @XmlElement public Long idPedido;
+	    @XmlElement public Boolean grupo1;
+	    @XmlElement public Boolean grupo2;
+	    @XmlElement public Boolean grupo3;
 	}
 	
 	
@@ -69,9 +74,8 @@ public class ClienteResorce {
 	public Response agregarPedidoProducto(@PathParam("id") Long id, @PathParam("idOrden")Long idOrden, RequestBody request) {
 		RotondAndesTM tm = new RotondAndesTM(getPath());
 		try {
-			Pedido pedido = tm.registrarPedido(id, request.idProd, request.idRestaurante, idOrden);
-			 
-			return Response.status( 200 ).entity( pedido ).build();	
+			ListaPedidosConexion pedidos = tm.registrarPedidoProductoUniversal(request.idPedido, request.idRestaurante, idOrden, id, request.idProd, request.grupo1, request.grupo2, request.grupo3);
+			return Response.status( 200 ).entity( pedidos ).build();	
 		}catch( Exception e )
 		{
 			return Response.status( 500 ).entity( doErrorMessage( e ) ).build( );
@@ -283,6 +287,4 @@ public class ClienteResorce {
 				return Response.status( 500 ).entity( doErrorMessage( e ) ).build( );
 			}
 		}
-
-
 }

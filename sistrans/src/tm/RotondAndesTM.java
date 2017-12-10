@@ -40,11 +40,13 @@ import vos.Ingrediente;
 
 import vos.IngredientesSimilares;
 import vos.ListaConfirmaciones;
+import vos.ListaPedidosConexion;
 import vos.ListaProductos;
 import vos.ListaRentabilidad;
 import vos.Menu;
 import vos.Orden;
 import vos.Pedido;
+import vos.PedidoConexion;
 import vos.PedidoDeMenu;
 import vos.ProductoLocal;
 import vos.Producto;
@@ -2581,6 +2583,33 @@ public class RotondAndesTM {
 			ListaConfirmaciones resp = dtm.retirarRemoteRestaurantes(parametrosUnidos);
 			System.out.println(resp.getConfirmaciones().size());
 			remL.getConfirmaciones().addAll(resp.getConfirmaciones());
+		}
+		catch(NonReplyException e)
+		{
+			
+		}
+		return remL;
+	}
+	
+	
+	public ListaPedidosConexion registrarPedidoProductoUniversal(Long idPedido, Long idRestaurante, Long idOrden, Long idCliente, Long idProducto, Boolean grupo1, Boolean grupo2, Boolean grupo3)throws Exception
+	{
+		List<PedidoConexion> lista = new ArrayList<PedidoConexion>();
+		ListaPedidosConexion remL = new ListaPedidosConexion(lista);
+		try
+		{
+			Cliente cliente = darCliente(idCliente);
+			if(grupo1)
+			{
+				remL.getPedidosConexion().add(registrarPedido(idCliente, idProducto, idRestaurante, idOrden).toPedidoConexion(null, idCliente, cliente.getNombre(), idOrden, cliente.getMesa()));
+			}
+			if(grupo2 || grupo3)
+			{
+				PedidoConexion pedidoRemoto = new PedidoConexion(idPedido, null, idProducto, null, idRestaurante, null, idCliente, cliente.getNombre(), idOrden, false, null, null, cliente.getMesa(), null, null, null, null, null);
+				ListaPedidosConexion resp = dtm.registrarPedidoRemoto(pedidoRemoto);
+				System.out.println(resp.getPedidosConexion().size());
+				remL.getPedidosConexion().addAll(resp.getPedidosConexion());
+			}
 		}
 		catch(NonReplyException e)
 		{

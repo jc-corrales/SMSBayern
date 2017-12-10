@@ -408,7 +408,7 @@ public class DAOTablaPedidos {
 		ResultSet rs = prepStmt.executeQuery();
 		if(rs.next())
 		{
-			if(!rs.getBoolean("ES_CONFIRMADA"))
+			if(rs.getBoolean("ES_CONFIRMADA"))
 			{
 				respuesta = true;
 			}
