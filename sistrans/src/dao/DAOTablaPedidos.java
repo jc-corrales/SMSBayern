@@ -708,4 +708,21 @@ public class DAOTablaPedidos {
 		}
 		return respuesta;
 	}
+	
+	/**
+	 * Método para actualizar el costo de una Orden Externa según los cambios que se presenten.
+	 * Nuevo Pedido.
+	 * Cancelación de Pedido.
+	 * @param idOrden Long, ID de la Orden.
+	 * @param valor Double, valor a Modificar la orden, puede ser negativo.
+	 * @throws SQLException
+	 * @throws Exception
+	 */
+	public void updateCostoTotalOrdenExterna(Long idOrden, Double valor)throws SQLException, Exception
+	{		
+		String sql2 = "UPDATE ORDENESEXTERNAS SET COSTOTOTAL = COSTOTOTAL + " + valor + " WHERE ID = " + idOrden;
+		PreparedStatement prepStmt2 = conn.prepareStatement(sql2);
+		recursos.add(prepStmt2);
+		prepStmt2.executeQuery();
+	}
 }

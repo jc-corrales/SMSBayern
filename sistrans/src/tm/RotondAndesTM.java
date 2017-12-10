@@ -2744,6 +2744,7 @@ public class RotondAndesTM {
 			pedidoLocal.setNombreCliente(pedido.getNombreCliente());
 			pedidoLocal.setIdMesa(pedido.getIdMesa());
 			pedidoLocal.setNombreRestaurante(rest.getName());
+			dao.updateCostoTotalOrdenExterna(pedidoLocal.getIdOrden(), pedidoLocal.getPrecio());
 			res = pedidoLocal;
 		}catch (SQLException e) {
 			System.err.println("SQLException:" + e.getMessage());
