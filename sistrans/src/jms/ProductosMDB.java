@@ -61,7 +61,13 @@ public class ProductosMDB implements MessageListener, ExceptionListener
 	private Topic localTopic;
 	
 	private List<Producto> answer = new ArrayList<Producto>();
-	
+	/**
+	 * Método constructor de la clase.
+	 * @param factory
+	 * @param ctx
+	 * @throws JMSException
+	 * @throws NamingException
+	 */
 	public ProductosMDB(TopicConnectionFactory factory, InitialContext ctx) throws JMSException, NamingException 
 	{	
 		topicConnection = factory.createTopicConnection();
@@ -85,7 +91,18 @@ public class ProductosMDB implements MessageListener, ExceptionListener
 		topicSession.close();
 		topicConnection.close();
 	}
-	
+	/**
+	 * Método que obtiene los productos remotos según unos parámetros.
+	 * @param parametros String, "(filtro),(parametro)", el Parámetro debe ser pertinente a la consulta, no se restringe a números.
+	 * @return
+	 * @throws JsonGenerationException
+	 * @throws JsonMappingException
+	 * @throws JMSException
+	 * @throws IOException
+	 * @throws NonReplyException
+	 * @throws InterruptedException
+	 * @throws NoSuchAlgorithmException
+	 */
 	public ListaProductos getRemoteProductos(String parametros) throws JsonGenerationException, JsonMappingException, JMSException, IOException, NonReplyException, InterruptedException, NoSuchAlgorithmException
 	{
 		answer.clear();

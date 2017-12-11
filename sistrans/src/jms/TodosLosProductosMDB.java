@@ -60,7 +60,13 @@ public class TodosLosProductosMDB implements MessageListener, ExceptionListener{
 	private Topic localTopic;
 	
 	private List<Producto> answer = new ArrayList<Producto>();
-	
+	/**
+	 * Método constructor de la clase.
+	 * @param factory
+	 * @param ctx
+	 * @throws JMSException
+	 * @throws NamingException
+	 */
 	public TodosLosProductosMDB(TopicConnectionFactory factory, InitialContext ctx) throws JMSException, NamingException 
 	{	
 		topicConnection = factory.createTopicConnection();
@@ -84,7 +90,17 @@ public class TodosLosProductosMDB implements MessageListener, ExceptionListener{
 		topicSession.close();
 		topicConnection.close();
 	}
-	
+	/**
+	 * Método que obtiene todos los productos remotos.
+	 * @return
+	 * @throws JsonGenerationException
+	 * @throws JsonMappingException
+	 * @throws JMSException
+	 * @throws IOException
+	 * @throws NonReplyException
+	 * @throws InterruptedException
+	 * @throws NoSuchAlgorithmException
+	 */
 	public ListaProductos getRemoteProductos() throws JsonGenerationException, JsonMappingException, JMSException, IOException, NonReplyException, InterruptedException, NoSuchAlgorithmException
 	{
 		answer.clear();

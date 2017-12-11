@@ -60,7 +60,13 @@ public class RetirarRestauranteMDB implements MessageListener, ExceptionListener
 	private Topic localTopic;
 	
 	private List<Boolean> answer = new ArrayList<Boolean>();
-	
+	/**
+	 * Constructor de la clase.
+	 * @param factory
+	 * @param ctx
+	 * @throws JMSException
+	 * @throws NamingException
+	 */
 	public RetirarRestauranteMDB(TopicConnectionFactory factory, InitialContext ctx) throws JMSException, NamingException 
 	{	
 		topicConnection = factory.createTopicConnection();
@@ -84,7 +90,18 @@ public class RetirarRestauranteMDB implements MessageListener, ExceptionListener
 		topicSession.close();
 		topicConnection.close();
 	}
-	
+	/**
+	 * Método para retirar los Restaurantes remotos.
+	 * @param parametrosUnidos String, un Long con el ID del Restaurante a retirar Ejemplo: "52".
+	 * @return
+	 * @throws JsonGenerationException
+	 * @throws JsonMappingException
+	 * @throws JMSException
+	 * @throws IOException
+	 * @throws NonReplyException
+	 * @throws InterruptedException
+	 * @throws NoSuchAlgorithmException
+	 */
 	public ListaConfirmaciones retirarRemoteRestaurantes(String parametrosUnidos) throws JsonGenerationException, JsonMappingException, JMSException, IOException, NonReplyException, InterruptedException, NoSuchAlgorithmException
 	{
 		answer.clear();

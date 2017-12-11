@@ -2790,11 +2790,13 @@ public class RotondAndesTM {
 		DAOTablaPedidos dao = new DAOTablaPedidos();
 		DAOTablaRestaurantes daoRestaurantes = new DAOTablaRestaurantes();
 		DAOTablaClientes daoClientes = new DAOTablaClientes();
+		DAOTablaProductos daoProductos = new DAOTablaProductos();
 		try {
 			this.conn = darConexion();
 			dao.setConn(conn);
 			daoRestaurantes.setConn(conn);
 			daoClientes.setConn(conn);
+			daoProductos.setConn(conn);
 			if(!daoRestaurantes.darEstadoOperacionRestaurante(pedido.getIdRestaurante()))
 			{
 				throw new Exception("El Restaurante actualmente no está en servicio.");
@@ -2804,7 +2806,7 @@ public class RotondAndesTM {
 				daoClientes.crearClienteExterno(pedido.getIdCliente(), pedido.getNombreCliente(), pedido.getIdMesa(), pedido.getOrigenPedido());
 			}
 			//			conn.setAutoCommit(false);
-			Menu menu = darMenu(pedido.getIdMenu(), pedido.getIdRestaurante());
+			Menu menu = daoProductos.darMenu(pedido.getIdMenu(), pedido.getIdRestaurante());
 			lista = dao.registrarNuevoPedidoMenuExterno(pedido.getIdCliente(), pedido.getOrigenPedido(), menu, pedido.getIdRestaurante());
 			Restaurante restauranteTemp = daoRestaurantes.obtenerRestaurante(pedido.getIdRestaurante());
 			for(int i = 0; i < lista.size(); i++)
@@ -2825,6 +2827,7 @@ public class RotondAndesTM {
 			try {
 				//				conn.setAutoCommit(true);
 				dao.cerrarRecursos();
+				daoProductos.cerrarRecursos();
 				daoClientes.cerrarRecursos();
 				daoRestaurantes.cerrarRecursos();
 				if(this.conn!=null)

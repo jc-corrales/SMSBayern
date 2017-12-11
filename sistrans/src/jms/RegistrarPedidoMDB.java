@@ -61,7 +61,13 @@ public class RegistrarPedidoMDB implements MessageListener, ExceptionListener
 	private Topic localTopic;
 	
 	private List<PedidoConexion> answer = new ArrayList<PedidoConexion>();
-	
+	/**
+	 * Método constructor de la CLase.
+	 * @param factory
+	 * @param ctx
+	 * @throws JMSException
+	 * @throws NamingException
+	 */
 	public RegistrarPedidoMDB(TopicConnectionFactory factory, InitialContext ctx) throws JMSException, NamingException 
 	{	
 		topicConnection = factory.createTopicConnection();
@@ -85,7 +91,18 @@ public class RegistrarPedidoMDB implements MessageListener, ExceptionListener
 		topicSession.close();
 		topicConnection.close();
 	}
-	
+	/**
+	 * Método que envía pedidos a las otras RotondAndes.
+	 * @param pedido
+	 * @return
+	 * @throws JsonGenerationException
+	 * @throws JsonMappingException
+	 * @throws JMSException
+	 * @throws IOException
+	 * @throws NonReplyException
+	 * @throws InterruptedException
+	 * @throws NoSuchAlgorithmException
+	 */
 	public ListaPedidosConexion sendPedidos(PedidoConexion pedido) throws JsonGenerationException, JsonMappingException, JMSException, IOException, NonReplyException, InterruptedException, NoSuchAlgorithmException
 	{
 		answer.clear();
@@ -175,7 +192,6 @@ public class RegistrarPedidoMDB implements MessageListener, ExceptionListener
 						Topic t = new RMQDestination("", "videos.test", ex.getRoutingKey(), "", false);
 						sendMessage(payload, REQUEST_ANSWER, t, id);
 					}
-					
 				}
 				else if(ex.getStatus().equals(REQUEST_ANSWER))
 				{
