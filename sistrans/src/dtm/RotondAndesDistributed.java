@@ -198,7 +198,7 @@ public class RotondAndesDistributed {
 	{
 		String [] parametros = parametrosUnidos.split(",");
 		Integer filtro = Integer.parseInt(parametros[0]);
-		String parametro = parametros[1];			
+		String parametro = parametros[1];	
 		List<Producto> lista = tm.darProductosPorSinCantidad(filtro, parametro);
 		return new ListaProductos(lista);
 	}
@@ -244,11 +244,31 @@ public class RotondAndesDistributed {
 	 */
 	public ListaPedidosConexion registrarPedidoLocal(PedidoConexion pedido)throws Exception
 	{
-		PedidoConexion temp = tm.registrarPedidoExterno(pedido);
-		List<PedidoConexion> pedidosConexion = new ArrayList<PedidoConexion>();
-		pedidosConexion.add(temp);
-		ListaPedidosConexion lista = new ListaPedidosConexion(pedidosConexion);
-		return lista;
+		List<PedidoConexion> lista = new ArrayList<PedidoConexion>();
+		ListaPedidosConexion temp = new ListaPedidosConexion(lista);
+		if(pedido.getIdProducto() != null)
+		{
+			try
+			{
+				temp.getPedidosConexion().add(tm.registrarPedidoExterno(pedido));
+			}
+			catch(Exception e)
+			{
+				System.out.println("Error ordenando el Producto Remoto.");
+			}
+		}
+		else if(pedido.getIdMenu() != null)
+		{
+			try
+			{
+				temp.getPedidosConexion().addAll(tm.registrarPedidoMenuExterno(pedido));
+			}
+			catch(Exception e)
+			{
+				System.out.println("Error ordenando el Menú Remoto.");
+			}
+		}
+		return temp;
 	}
 	/**
 	 * Método que envía Pedidos a otras bases de Datos.

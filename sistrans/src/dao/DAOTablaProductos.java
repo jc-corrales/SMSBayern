@@ -182,7 +182,7 @@ public class DAOTablaProductos {
 			break;
 			
 		case RANGO_PRECIOS:
-			String[] precios = parametro.split(",");
+			String[] precios = parametro.split(";");
 			sentencia += "AND PRECIO >= " + Integer.parseInt(precios[0]) + " AND  PRECIO <= " + Integer.parseInt(precios[1]);
 		default:
 			break;
@@ -232,7 +232,7 @@ public class DAOTablaProductos {
 			break;
 			
 		case RANGO_PRECIOS:
-			String[] precios = parametro.split(",");
+			String[] precios = parametro.split("-");
 			sentencia += "AND PRECIO >= " + Integer.parseInt(precios[0]) + " AND  PRECIO <= " + Integer.parseInt(precios[1]);
 		default:
 			break;

@@ -18,7 +18,6 @@ import vos.Orden;
 import vos.Pedido;
 import vos.PedidoConexion;
 import vos.PedidoDeMenu;
-import vos.Producto;
 import vos.ProductoLocal;
 import vos.Restaurante;
 import vos.TipoComida;
@@ -724,5 +723,57 @@ public class DAOTablaPedidos {
 		PreparedStatement prepStmt2 = conn.prepareStatement(sql2);
 		recursos.add(prepStmt2);
 		prepStmt2.executeQuery();
+	}
+	
+	/**
+	 * Método que registra el Pedido de un Menú
+	 * @param id Long, ID del Pedido de Menú a registrar.
+	 * @param menu Menu, Información del Menú a registrar.
+	 * @param idOrden Long, ID de la Orden bajo la cual va a estar asignado este Pedido.
+	 * @return PedidoDeMenu, Información del Pedido de Menu efectuado.
+	 * @throws SQLException
+	 * @throws Exception
+	 */
+	public List<PedidoConexion> registrarNuevoPedidoMenuExterno(Long idCliente, Integer origen, Menu menu, Long idRestaurante) throws SQLException, Exception
+	{
+		List<PedidoConexion> lista = new ArrayList<PedidoConexion>();
+		Long idOrden =  darIdPedidosMax();	
+		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+		LocalDateTime localDate = LocalDateTime.now();
+		Date fecha = Date.from(localDate.atZone(ZoneId.systemDefault()).toInstant());
+		Double costoTotal = menu.getPrecio();
+		String sqlOrden = "INSERT INTO ORDENESEXTERNAS(ID, ID_CLIENTE, COSTOTOTAL, FECHA, ES_CONFIRMADA, ORIGEN) VALUES( " + idOrden + ", " + idCliente + ", " + costoTotal + ", " + "TIMESTAMP '" + dtf.format(localDate) + "', 1, " + origen;
+		PreparedStatement prepStmtOrden = conn.prepareStatement(sqlOrden);
+		recursos.add(prepStmtOrden);
+		prepStmtOrden.executeQuery();
+		
+		PedidoConexion pedidoMenu = new PedidoConexion(idOrden, fecha, null, null, idRestaurante, null, idCliente, null, idOrden, false, menu.getId(), menu.getName(), null, menu.getCostoProduccion(), menu.getPrecio(), null, menu.getDescripcion(), menu.getdescription(), origen);
+		lista.add(pedidoMenu);
+		String sql = "INSERT INTO MENUS_PEDIDOS_EXTERNOS (ID, IDMENU, IDORDEN) VALUES (" + darIdPedidosMenuMax() + ", " + menu.getId() + ", " + idOrden + ")";
+		PreparedStatement prepStmt= conn.prepareStatement(sql);
+		System.out.println("SQL: " +sql);
+		recursos.add(prepStmt);
+		prepStmt.executeQuery();
+		if(menu.getAcompaniamiento() != null)
+		{
+			lista.add(registrarNuevoPedidoExterno(idCliente, origen, menu.getAcompaniamiento(), idRestaurante));
+		}
+		if(menu.getEntrada() != null)
+		{
+			lista.add(registrarNuevoPedidoExterno(idCliente, origen, menu.getEntrada(), idRestaurante));
+		}
+		if(menu.getPlatoFuerte() != null)
+		{
+			lista.add(registrarNuevoPedidoExterno(idCliente, origen, menu.getPlatoFuerte(), idRestaurante));
+		}
+		if(menu.getPostre() != null)
+		{
+			lista.add(registrarNuevoPedidoExterno(idCliente, origen, menu.getPostre(), idRestaurante));
+		}
+		if(menu.getBebida() != null)
+		{
+			lista.add(registrarNuevoPedidoExterno(idCliente, origen, menu.getBebida(), idRestaurante));
+		}
+		return lista;
 	}
 }
