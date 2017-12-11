@@ -1,0 +1,290 @@
+{
+	"variables": [],
+	"info": {
+		"name": "RFC10. CONSULTAR CONSUMO EN ROTONDANDES – RFC9-v2",
+		"_postman_id": "3acf4512-acd2-d2c6-b4ae-fabc03396eb9",
+		"description": "Se quiere conocer la información de los usuarios QUE NO consumieron al menos un producto de un determinado\r\nrestaurante en un rango de fechas. En la clasificación debe ofrecerse la posibilidad de agrupamiento y ordenamiento de\r\nlas respuestas según los intereses del usuario que consulta como, por ejemplo, por los datos del cliente, por producto y\r\npor tipo de producto. Esta operación es realizada por los usuarios restaurante y por el gerente general de RotondAndes.\r\nNOTA: Respetando la privacidad de los clientes, cuando un cliente restaurante hace esta consulta obtiene la información\r\nde su propia actividad, mientras que el administrador obtiene toda la información de cualquiera de los clientes. Ver RNF1.\r\n",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Consultar todos los Clientes (Admin)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "http://localhost:8081/RotondAndes/rest/admin/noConsumoMinimoClientes",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"idRestaurante\" : 1, \"criterioDeBusqueda\" : 0, \"ordenDeBusqueda\" : \"ID_CLIENTE\", \"fecha1\" : \"10/10/17\", \"fecha2\" : \"20/12/17\"}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Consultar todos los Clientes por Categoría (Admin)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "http://localhost:8081/RotondAndes/rest/admin/noConsumoMinimoClientes",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"idRestaurante\" : 1, \"criterioDeBusqueda\" : 1, \"ordenDeBusqueda\" : \"ID_CLIENTE\", \"fecha1\" : \"10/10/17\", \"fecha2\" : \"20/12/17\"}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Consultar todos los Clientes por Producto (Admin)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "http://localhost:8081/RotondAndes/rest/admin/noConsumoMinimoClientes",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"idRestaurante\" : 1, \"criterioDeBusqueda\" : 2, \"ordenDeBusqueda\" : \"ID_CLIENTE\", \"fecha1\" : \"10/10/17\", \"fecha2\" : \"20/12/17\"}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Consultar cliente 102 (Admin)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "http://localhost:8081/RotondAndes/rest/admin/noConsumoMinimoClientes/102",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"idRestaurante\" : 1, \"criterioDeBusqueda\" : 0, \"ordenDeBusqueda\" : \"ID_CLIENTE\", \"fecha1\" : \"10/10/17\", \"fecha2\" : \"20/12/17\"}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Consultar cliente 102 por Categoría (Admin)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "http://localhost:8081/RotondAndes/rest/admin/noConsumoMinimoClientes/102",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"idRestaurante\" : 1, \"criterioDeBusqueda\" : 1, \"ordenDeBusqueda\" : \"ID_CLIENTE\", \"fecha1\" : \"10/10/17\", \"fecha2\" : \"20/12/17\"}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Consultar cliente 102 por Producto (Admin)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "http://localhost:8081/RotondAndes/rest/admin/noConsumoMinimoClientes/102",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"idRestaurante\" : 1, \"criterioDeBusqueda\" : 2, \"ordenDeBusqueda\" : \"ID_CLIENTE\", \"fecha1\" : \"10/10/17\", \"fecha2\" : \"20/12/17\"}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Consultar cliente 102 por Categoria copy",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "http://localhost:8081/RotondAndes/rest/clientes/102/noConsumoMinimoClientes",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"idRestaurante\" : 1, \"criterioDeBusqueda\" : 0, \"ordenDeBusqueda\" : \"ID_CLIENTE\", \"fecha1\" : \"10/10/17\", \"fecha2\" : \"20/12/17\"}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Consultar cliente 103 por Categoria",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "http://localhost:8081/RotondAndes/rest/admin/noConsumoMinimoClientes/103",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"idRestaurante\" : 1, \"criterioDeBusqueda\" : 1, \"ordenDeBusqueda\" : \"ID_CLIENTE\", \"fecha1\" : \"10/10/17\", \"fecha2\" : \"20/12/17\"}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Consultar cliente 104 por Producto",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "http://localhost:8081/RotondAndes/rest/clientes/104/noConsumoMinimoClientes",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"idRestaurante\" : 1, \"criterioDeBusqueda\" : 2, \"ordenDeBusqueda\" : \"ID_CLIENTE\", \"fecha1\" : \"10/10/17\", \"fecha2\" : \"20/12/17\"}"
+				},
+				"description": ""
+			},
+			"response": []
+		}
+	]
+}
